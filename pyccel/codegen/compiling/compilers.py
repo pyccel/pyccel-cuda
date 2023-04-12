@@ -264,7 +264,7 @@ class Compiler:
         libs = self._get_libs(compile_obj.libs, accelerators)
         libs_flags = [s if s.startswith('-l') else '-l{}'.format(s) for s in libs]
         libdirs = self._get_libdirs(compile_obj.libdirs, accelerators)
-        libdirs_flags = [f'-L{l}' for l in libdirs]
+        libdirs_flags = self._insert_prefix_to_list(libdirs, '-L')
 
         exec_cmd = self._get_exec(accelerators)
 
@@ -334,11 +334,9 @@ class Compiler:
         exec_cmd, includes, libs_flags, libdirs_flags, m_code = \
                 self._get_compile_components(compile_obj, accelerators)
         if self._info['exec'] in ('nvcc', 'nvc', 'nvfortran'):
-            linker_libdirs_flags = [f'"-Wl,-rpath,{l[2:]}"' for l in libdirs_flags]
-            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Xcompiler')
+            linker_libdirs_flags = ['-Xcompiler' if l == '-L' else f'"-Wl,-rpath,{l}"' for l in libdirs_flags]
         else:
-            linker_libdirs_flags = [l[2:] for l in libdirs_flags]
-            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Wl,-rpath')
+            linker_libdirs_flags = ['-Wl,-rpath' if l == '-L' else l for l in libdirs_flags]
 
         if self._info['language'] == 'fortran':
             j_code = (self._info['module_output_flag'], output_folder)
@@ -391,11 +389,9 @@ class Compiler:
         exec_cmd, includes, libs_flags, libdirs_flags, m_code = \
                 self._get_compile_components(compile_obj, accelerators)
         if self._info['exec'] in ('nvcc', 'nvc', 'nvfortran'):
-            linker_libdirs_flags = [f'"-Wl,-rpath,{l[2:]}"' for l in libdirs_flags]
-            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Xcompiler')
+            linker_libdirs_flags = ['-Xcompiler' if l == '-L' else f'"-Wl,-rpath,{l}"' for l in libdirs_flags]
         else:
-            linker_libdirs_flags = [l[2:] for l in libdirs_flags]
-            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Wl,-rpath')
+            linker_libdirs_flags = ['-Wl,-rpath' if l == '-L' else l for l in libdirs_flags]
 
         flags.insert(0,"-shared")
 
