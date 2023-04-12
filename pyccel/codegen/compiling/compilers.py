@@ -429,6 +429,7 @@ class Compiler:
         cmd = [os.path.expandvars(c) for c in cmd]
         if verbose:
             print(' '.join(cmd))
+        print(' '.join(cmd))
 
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                 universal_newlines=True)
