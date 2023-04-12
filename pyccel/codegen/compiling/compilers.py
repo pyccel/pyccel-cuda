@@ -334,9 +334,11 @@ class Compiler:
         exec_cmd, includes, libs_flags, libdirs_flags, m_code = \
                 self._get_compile_components(compile_obj, accelerators)
         if self._info['exec'] in ('nvcc', 'nvc', 'nvfortran'):
-            linker_libdirs_flags = [f"-Xcompiler '-Wl,-rpath,{l[2:]}" for l in libdirs_flags]
+            linker_libdirs_flags = [f"'-Wl,-rpath,{l[2:]}'" for l in libdirs_flags]
+            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Xcompiler')
         else:
-            linker_libdirs_flags = [f'-Wl,-rpath {l[2:]}' for l in libdirs_flags]
+            linker_libdirs_flags = [l[2:] for l in libdirs_flags]
+            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Wl,-rpath')
 
         if self._info['language'] == 'fortran':
             j_code = (self._info['module_output_flag'], output_folder)
@@ -390,9 +392,10 @@ class Compiler:
                 self._get_compile_components(compile_obj, accelerators)
         if self._info['exec'] in ('nvcc', 'nvc', 'nvfortran'):
             linker_libdirs_flags = [f"'-Wl,-rpath,{l[2:]}'" for l in libdirs_flags]
-            self._insert_prefix_to_list(libdirs_flags, '-Xcompiler')
+            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Xcompiler')
         else:
-            linker_libdirs_flags = [f'-Wl,-rpath {l[2:]}' for l in libdirs_flags]
+            linker_libdirs_flags = [l[2:] for l in libdirs_flags]
+            linker_libdirs_flags = self._insert_prefix_to_list(linker_libdirs_flags, '-Wl,-rpath')
 
         flags.insert(0,"-shared")
 
