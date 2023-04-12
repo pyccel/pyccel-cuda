@@ -389,7 +389,8 @@ class Compiler:
         exec_cmd, includes, libs_flags, libdirs_flags, m_code = \
                 self._get_compile_components(compile_obj, accelerators)
         if self._info['exec'] in ('nvcc', 'nvc', 'nvfortran'):
-            linker_libdirs_flags = [f"-Xcompiler '-Wl,-rpath,{l[2:]}" for l in libdirs_flags]
+            linker_libdirs_flags = [f"'-Wl,-rpath,{l[2:]}" for l in libdirs_flags]
+            self._insert_prefix_to_list(libdirs_flags, '-Xcompiler')
         else:
             linker_libdirs_flags = [f'-Wl,-rpath {l[2:]}' for l in libdirs_flags]
 
