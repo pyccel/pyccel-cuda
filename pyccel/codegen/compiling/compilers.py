@@ -1,4 +1,4 @@
-#!/usr/bin/python
+See#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------------------#
 # This file is part of Pyccel which is released under MIT License. See the LICENSE file or #
@@ -264,7 +264,7 @@ class Compiler:
         libs = self._get_libs(compile_obj.libs, accelerators)
         libs_flags = [s if s.startswith('-l') else '-l{}'.format(s) for s in libs]
         libdirs = self._get_libdirs(compile_obj.libdirs, accelerators)
-        libdirs_flags = self._insert_prefix_to_list(libdirs, '-L')
+        libdirs_flags = self._insert_prefix_to_list(libdirs, '-L')
 
         exec_cmd = self._get_exec(accelerators)
 
