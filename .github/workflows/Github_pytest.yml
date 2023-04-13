@@ -3,8 +3,6 @@ name: Pyccel tests
 on:
   pull_request:
     branches: [ master, development ]
-  push:
-    branches: [ devel-issue13 ]
 
 jobs:
   Linux:
