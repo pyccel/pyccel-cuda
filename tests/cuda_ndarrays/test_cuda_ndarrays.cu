@@ -132,7 +132,7 @@ void test_cuda_array_create_device_double()
     t_ndarray b = {.shape = NULL};
 
     int64_t tmp_shape[] = {INT64_C(14)};
-    arr = cuda_array_create(1, tmp_shape, nd_float, false, allocateMemoryOnDevice);
+    arr = cuda_array_create(1, tmp_shape, nd_double, false, allocateMemoryOnDevice);
     double cuda_array_dummy[] = {1.02, 0.25, 5e-05, 1.0, 200.0, 33.0, 5.0, 57.0, 62.0, 70.0, 103.009, 141.0, 122.0, 26.5};
     cudaMemcpy(arr.nd_double, cuda_array_dummy, arr.buffer_size, cudaMemcpyHostToDevice);
 
@@ -198,7 +198,7 @@ void test_cuda_array_create_device_float()
     cudaMemcpy(arr.nd_float, cuda_array_dummy, arr.buffer_size, cudaMemcpyHostToDevice);
 
     int64_t tmp_shape_0001[] = {INT64_C(14)};
-    b = cuda_array_create(1, tmp_shape_0001, nd_double, false, allocateMemoryOnHost);
+    b = cuda_array_create(1, tmp_shape_0001, nd_float, false, allocateMemoryOnHost);
     cudaMemcpy(b.nd_float, arr.nd_float, b.buffer_size, cudaMemcpyDeviceToHost);
 
     assert_int32(arr.nd, 1, "testing the number of dimensions", __func__, __FILE__, __LINE__);

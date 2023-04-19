@@ -34,7 +34,7 @@ class CTestFile(pytest.File):
         CCuda unit test executable.
         """
         # Run the exe that corresponds to the .cu file and capture the output.
-        test_exe = os.path.splitext(self.fspath.basename)[0]
+        test_exe = os.path.splitext(self.fspath)[0]
         rootdir = self.config.rootdir.strpath
         test_exe = os.path.relpath(test_exe)
         ndarray_path =  os.path.join(rootdir , "pyccel", "stdlib", "ndarrays")
