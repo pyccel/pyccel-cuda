@@ -144,7 +144,21 @@ t_ndarray   cuda_array_create(int32_t nd, int64_t *shape,
     return (arr);
 }
 
-int32_t cuda_free_array(t_ndarray arr)
+int32_t cuda_free_host(t_ndarray arr)
+{
+    if (arr.shape == NULL)
+        return (0);
+    cudaFreeHost(arr.raw_data);
+    arr.raw_data = NULL;
+    cudaFree(arr.shape);
+    arr.shape = NULL;
+    cudaFree(arr.strides);
+    arr.strides = NULL;
+    return (1);
+}
+
+__host__ __device__
+int32_t cuda_free(t_ndarray arr)
 {
     if (arr.shape == NULL)
         return (0);
@@ -157,7 +171,7 @@ int32_t cuda_free_array(t_ndarray arr)
     return (1);
 }
 
-
+__host__ __device__
 int32_t cuda_free_pointer(t_ndarray arr)
 {
     if (arr.is_view == false || arr.shape == NULL)
@@ -168,3 +182,4 @@ int32_t cuda_free_pointer(t_ndarray arr)
     arr.strides = NULL;
     return (1);
 }
+
