@@ -359,7 +359,6 @@ class CWrapperCodePrinter(CCodePrinter):
         str
             The code describing the type.
         """
-
         dtype = self._print(variable.dtype)
         prec  = variable.precision
 
