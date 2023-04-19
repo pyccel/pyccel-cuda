@@ -6,7 +6,6 @@
 """
 This module contains all the provided decorator methods.
 """
-from numpy import array
 
 #TODO use pycode and call exec after that in lambdify
 
@@ -102,5 +101,23 @@ def allow_negative_index(f,*args):
     return identity
 
 def kernel(f):
-    return numpy.array([[f]])
+    """
+    A decorator for a GPU kernel function.
+
+    This decorator marks a function as a kernel so that it can be executed on a GPU.
+    It returns a numpy array containing the function object to ensure that the function is an array function,
+    allowing it to be executed on a GPU.
+
+    Parameters
+    ----------
+    f : Function
+        The function to be marked as a kernel.
+
+    Returns
+    -------
+    numpy.ndarray: A numpy array containing the function object.
+
+    """
+    from numpy import array
+    return array([[f]])
 
