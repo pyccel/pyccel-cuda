@@ -131,15 +131,14 @@ class CudaArray(CudaNewArray):
 class CudaSynchronize(PyccelInternalFunction):
     "Represents a call to  Cuda.deviceSynchronize for code generation."
 
-    __slots__ = ('_dtype','_precision','_shape','_rank','_order')
+    __slots__ = ()
     _attribute_nodes = ()
+    _shape     = None
+    _rank      = 0
+    _dtype     = NativeInteger()
+    _precision = None
+    _order     = None
     def __init__(self):
-        #...
-        self._shape     = None
-        self._rank      = 0
-        self._dtype     = NativeInteger()
-        self._precision = None
-        self._order     = None
         super().__init__()
 
 class CudaInternalVar(PyccelAstNode):
@@ -152,8 +151,11 @@ class CudaInternalVar(PyccelAstNode):
         Represent the dimension where we want to locate our thread.
 
     """
-    __slots__ = ('_dim','_dtype','_precision','_shape','_rank','_order')
+    __slots__ = ('_dim','_dtype', '_precision')
     _attribute_nodes = ('_dim',)
+    _shape     = None
+    _rank      = 0
+    _order     = None
 
     def __init__(self, dim=None):
         
@@ -165,11 +167,8 @@ class CudaInternalVar(PyccelAstNode):
             raise ValueError("dimension need to be 0, 1 or 2")
         #...
         self._dim       = dim
-        self._shape     = None
-        self._rank      = 0
         self._dtype     = dim.dtype
         self._precision = dim.precision
-        self._order     = None
         super().__init__()
 
     @property
