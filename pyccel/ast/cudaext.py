@@ -248,8 +248,8 @@ class CudaGridDim(CudaInternalVar):
 
 class CudaGrid(PyccelAstNode)               :
     """
-    CudaGrid locate Thread In the GPU architecture Using CudaThreadIdx, CudaBlockDim, CudaBlockIdx
-    To calculate the exact index of the thread automatically.
+    CudaGrid locates a thread in the GPU architecture using `CudaThreadIdx`, `CudaBlockDim`, `CudaBlockIdx`
+    to calculate the exact index of the thread automatically.
 
     Parameters
     ----------
