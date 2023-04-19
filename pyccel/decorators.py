@@ -6,7 +6,7 @@
 """
 This module contains all the provided decorator methods.
 """
-import numpy
+from numpy import array
 
 #TODO use pycode and call exec after that in lambdify
 
