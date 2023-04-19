@@ -370,10 +370,10 @@ class CcudaCodePrinter(CCodePrinter):
         for a, f in zip(expr.args, func.arguments):
             a = a.value if a else Nil()
             f = f.var
-            if self.stored_in_c_pointer(f):
+            if self.is_c_pointer(f):
                 if isinstance(a, Variable):
                     args.append(ObjectAddress(a))
-                elif not self.stored_in_c_pointer(a):
+                elif not self.is_c_pointer(a):
                     tmp_var = self.scope.get_temporary_variable(f.dtype)
                     assign = Assign(tmp_var, a)
                     self._additional_code += self._print(assign)
