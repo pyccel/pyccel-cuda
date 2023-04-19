@@ -471,11 +471,8 @@ cupy_funcs = {
     'size'      : PyccelFunctionDef('size'      , CupyArraySize),
 }
 
-cuda_constants = {
-}
-
 cupy_mod = Module('cupy',
-    variables = cuda_constants.values(),
+    variables = [],
     funcs = cupy_funcs.values())
 
 #==============================================================================

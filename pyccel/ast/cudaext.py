@@ -290,9 +290,6 @@ cuda_Internal_Var = {
     'CudaGridDim'   : 'gridDim'
 }
 
-cuda_constants = {
-
-}
 cuda_mod = Module('cuda',
-    variables = cuda_constants.values(),
+    variables = [],
     funcs = cuda_funcs.values())
