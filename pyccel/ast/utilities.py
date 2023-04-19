@@ -81,7 +81,7 @@ decorators_mod = Module('decorators',(),
         funcs = [PyccelFunctionDef(d, PyccelInternalFunction) for d in pyccel_decorators.__all__])
 pyccel_mod = Module('pyccel',(),(),
         imports = [Import('decorators', decorators_mod),
-                    Import('cuda', AsName(cuda_mod,'cuda')),
+                    Import('cuda', cuda_mod),
                     ])
 
 # TODO add documentation
