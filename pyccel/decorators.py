@@ -102,11 +102,11 @@ def allow_negative_index(f,*args):
 
 def kernel(f):
     """
-    A decorator for a GPU kernel function.
-
-    This decorator marks a function as a kernel so that it can be executed on a GPU.
-    It returns a numpy array containing the function object to ensure that the function is an array function,
+    This decorator is used to mark a Python function as a GPU kernel function,
     allowing it to be executed on a GPU.
+    The decorator returns a NumPy array containing the decorated function object
+    to ensure that the function is treated as an array function.
+    This also allows the function to run in pure Python without errors related to indexing.
 
     Parameters
     ----------
