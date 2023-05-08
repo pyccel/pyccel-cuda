@@ -11,32 +11,28 @@ from functools import reduce
 import operator
 
 from pyccel.errors.errors import Errors
-from pyccel.errors.messages import WRONG_LINSPACE_ENDPOINT, NON_LITERAL_KEEP_DIMS, NON_LITERAL_AXIS
 
 from pyccel.utilities.stage import PyccelStage
 
 from .basic          import PyccelAstNode
-from .builtins       import (PythonInt, PythonBool, PythonFloat, PythonTuple,
-                             PythonComplex, PythonReal, PythonImag, PythonList,
-                             PythonType, PythonConjugate)
+from .builtins       import (PythonTuple, PythonList)
 
-from .core           import Module, Import, PyccelFunctionDef, FunctionCall
+from .core           import Module, PyccelFunctionDef
 
-from .datatypes      import (dtype_and_precision_registry as dtype_registry,
-                             default_precision, datatype, NativeInteger,
+from .datatypes      import (default_precision, NativeInteger,
                              NativeFloat, NativeComplex, NativeBool, str_dtype,
                              NativeNumeric)
 
-from .internals      import PyccelInternalFunction, Slice, max_precision, get_final_precision
+from .internals      import PyccelInternalFunction, max_precision, get_final_precision
 from .internals      import PyccelArraySize
 
-from .literals       import LiteralInteger, LiteralFloat, LiteralComplex, LiteralString, convert_to_literal
+from .literals       import LiteralInteger, LiteralFloat, LiteralComplex
 from .literals       import LiteralTrue, LiteralFalse
 from .literals       import Nil
 from .mathext        import MathCeil
-from .operators      import broadcast, PyccelMinus, PyccelDiv
-from .variable       import (Variable, Constant, HomogeneousTupleVariable)
-from .cudaext        import CudaNewArray, CudaArray
+from .operators      import PyccelMinus, PyccelDiv
+from .variable       import (Variable, HomogeneousTupleVariable)
+from .cudaext        import CudaNewArray
 from .numpyext       import process_dtype, process_shape, DtypePrecisionToCastFunction
 
 errors = Errors()
