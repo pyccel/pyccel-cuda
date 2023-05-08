@@ -317,9 +317,9 @@ class CCudaCodePrinter(CCodePrinter):
             memory_location = 'allocateMemoryOn' + str(memory_location).capitalize()
         else:
             memory_location = 'managedMemory'
-        alloc_code = "{} = cuda_array_create({}, {}, {}, {}, {});".format(
-        expr.variable, len(expr.shape), tmp_shape, dtype, is_view, memory_location)
-        return '{}\n{}\n{}\n'.format(free_code, shape_Assign, alloc_code)
+        alloc_code = f"{expr.variable} = \
+            cuda_array_create({len(expr.shape)}, {tmp_shape}, {dtype}, {is_view}, {memory_location});"
+        return f"{free_code}\n{shape_Assign}\n{alloc_code}\n"
 
     def _print_Deallocate(self, expr):
         var_code = self._print(expr.variable)
