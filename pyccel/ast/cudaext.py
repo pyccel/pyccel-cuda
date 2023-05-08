@@ -1,34 +1,16 @@
-from functools import reduce
-import operator
-
-import numpy
-
-from pyccel.errors.errors import Errors
-from pyccel.errors.messages import WRONG_LINSPACE_ENDPOINT, NON_LITERAL_KEEP_DIMS, NON_LITERAL_AXIS
-
-from pyccel.utilities.stage import PyccelStage
-
 from .basic          import PyccelAstNode
-from .builtins       import (PythonInt, PythonBool, PythonFloat, PythonTuple,
-                             PythonComplex, PythonReal, PythonImag, PythonList,
-                             PythonType, PythonConjugate)
+from .builtins       import (PythonTuple,PythonList)
 
-from .core           import Module, Import, PyccelFunctionDef
+from .core           import Module, PyccelFunctionDef
 
-from .datatypes      import (dtype_and_precision_registry as dtype_registry,
-                             default_precision, datatype, NativeInteger,
-                             NativeFloat, NativeComplex, NativeBool, str_dtype,
-                             NativeNumeric)
+from .datatypes      import NativeInteger
 
-from .internals      import PyccelInternalFunction, Slice, max_precision, get_final_precision
-from .internals      import PyccelArraySize
+from .internals      import PyccelInternalFunction, get_final_precision
 
-from .literals       import LiteralInteger, LiteralFloat, LiteralComplex, convert_to_literal
+from .literals       import LiteralInteger
 from .literals       import LiteralTrue, LiteralFalse
-from .literals       import Nil
-from .mathext        import MathCeil
-from .operators      import PyccelAdd, PyccelLe, PyccelMul, broadcast, PyccelMinus, PyccelDiv
-from .variable       import (Variable, Constant, HomogeneousTupleVariable)
+from .operators      import PyccelAdd, PyccelMul
+from .variable       import (Variable, HomogeneousTupleVariable)
 
 from .numpyext       import process_dtype, process_shape, NumpyNewArray
 
