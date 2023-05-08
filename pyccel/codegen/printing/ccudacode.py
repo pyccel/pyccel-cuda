@@ -4,60 +4,30 @@
 # go to https://github.com/pyccel/pyccel/blob/master/LICENSE for full license details.     #
 #------------------------------------------------------------------------------------------#
 # pylint: disable=missing-function-docstring
-import functools
-from itertools import chain
-import re
 
-from pyccel.ast.basic     import ScopedNode
 
-from pyccel.ast.builtins  import PythonRange, PythonComplex
-from pyccel.ast.builtins  import PythonPrint, PythonType
-from pyccel.ast.builtins  import PythonList, PythonTuple
+from pyccel.ast.builtins  import PythonTuple
 
-from pyccel.ast.core      import Declare, For, CodeBlock
-from pyccel.ast.core      import FuncAddressDeclare, FunctionCall, FunctionCallArgument, FunctionDef
-from pyccel.ast.core      import Deallocate
-from pyccel.ast.core      import FunctionAddress, FunctionDefArgument
-from pyccel.ast.core      import Assign, Import, AugAssign, AliasAssign
-from pyccel.ast.core      import SeparatorComment
-from pyccel.ast.core      import Module, AsName
+from pyccel.ast.core      import (FunctionCall, Deallocate, FunctionAddress,
+                                  FunctionDefArgument, Assign, Import,
+                                  AliasAssign, Module)
 
-from pyccel.ast.operators import PyccelAdd, PyccelMul, PyccelMinus, PyccelLt, PyccelGt
-from pyccel.ast.operators import PyccelAssociativeParenthesis, PyccelMod
-from pyccel.ast.operators import PyccelUnarySub, IfTernaryOperator
-
-from pyccel.ast.datatypes import NativeInteger, NativeBool, NativeComplex
-from pyccel.ast.datatypes import NativeFloat, NativeTuple, datatype, default_precision
-
-from pyccel.ast.internals import Slice, PrecomputedCode, get_final_precision
-
-from pyccel.ast.literals  import LiteralTrue, LiteralFalse, LiteralImaginaryUnit, LiteralFloat
-from pyccel.ast.literals  import LiteralString, LiteralInteger, Literal
-from pyccel.ast.literals  import Nil
-
-from pyccel.ast.mathext  import math_constants
+from pyccel.ast.datatypes import NativeTuple, datatype
+from pyccel.ast.literals  import LiteralTrue, Literal, Nil
 
 from pyccel.ast.numpyext import NumpyFull, NumpyArray, NumpyArange
-from pyccel.ast.numpyext import NumpyReal, NumpyImag, NumpyFloat
 
 from pyccel.ast.cupyext import CupyFull, CupyArray, CupyArange
 
 from pyccel.ast.cudaext import CudaCopy, cuda_Internal_Var, CudaArray
 
-from pyccel.ast.utilities import expand_to_loops
-
-from pyccel.ast.variable import IndexedElement
-from pyccel.ast.variable import PyccelArraySize, Variable
-from pyccel.ast.variable import DottedName
-from pyccel.ast.variable import InhomogeneousTupleVariable, HomogeneousTupleVariable
+from pyccel.ast.variable import Variable
 
 from pyccel.ast.c_concepts import ObjectAddress
 
 from pyccel.codegen.printing.ccode import CCodePrinter
 
 from pyccel.errors.errors   import Errors
-from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, INCOMPATIBLE_TYPEVAR_TO_FUNC,
-                                    PYCCEL_RESTRICTION_IS_ISNOT, UNSUPPORTED_ARRAY_RANK)
 
 
 errors = Errors()
