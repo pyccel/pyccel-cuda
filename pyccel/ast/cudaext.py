@@ -53,7 +53,7 @@ class CudaArray(CudaNewArray):
     def __init__(self, arg, dtype=None, order='C', memory_location='managed'):
 
         if not isinstance(arg, (PythonTuple, PythonList, Variable)):
-            raise TypeError('Unknown type of  %s.' % type(arg))
+            raise TypeError(f"Unknown type of  {type(arg)}.")
 
         is_homogeneous_tuple = isinstance(arg, (PythonTuple, PythonList, HomogeneousTupleVariable)) and arg.is_homogeneous
         is_array = isinstance(arg, Variable) and arg.is_ndarray
@@ -178,7 +178,7 @@ class CudaCopy(CudaNewArray):
     def __init__(self, arg, memory_location, is_async=False):
         
         if not isinstance(arg, Variable):
-            raise TypeError('unknown type of  %s.' % type(arg))
+            raise TypeError(f"unknown type of  {type(arg)}.")
         
         # Verify the memory_location of src
         if arg.memory_location not in ('device', 'host', 'managed'):
