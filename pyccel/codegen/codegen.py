@@ -8,7 +8,7 @@ import os
 
 from pyccel.codegen.printing.fcode  import FCodePrinter
 from pyccel.codegen.printing.ccode  import CCodePrinter
-from pyccel.codegen.printing.ccudacode  import CcudaCodePrinter
+from pyccel.codegen.printing.ccudacode  import CCudaCodePrinter
 from pyccel.codegen.printing.pycode import PythonCodePrinter
 
 from pyccel.ast.core      import FunctionDef, Interface, ModuleHeader
@@ -20,7 +20,7 @@ _header_extension_registry = {'fortran': None, 'c':'h',  'python':None, 'ccuda':
 printer_registry    = {
                         'fortran':FCodePrinter,
                         'c':CCodePrinter,
-                        'ccuda':CcudaCodePrinter,
+                        'ccuda':CCudaCodePrinter,
                         'python':PythonCodePrinter
                       }
 

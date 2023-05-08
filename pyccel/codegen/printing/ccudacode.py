@@ -212,7 +212,7 @@ c_imports = {n : Import(n, Module(n, (), ())) for n in
                  'stdbool',
                  'assert']}
 
-class CcudaCodePrinter(CCodePrinter):
+class CCudaCodePrinter(CCodePrinter):
     """A printer to convert python expressions to strings of ccuda code"""
     printmethod = "_ccudacode"
     language = "ccuda"
