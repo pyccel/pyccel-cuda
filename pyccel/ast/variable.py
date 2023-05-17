@@ -158,8 +158,8 @@ class Variable(PyccelAstNode):
             raise ValueError("memory_handling must be 'heap', 'stack' or 'alias'")
         self._memory_handling = memory_handling
 
-        if memory_location not in ('host', 'device', 'managed'):
-            raise ValueError("memory_location must be 'host', 'device' or 'managed'")
+        if memory_location not in ('host', 'device', 'managed', 'shared'):
+            raise ValueError("memory_location must be 'host', 'device' , 'shared' or 'managed'")
         self._memory_location = memory_location
 
         if not isinstance(is_const, bool):

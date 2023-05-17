@@ -94,7 +94,7 @@ from pyccel.ast.numpyext import NumpyNewArray, NumpyNonZero
 from pyccel.ast.numpyext import DtypePrecisionToCastFunction
 
 from pyccel.ast.cupyext import CupyNewArray
-from pyccel.ast.cudaext import CudaNewArray, CudaThreadIdx, CudaBlockDim, CudaBlockIdx, CudaGridDim
+from pyccel.ast.cudaext import CudaNewArray, CudaThreadIdx, CudaBlockDim, CudaBlockIdx, CudaGridDim, CudaSharedArray
 
 from pyccel.ast.omp import (OMP_For_Loop, OMP_Simd_Construct, OMP_Distribute_Construct,
                             OMP_TaskLoop_Construct, OMP_Sections_Construct, Omp_End_Clause,
@@ -543,16 +543,6 @@ class SemanticParser(BasicParser):
                 d_var['memory_handling'] = 'heap'
             return d_var
 
-        elif isinstance(expr, NumpyNewArray):
-            d_var['datatype'   ] = expr.dtype
-            d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
-            d_var['shape'      ] = expr.shape
-            d_var['rank'       ] = expr.rank
-            d_var['order'      ] = expr.order
-            d_var['precision'  ] = expr.precision
-            d_var['cls_base'   ] = NumpyArrayClass
-            return d_var
-
         elif isinstance(expr, CupyNewArray):
             d_var['datatype'   ] = expr.dtype
             d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
@@ -565,8 +555,9 @@ class SemanticParser(BasicParser):
             return d_var
 
         elif isinstance(expr, CudaNewArray):
+            print(type(expr))
             d_var['datatype'   ] = expr.dtype
-            d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
+            d_var['memory_handling'] = 'heap' if (expr.rank > 0 and not isinstance(expr, CudaSharedArray)) else 'stack'
             d_var['memory_location'] = expr.memory_location
             d_var['shape'      ] = expr.shape
             d_var['rank'       ] = expr.rank
@@ -574,6 +565,17 @@ class SemanticParser(BasicParser):
             d_var['precision'  ] = expr.precision
             d_var['cls_base'   ] = CudaArrayClass
             return d_var
+
+        elif isinstance(expr, NumpyNewArray):
+            d_var['datatype'   ] = expr.dtype
+            d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
+            d_var['shape'      ] = expr.shape
+            d_var['rank'       ] = expr.rank
+            d_var['order'      ] = expr.order
+            d_var['precision'  ] = expr.precision
+            d_var['cls_base'   ] = NumpyArrayClass
+            return d_var
+
 
         elif isinstance(expr, NumpyTranspose):
 
@@ -590,7 +592,6 @@ class SemanticParser(BasicParser):
             return d_var
 
         elif isinstance(expr, PyccelAstNode):
-
             d_var['datatype'   ] = expr.dtype
             d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
             d_var['shape'      ] = expr.shape
@@ -912,6 +913,7 @@ class SemanticParser(BasicParser):
             try:
                 new_expr = func(*args, **kwargs)
             except TypeError:
+                print('here')
                 errors.report(UNRECOGNISED_FUNCTION_CALL,
                         symbol = expr,
                         severity = 'fatal')
@@ -1007,7 +1009,7 @@ class SemanticParser(BasicParser):
                         symbol = expr,
                         severity='fatal')
             # TODO : type check the NUMBER OF BLOCKS 'numBlocks' and threads per block 'tpblock'
-            if not isinstance(expr.numBlocks, LiteralInteger):
+            if not isinstance(expr.numBlocks, (LiteralInteger, PythonTuple)):
                 # expr.numBlocks could be invalid type, or PyccelSymbol
                 if isinstance(expr.numBlocks, PyccelSymbol):
                     numBlocks = self.get_variable(expr.numBlocks)
@@ -1019,7 +1021,7 @@ class SemanticParser(BasicParser):
                     errors.report(INVALID_KERNEL_CALL_BP_GRID,
                         symbol = expr,
                         severity='error')
-            if not isinstance(expr.tpblock, LiteralInteger):
+            if not isinstance(expr.tpblock, (LiteralInteger, PythonTuple)):
                 # expr.tpblock could be invalid type, or PyccelSymbol
                 if isinstance(expr.tpblock, PyccelSymbol):
                     tpblock = self.get_variable(expr.tpblock)
@@ -1038,7 +1040,7 @@ class SemanticParser(BasicParser):
                     errors.report("Too few arguments passed in function call",
                         symbol = expr,
                         severity='error')
-                elif isinstance(a.value, Variable) and a.value.on_stack:
+                elif isinstance(a.value, Variable) and a.value.rank != 0 and a.value.on_stack:
                     errors.report("A variable allocated on the stack can't be passed to a Kernel function",
                         symbol = expr,
                         severity='error')
@@ -2569,6 +2571,7 @@ class SemanticParser(BasicParser):
                         return FunctionCall(master, args, self._current_function)
 
         else:
+            print(lhs, rhs)
             rhs = self._visit(rhs, **settings)
 
         if isinstance(rhs, FunctionDef):

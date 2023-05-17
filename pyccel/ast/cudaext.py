@@ -1,9 +1,9 @@
 from .basic          import PyccelAstNode
 from .builtins       import (PythonTuple,PythonList)
 
-from .core           import Module, PyccelFunctionDef
+from .core           import Module, PyccelFunctionDef, Import
 
-from .datatypes      import NativeInteger
+from .datatypes      import NativeInteger, NativeVoid
 
 from .internals      import PyccelInternalFunction, get_final_precision
 
@@ -109,6 +109,34 @@ class CudaArray(CudaNewArray):
     def memory_location(self):
         return self._memory_location
 
+class CudaSharedArray(CudaNewArray):
+    """
+    Represents a call to  cuda.shared.array for code generation.
+
+    arg : list, tuple, PythonList
+
+    """
+
+    __slots__ = ('_dtype','_precision','_shape','_rank','_order', '_memory_location')
+    name = 'array'
+
+    def __init__(self, shape, dtype, order='C'):
+
+        # Convert shape to PythonTuple
+        self._shape = process_shape(False, shape)
+
+        # Verify dtype and get precision
+        self._dtype, self._precision = process_dtype(dtype)
+
+        self._rank  = len(self._shape)
+        self._order = self._order = NumpyNewArray._process_order(self._rank, order)
+        self._memory_location = 'shared'
+        super().__init__()
+
+    @property
+    def memory_location(self):
+        return self._memory_location
+
 class CudaSynchronize(PyccelInternalFunction):
     "Represents a call to  Cuda.deviceSynchronize for code generation."
 
@@ -116,7 +144,20 @@ class CudaSynchronize(PyccelInternalFunction):
     _attribute_nodes = ()
     _shape     = None
     _rank      = 0
-    _dtype     = NativeInteger()
+    _dtype     = NativeVoid()
+    _precision = None
+    _order     = None
+    def __init__(self):
+        super().__init__()
+
+class CudaSyncthreads(PyccelInternalFunction):
+    "Represents a call to  __syncthreads for code generation."
+
+    __slots__ = ()
+    _attribute_nodes = ()
+    _shape     = None
+    _rank      = 0
+    _dtype     = NativeVoid()
     _precision = None
     _order     = None
     def __init__(self):
@@ -251,12 +292,11 @@ class CudaGrid(PyccelAstNode)               :
             return expr[0]
         return PythonTuple(*expr)
 
-
-
 cuda_funcs = {
     'array'             : PyccelFunctionDef('array'             , CudaArray),
     'copy'              : PyccelFunctionDef('copy'              , CudaCopy),
     'synchronize'       : PyccelFunctionDef('synchronize'       , CudaSynchronize),
+    'syncthreads'       : PyccelFunctionDef('syncthreads'       , CudaSyncthreads),
     'threadIdx'         : PyccelFunctionDef('threadIdx'         , CudaThreadIdx),
     'blockDim'          : PyccelFunctionDef('blockDim'          , CudaBlockDim),
     'blockIdx'          : PyccelFunctionDef('blockIdx'          , CudaBlockIdx),
@@ -271,6 +311,16 @@ cuda_Internal_Var = {
     'CudaGridDim'   : 'gridDim'
 }
 
+# cuda_sharedmemory = {
+#     'array'             : PyccelFunctionDef('array'             , CudaSharedArray),
+# }
+
+cuda_sharedmemory = Module('shared', (),
+    [ PyccelFunctionDef('array' , CudaSharedArray)])
+
 cuda_mod = Module('cuda',
     variables = [],
-    funcs = cuda_funcs.values())
+    funcs = cuda_funcs.values(),
+    imports = [
+        Import('shared', cuda_sharedmemory),
+        ])
