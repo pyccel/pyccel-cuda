@@ -555,7 +555,6 @@ class SemanticParser(BasicParser):
             return d_var
 
         elif isinstance(expr, CudaNewArray):
-            print(type(expr))
             d_var['datatype'   ] = expr.dtype
             d_var['memory_handling'] = 'heap' if (expr.rank > 0 and not isinstance(expr, CudaSharedArray)) else 'stack'
             d_var['memory_location'] = expr.memory_location
@@ -913,7 +912,6 @@ class SemanticParser(BasicParser):
             try:
                 new_expr = func(*args, **kwargs)
             except TypeError:
-                print('here')
                 errors.report(UNRECOGNISED_FUNCTION_CALL,
                         symbol = expr,
                         severity = 'fatal')
@@ -1276,7 +1274,7 @@ class SemanticParser(BasicParser):
                 # ...
 
                 # We cannot allow the definition of a stack array in a loop
-                if lhs.is_stack_array and self.scope.is_loop:
+                if lhs.is_stack_array and lhs.memory_location != 'shared' and self.scope.is_loop:
                     errors.report(STACK_ARRAY_DEFINITION_IN_LOOP, symbol=name,
                         severity='error',
                         bounding_box=(self._current_fst_node.lineno,
@@ -2571,7 +2569,6 @@ class SemanticParser(BasicParser):
                         return FunctionCall(master, args, self._current_function)
 
         else:
-            print(lhs, rhs)
             rhs = self._visit(rhs, **settings)
 
         if isinstance(rhs, FunctionDef):

@@ -13,6 +13,7 @@ from pyccel.ast.core      import (FunctionCall, Deallocate, FunctionAddress,
                                   FunctionDefArgument, Assign, Import,
                                   AliasAssign, Module, Declare, AsName)
 
+from pyccel.ast.datatypes import NativeInteger
 from pyccel.ast.datatypes import NativeTuple, datatype
 from pyccel.ast.literals  import LiteralTrue, Literal, Nil
 
@@ -22,11 +23,12 @@ from pyccel.ast.cupyext import CupyFull, CupyArray, CupyArange
 
 from pyccel.ast.cudaext import CudaCopy, cuda_Internal_Var, CudaArray, CudaSharedArray
 
-from pyccel.ast.operators import PyccelMul
+from pyccel.ast.operators import PyccelMul, PyccelUnarySub
 
-from pyccel.ast.variable import Variable
+from pyccel.ast.variable import Variable, PyccelArraySize
 from pyccel.ast.variable import InhomogeneousTupleVariable, DottedName
 
+from pyccel.ast.internals import Slice
 from pyccel.ast.c_concepts import ObjectAddress
 
 from pyccel.codegen.printing.ccode import CCodePrinter
@@ -471,6 +473,52 @@ class CCudaCodePrinter(CCodePrinter):
             else:
                 return f"cuda_free({var_code});\n"
 
+    def _print_IndexedElement(self, expr):
+        base = expr.base
+        inds = list(expr.indices)
+        base_shape = base.shape
+        allow_negative_indexes = True if isinstance(base, PythonTuple) else base.allows_negative_indexes
+        for i, ind in enumerate(inds):
+            if isinstance(ind, PyccelUnarySub) and isinstance(ind.args[0], LiteralInteger):
+                inds[i] = PyccelMinus(base_shape[i], ind.args[0], simplify = True)
+            else:
+                #indices of indexedElement of len==1 shouldn't be a tuple
+                if isinstance(ind, tuple) and len(ind) == 1:
+                    inds[i].args = ind[0]
+                if allow_negative_indexes and \
+                        not isinstance(ind, LiteralInteger) and not isinstance(ind, Slice):
+                    inds[i] = IfTernaryOperator(PyccelLt(ind, LiteralInteger(0)),
+                        PyccelAdd(base_shape[i], ind, simplify = True), ind)
+        #set dtype to the C struct types
+        dtype = self._print(expr.dtype)
+        dtype = self.find_in_ndarray_type_registry(dtype, expr.precision)
+        base_name = self._print(base)
+        if getattr(base, 'is_ndarray', False) or isinstance(base, HomogeneousTupleVariable):
+            if expr.rank > 0:
+                #managing the Slice input
+                for i , ind in enumerate(inds):
+                    if isinstance(ind, Slice):
+                        inds[i] = self._new_slice_with_processed_arguments(ind, PyccelArraySize(base, i),
+                            allow_negative_indexes)
+                    else:
+                        inds[i] = Slice(ind, PyccelAdd(ind, LiteralInteger(1), simplify = True), LiteralInteger(1),
+                            Slice.Element)
+                inds = [self._print(i) for i in inds]
+                return "cuda_array_slicing(%s, %s, (t_slice []){%s})" % (base_name, expr.rank, ", ".join(inds))
+            inds = [self._cast_to(i, NativeInteger(), 8).format(self._print(i)) for i in inds]
+        else:
+            raise NotImplementedError(expr)
+        return "GET_ELEMENT(%s, %s, %s)" % (base_name, dtype, ", ".join(inds))
+
+
+    def _print_Slice(self, expr):
+        start = self._print(expr.start)
+        stop = self._print(expr.stop)
+        step = self._print(expr.step)
+        slice_type = 'RANGE' if expr.slice_type == Slice.Range else 'ELEMENT'
+        return f'cuda_new_slice({start}, {stop}, {step}, {slice_type})'
+
+
     def _print_KernelCall(self, expr):
         func = expr.funcdef
         if func.is_inline:
@@ -498,7 +546,7 @@ class CCudaCodePrinter(CCodePrinter):
         args = ', '.join(['{}'.format(self._print(a)) for a in args])
         # TODO: need to raise error in semantic if we have result , kernel can't return
         if not func.results:
-            return '{}<<<{},{}>>>({});\n'.format(func.name, expr.numBlocks, expr.tpblock,args)
+            return '{}<<<dim3{},dim3{}>>>({});\n'.format(func.name, expr.numBlocks, expr.tpblock,args)
 
     def _print_Assign(self, expr):
         prefix_code = ''

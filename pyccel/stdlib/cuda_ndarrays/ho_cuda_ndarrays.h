@@ -2,6 +2,8 @@
 # define HO_CUDA_NDARRAYS_H
 
 #include "../ndarrays/ndarrays.h"
+// CUDA runtime
+
 
 __global__
 void cuda_array_arange_int8(t_ndarray arr, int start);
@@ -28,13 +30,9 @@ int32_t         cuda_free_array(t_ndarray dump);
 
 int32_t cuda_free_host(t_ndarray arr);
 
-__host__ __device__
-int32_t cuda_free(t_ndarray arr);
-
-__host__ __device__
-int32_t cuda_free_pointer(t_ndarray arr);
-
 #ifdef HO_CUDA_PYCCEL
+#include <cuda_device_runtime_api.h>
+#include <cuda_profiler_api.h>
 __device__ inline void    shared_array_init(t_ndarray *arr)
 {
     switch (arr->type)
@@ -73,11 +71,22 @@ __device__ inline void    shared_array_init(t_ndarray *arr)
     }
 }
 
-__device__
-t_ndarray array_slicing(t_ndarray arr, int n, ...)
+__device__ __host__ inline
+t_slice cuda_new_slice(int32_t start, int32_t end, int32_t step, enum e_slice_type type)
+{
+    t_slice slice;
+
+    slice.start = start;
+    slice.end = end;
+    slice.step = step;
+    slice.type = type;
+    return (slice);
+}
+
+__device__ __host__ inline
+t_ndarray cuda_array_slicing(t_ndarray arr, int n, t_slice slices[])
 {
     t_ndarray view;
-    va_list  va;
     t_slice slice;
     int32_t start = 0;
     int32_t j;
@@ -85,15 +94,13 @@ t_ndarray array_slicing(t_ndarray arr, int n, ...)
     view.nd = n;
     view.type = arr.type;
     view.type_size = arr.type_size;
-    view.shape = malloc(sizeof(int64_t) * view.nd);
-    view.strides = malloc(sizeof(int64_t) * view.nd);
+    view.shape = (int64_t *)malloc(sizeof(int64_t) * view.nd);
+    view.strides = (int64_t *)malloc(sizeof(int64_t) * view.nd);
     view.is_view = true;
-
-    va_start(va, n);
     j = 0;
     for (int32_t i = 0; i < arr.nd; i++)
     {
-        slice = va_arg(va, t_slice);
+        slice = slices[i];
         if (slice.type == RANGE)
         {
             view.shape[j] = (slice.end - slice.start + (slice.step - 1)) / slice.step;
@@ -102,13 +109,23 @@ t_ndarray array_slicing(t_ndarray arr, int n, ...)
         }
         start += slice.start * arr.strides[i];
     }
-    va_end(va);
 
     view.raw_data = arr.raw_data + start * arr.type_size;
     view.length = 1;
     for (int32_t i = 0; i < view.nd; i++)
             view.length *= view.shape[i];
     return (view);
+}
+__host__ __device__ inline
+int32_t cuda_free_pointer(t_ndarray arr)
+{
+    if (arr.is_view == false || arr.shape == NULL)
+        return (0);
+    free(arr.shape);
+    arr.shape = NULL;
+    free(arr.strides);
+    arr.strides = NULL;
+    return (1);
 }
 
 #endif
