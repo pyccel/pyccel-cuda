@@ -295,8 +295,8 @@ class CCudaCodePrinter(CCodePrinter):
             self._additional_args.pop()
 
         #TODO: need to check if "extern C" is necessary.
-        # extern_word = 'extern "C"'
-        extern_word = ''
+        extern_word = 'extern "C"'
+        # extern_word = ''
 
         cuda_deco = ''
         if 'kernel' in expr.decorators:
