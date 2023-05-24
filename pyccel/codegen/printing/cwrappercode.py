@@ -292,7 +292,7 @@ class CWrapperCodePrinter(CCodePrinter):
             Signature of the function.
         """
         #if target_language is C no need for the binding
-        if self._target_language == 'c':
+        if self._target_language in ('c', 'ccuda'):
             return self.function_signature(expr)
 
         args = [a.var for a in expr.arguments]

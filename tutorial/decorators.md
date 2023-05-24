@@ -600,6 +600,45 @@ The generated C code:
 ```c
 ```
 
+## GPU decorators
+
+### kernel
+
+This decorator is used to mark a Python function as a GPU kernel function using the Pyccel library. The decorated function can then be executed on a GPU by specifying the number of blocks and threads per block as arguments to the function using square brackets. The `kernel` decorator is provided by the Pyccel library and is used to create a GPU kernel from a Python function.
+
+#### Basic Example
+
+python Code:
+
+```Python
+from pyccel.decorators import kernel
+
+@kernel
+def func():
+    #Code
+
+if __name__ == '__main__':
+    # the decorated function.
+    func[1, 5]()
+```
+
+the Generated Code (Ccuda):
+
+```C
+extern "C" __global__ void func(void)
+{
+    /*Code*/
+    return;
+}
+
+int main()
+{
+    /*the decorated function.*/
+    func<<<1,5>>>();
+    return 0;
+}
+```
+
 ## Getting Help
 
 If you face problems with Pyccel, please take the following steps:

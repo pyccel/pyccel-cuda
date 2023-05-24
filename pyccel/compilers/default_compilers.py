@@ -174,6 +174,16 @@ nvc_info = {'exec' : 'nvc',
             }
 
 #------------------------------------------------------------
+nvcc_info = {'exec' : 'nvcc',
+            'language': 'ccuda',
+            'debug_flags': ("-g",),
+            'release_flags': ("-O3",),
+            'general_flags' : ('--compiler-options', '-fPIC',),
+            'standard_flags' : ('-std=c99',),
+            'family': 'nvidia',
+            }
+
+#------------------------------------------------------------
 def change_to_lib_flag(lib):
     """
     Convert a library to a library flag.
@@ -275,6 +285,7 @@ pgcc_info.update(python_info)
 pgfortran_info.update(python_info)
 nvc_info.update(python_info)
 nvfort_info.update(python_info)
+nvcc_info.update(python_info)
 
 available_compilers = {('GNU', 'c') : gcc_info,
                        ('GNU', 'fortran') : gfort_info,
@@ -283,6 +294,7 @@ available_compilers = {('GNU', 'c') : gcc_info,
                        ('PGI', 'c') : pgcc_info,
                        ('PGI', 'fortran') : pgfortran_info,
                        ('nvidia', 'c') : nvc_info,
-                       ('nvidia', 'fortran') : nvfort_info}
+                       ('nvidia', 'fortran') : nvfort_info,
+                       ('nvidia', 'ccuda') : nvcc_info}
 
 vendors = ('GNU','intel','PGI','nvidia')

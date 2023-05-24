@@ -37,6 +37,7 @@ from pyccel.ast.core import Return, FunctionDefArgument, FunctionDefResult
 from pyccel.ast.core import ConstructorCall, InlineFunctionDef
 from pyccel.ast.core import FunctionDef, Interface, FunctionAddress, FunctionCall, FunctionCallArgument
 from pyccel.ast.core import DottedFunctionCall
+from pyccel.ast.core import KernelCall
 from pyccel.ast.core import ClassDef
 from pyccel.ast.core import For
 from pyccel.ast.core import Module
@@ -57,7 +58,7 @@ from pyccel.ast.core import Decorator
 from pyccel.ast.core import PyccelFunctionDef
 from pyccel.ast.core import Assert
 
-from pyccel.ast.class_defs import NumpyArrayClass, TupleClass, get_cls_base
+from pyccel.ast.class_defs import NumpyArrayClass, TupleClass, get_cls_base, CudaArrayClass
 
 from pyccel.ast.datatypes import NativeRange, str_dtype
 from pyccel.ast.datatypes import NativeSymbol
@@ -92,6 +93,9 @@ from pyccel.ast.numpyext import NumpyTranspose, NumpyConjugate
 from pyccel.ast.numpyext import NumpyNewArray, NumpyNonZero
 from pyccel.ast.numpyext import DtypePrecisionToCastFunction
 
+from pyccel.ast.cupyext import CupyNewArray
+from pyccel.ast.cudaext import CudaNewArray, CudaThreadIdx, CudaBlockDim, CudaBlockIdx, CudaGridDim
+
 from pyccel.ast.omp import (OMP_For_Loop, OMP_Simd_Construct, OMP_Distribute_Construct,
                             OMP_TaskLoop_Construct, OMP_Sections_Construct, Omp_End_Clause,
                             OMP_Single_Construct)
@@ -117,7 +121,7 @@ from pyccel.ast.variable import DottedName, DottedVariable
 from pyccel.errors.errors import Errors
 from pyccel.errors.errors import PyccelSemanticError
 
-from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_THROWAWAY,
+from pyccel.errors.messages import (INVALID_FUNCTION_CALL, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK, MISSING_KERNEL_CONFIGURATION,PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_THROWAWAY,
         UNDEFINED_VARIABLE, IMPORTING_EXISTING_IDENTIFIED, INDEXED_TUPLE, LIST_OF_TUPLES,
         INVALID_INDICES, INCOMPATIBLE_ARGUMENT, INCOMPATIBLE_ORDERING,
         UNRECOGNISED_FUNCTION_CALL, STACK_ARRAY_SHAPE_UNPURE_FUNC, STACK_ARRAY_UNKNOWN_SHAPE,
@@ -231,7 +235,6 @@ class SemanticParser(BasicParser):
         #
         self._code = parser._code
         # ...
-
         self.annotate()
         # ...
 
@@ -480,7 +483,6 @@ class SemanticParser(BasicParser):
 
         d_var = {}
         # TODO improve => put settings as attribut of Parser
-
         if expr in (PythonInt, PythonFloat, PythonComplex, PythonBool, NumpyBool, NumpyInt, NumpyInt8, NumpyInt16,
                       NumpyInt32, NumpyInt64, NumpyComplex, NumpyComplex64,
 					  NumpyComplex128, NumpyFloat, NumpyFloat64, NumpyFloat32):
@@ -493,6 +495,7 @@ class SemanticParser(BasicParser):
         elif isinstance(expr, Variable):
             d_var['datatype'       ] = expr.dtype
             d_var['memory_handling'] = expr.memory_handling
+            d_var['memory_location'] = expr.memory_location
             d_var['shape'          ] = expr.shape
             d_var['rank'           ] = expr.rank
             d_var['cls_base'       ] = expr.cls_base
@@ -548,6 +551,28 @@ class SemanticParser(BasicParser):
             d_var['order'      ] = expr.order
             d_var['precision'  ] = expr.precision
             d_var['cls_base'   ] = NumpyArrayClass
+            return d_var
+
+        elif isinstance(expr, CupyNewArray):
+            d_var['datatype'   ] = expr.dtype
+            d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
+            d_var['memory_location'] = expr.memory_location
+            d_var['shape'      ] = expr.shape
+            d_var['rank'       ] = expr.rank
+            d_var['order'      ] = expr.order
+            d_var['precision'  ] = expr.precision
+            d_var['cls_base'   ] = CudaArrayClass
+            return d_var
+
+        elif isinstance(expr, CudaNewArray):
+            d_var['datatype'   ] = expr.dtype
+            d_var['memory_handling'] = 'heap' if expr.rank > 0 else 'stack'
+            d_var['memory_location'] = expr.memory_location
+            d_var['shape'      ] = expr.shape
+            d_var['rank'       ] = expr.rank
+            d_var['order'      ] = expr.order
+            d_var['precision'  ] = expr.precision
+            d_var['cls_base'   ] = CudaArrayClass
             return d_var
 
         elif isinstance(expr, NumpyTranspose):
@@ -879,8 +904,17 @@ class SemanticParser(BasicParser):
         FunctionCall/PyccelInternalFunction
             The semantic representation of the call.
         """
+        if isinstance(func, FunctionDef) and 'kernel' in func.decorators:
+            errors.report(MISSING_KERNEL_CONFIGURATION, symbol = expr, severity = 'fatal')
         if isinstance(func, PyccelFunctionDef):
             func = func.cls_name
+            if func in (CudaThreadIdx, CudaBlockDim, CudaBlockIdx, CudaGridDim):
+                if 'kernel' not in self.scope.decorators\
+                    and 'device' not in self.scope.decorators:
+                    errors.report("Cuda internal variables should only be used in Kernel or Device functions",
+                        symbol = expr,
+                        severity = 'fatal')
+
             args, kwargs = split_positional_keyword_arguments(*args)
 
             try:
@@ -933,6 +967,92 @@ class SemanticParser(BasicParser):
             elif isinstance(func, FunctionDef):
                 self._check_argument_compatibility(args, func_args,
                             expr, func.is_elemental)
+            return new_expr
+
+    def _handle_kernel(self, expr, func, args, **settings):
+        """
+        Create a FunctionCall or an instance of a PyccelInternalFunction
+        from the function information and arguments
+
+        Parameters
+        ==========
+        expr : PyccelAstNode
+               The expression where this call is found (used for error output)
+        func : FunctionDef instance, Interface instance or PyccelInternalFunction type
+               The function being called
+        args : tuple
+               The arguments passed to the function
+
+        Returns
+        =======
+        new_expr : FunctionCall or PyccelInternalFunction
+        """
+        if 'kernel' not in func.decorators:
+            errors.report(INVALID_FUNCTION_CALL,
+                        symbol = expr,
+                        severity = 'fatal')
+        if isinstance(func, PyccelFunctionDef):
+            func = func.cls_name
+            args, kwargs = split_positional_keyword_arguments(*args)
+            for a in args:
+                if getattr(a,'dtype',None) == 'tuple':
+                    self._infere_type(a, **settings)
+            for a in kwargs.values():
+                if getattr(a,'dtype',None) == 'tuple':
+                    self._infere_type(a, **settings)
+
+            try:
+                new_expr = func(*args, **kwargs)
+            except TypeError:
+                errors.report(UNRECOGNISED_FUNCTION_CALL,
+                        symbol = expr,
+                        severity = 'fatal')
+
+            return new_expr
+        else:
+            if isinstance(func, FunctionDef) and len(args) > len(func.arguments):
+                errors.report("Too many arguments passed in function call",
+                        symbol = expr,
+                        severity='fatal')
+            # TODO : type check the NUMBER OF BLOCKS 'numBlocks' and threads per block 'tpblock'
+            if not isinstance(expr.numBlocks, LiteralInteger):
+                # expr.numBlocks could be invalid type, or PyccelSymbol
+                if isinstance(expr.numBlocks, PyccelSymbol):
+                    numBlocks = self.get_variable(expr.numBlocks)
+                    if not isinstance(numBlocks.dtype, NativeInteger):
+                        errors.report(INVALID_KERNEL_CALL_BP_GRID,
+                        symbol = expr,
+                        severity='error')
+                else:
+                    errors.report(INVALID_KERNEL_CALL_BP_GRID,
+                        symbol = expr,
+                        severity='error')
+            if not isinstance(expr.tpblock, LiteralInteger):
+                # expr.tpblock could be invalid type, or PyccelSymbol
+                if isinstance(expr.tpblock, PyccelSymbol):
+                    tpblock = self.get_variable(expr.tpblock)
+                    if not isinstance(tpblock.dtype, NativeInteger):
+                        errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
+                        symbol = expr,
+                        severity='error')
+                else:
+                    errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
+                        symbol = expr,
+                        severity='error')
+            new_expr = KernelCall(func, args, expr.numBlocks, expr.tpblock, self._current_function)
+
+            for a in new_expr.args:
+                if a is None:
+                    errors.report("Too few arguments passed in function call",
+                        symbol = expr,
+                        severity='error')
+                elif isinstance(a.value, Variable) and a.value.on_stack:
+                    errors.report("A variable allocated on the stack can't be passed to a Kernel function",
+                        symbol = expr,
+                        severity='error')
+            if isinstance(func, FunctionDef):
+                self._check_argument_compatibility(new_expr.args, func.arguments,
+                        expr, func.is_elemental)
             return new_expr
 
     def _create_variable(self, name, dtype, rhs, d_lhs, arr_in_multirets=False):
@@ -1934,7 +2054,6 @@ class SemanticParser(BasicParser):
 
 
     def _visit_DottedName(self, expr, **settings):
-
         var = self.check_for_variable(_get_name(expr))
         if var:
             return var
@@ -2088,6 +2207,18 @@ class SemanticParser(BasicParser):
         return errors.report(f'Attribute {rhs_name} not found',
             bounding_box=(self._current_fst_node.lineno, self._current_fst_node.col_offset),
             severity='fatal')
+
+    def _visit_KernelCall(self, expr, **settings):
+        name     = expr.funcdef
+        try:
+            name = self.scope.get_expected_name(name)
+        except RuntimeError:
+            pass
+        func     = self.scope.find(name, 'functions')
+
+        args = self._handle_function_args(expr.args, **settings)
+
+        return self._handle_kernel(expr, func, args, **settings)
 
     def _visit_PyccelOperator(self, expr, **settings):
         args     = [self._visit(a, **settings) for a in expr.args]

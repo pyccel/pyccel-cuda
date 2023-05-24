@@ -223,7 +223,7 @@ def epyccel( python_function_or_module, **kwargs ):
     verbose : bool
         Print additional information (default: False).
 
-    language : {'fortran', 'c', 'python'}
+    language : {'fortran', 'c', 'python', 'ccuda'}
         Language of generated code (default: 'fortran').
 
     accelerators : iterable of str, optional

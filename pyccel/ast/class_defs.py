@@ -160,6 +160,13 @@ NumpyArrayClass = ClassDef('numpy.ndarray',
 
 #=======================================================================================
 
+CudaArrayClass = ClassDef('cuda.ndarray',
+        methods=[
+            FunctionDef('shape',[],[],body=[],
+                decorators={'property':'property', 'numpy_wrapper':Shape})])
+
+#=======================================================================================
+
 literal_classes = {
         NativeBool()    : BooleanClass,
         NativeInteger() : IntegerClass,

@@ -21,6 +21,7 @@ __all__ = (
     'sympy',
     'template',
     'types',
+    'kernel',
 )
 
 def lambdify(f):
@@ -98,3 +99,25 @@ def allow_negative_index(f,*args):
     def identity(f):
         return f
     return identity
+
+def kernel(f):
+    """
+    This decorator is used to mark a Python function as a GPU kernel function,
+    allowing it to be executed on a GPU.
+    The decorator returns a NumPy array containing the decorated function object
+    to ensure that the function is treated as an array function.
+    This also allows the function to run in pure Python without errors related to indexing.
+
+    Parameters
+    ----------
+    f : Function
+        The function to be marked as a kernel.
+
+    Returns
+    -------
+    numpy.ndarray: A numpy array containing the function object.
+
+    """
+    from numpy import array
+    return array([[f]])
+

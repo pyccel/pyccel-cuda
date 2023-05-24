@@ -42,12 +42,14 @@ t_ndarray   array_create(int32_t nd, int64_t *shape,
         case nd_bool:
             arr.type_size = sizeof(bool);
             break;
+        #ifndef __NVCC__
         case nd_cfloat:
             arr.type_size = sizeof(float complex);
             break;
         case nd_cdouble:
             arr.type_size = sizeof(double complex);
             break;
+        #endif
     }
     arr.is_view = is_view;
     arr.length = 1;
@@ -95,12 +97,14 @@ void    stack_array_init(t_ndarray *arr)
         case nd_bool:
             arr->type_size = sizeof(bool);
             break;
+        #ifndef __NVCC__
         case nd_cfloat:
             arr->type_size = sizeof(float complex);
             break;
         case nd_cdouble:
             arr->type_size = sizeof(double complex);
             break;
+        #endif
     }
     arr->length = 1;
     for (int32_t i = 0; i < arr->nd; i++)
@@ -114,7 +118,7 @@ void    stack_array_init(t_ndarray *arr)
     }
 }
 
-void   _array_fill_int8(int8_t c, t_ndarray arr)
+void   array_fill_int8(int8_t c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -123,7 +127,7 @@ void   _array_fill_int8(int8_t c, t_ndarray arr)
             arr.nd_int8[i] = c;
 }
 
-void   _array_fill_int16(int16_t c, t_ndarray arr)
+void   array_fill_int16(int16_t c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -132,7 +136,7 @@ void   _array_fill_int16(int16_t c, t_ndarray arr)
             arr.nd_int16[i] = c;
 }
 
-void   _array_fill_int32(int32_t c, t_ndarray arr)
+void   array_fill_int32(int32_t c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -141,7 +145,7 @@ void   _array_fill_int32(int32_t c, t_ndarray arr)
             arr.nd_int32[i] = c;
 }
 
-void   _array_fill_int64(int64_t c, t_ndarray arr)
+void   array_fill_int64(int64_t c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -150,7 +154,7 @@ void   _array_fill_int64(int64_t c, t_ndarray arr)
             arr.nd_int64[i] = c;
 }
 
-void   _array_fill_bool(bool c, t_ndarray arr)
+void   array_fill_bool(bool c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -159,7 +163,7 @@ void   _array_fill_bool(bool c, t_ndarray arr)
             arr.nd_bool[i] = c;
 }
 
-void   _array_fill_float(float c, t_ndarray arr)
+void   array_fill_float(float c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -168,7 +172,7 @@ void   _array_fill_float(float c, t_ndarray arr)
             arr.nd_float[i] = c;
 }
 
-void   _array_fill_double(double c, t_ndarray arr)
+void   array_fill_double(double c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -177,7 +181,8 @@ void   _array_fill_double(double c, t_ndarray arr)
             arr.nd_double[i] = c;
 }
 
-void   _array_fill_cfloat(float complex c, t_ndarray arr)
+#ifndef __NVCC__
+void   array_fill_cfloat(float complex c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -187,7 +192,7 @@ void   _array_fill_cfloat(float complex c, t_ndarray arr)
 }
 
 
-void   _array_fill_cdouble(double complex c, t_ndarray arr)
+void   array_fill_cdouble(double complex c, t_ndarray arr)
 {
     if (c == 0)
         memset(arr.raw_data, 0, arr.buffer_size);
@@ -195,6 +200,7 @@ void   _array_fill_cdouble(double complex c, t_ndarray arr)
         for (int32_t i = 0; i < arr.length; i++)
             arr.nd_cdouble[i] = c;
 }
+#endif
 
 /*
 ** deallocation
@@ -437,5 +443,7 @@ NUMPY_SUM_(int32, int64_t, int32)
 NUMPY_SUM_(int64, int64_t, int64)
 NUMPY_SUM_(float32, float, float)
 NUMPY_SUM_(float64, double, double)
+#ifndef __NVCC__
 NUMPY_SUM_(complex64, float complex, cfloat)
 NUMPY_SUM_(complex128, double complex, cdouble)
+#endif
