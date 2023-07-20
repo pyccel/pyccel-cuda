@@ -13,22 +13,23 @@ from pyccel.ast.core      import (FunctionCall, Deallocate, FunctionAddress,
                                   FunctionDefArgument, Assign, Import,
                                   AliasAssign, Module, Declare, AsName)
 
-from pyccel.ast.datatypes import NativeInteger
+from pyccel.ast.datatypes import NativeInteger, NativeComplex, NativeBool, TimeVal, default_precision
 from pyccel.ast.datatypes import NativeTuple, datatype
-from pyccel.ast.literals  import LiteralTrue, Literal, Nil
+from pyccel.ast.literals  import LiteralTrue, LiteralString, Literal, Nil
+from pyccel.ast.c_concepts import ObjectAddress, CMacro, CStringExpression
 
 from pyccel.ast.numpyext import NumpyFull, NumpyArray, NumpyArange
 
 from pyccel.ast.cupyext import CupyFull, CupyArray, CupyArange
 
-from pyccel.ast.cudaext import CudaCopy, cuda_Internal_Var, CudaArray, CudaSharedArray
+from pyccel.ast.cudaext import CudaCopy, cuda_Internal_Var, CudaArray, CudaSharedArray, CudaTime
 
 from pyccel.ast.operators import PyccelMul, PyccelUnarySub
 
 from pyccel.ast.variable import Variable, PyccelArraySize
 from pyccel.ast.variable import InhomogeneousTupleVariable, DottedName
 
-from pyccel.ast.internals import Slice
+from pyccel.ast.internals import Slice, get_final_precision
 from pyccel.ast.c_concepts import ObjectAddress
 
 from pyccel.codegen.printing.ccode import CCodePrinter
@@ -189,6 +190,7 @@ dtype_registry = {('float',8)   : 'double',
                   ('int',8)     : 'int64_t',
                   ('int',2)     : 'int16_t',
                   ('int',1)     : 'int8_t',
+                  ('timeval', 0): 'struct timeval',
                   ('bool',4)    : 'bool'}
 
 ndarray_type_registry = {
@@ -217,9 +219,11 @@ c_imports = {n : Import(n, Module(n, (), ())) for n in
                  'pyc_math_c',
                  'stdio',
                  'stdbool',
+                 'sys/time',
                  'assert']}
 
 class CCudaCodePrinter(CCodePrinter):
+    print("---------")
     """A printer to convert python expressions to strings of ccuda code"""
     printmethod = "_ccudacode"
     language = "ccuda"
@@ -459,7 +463,7 @@ class CCudaCodePrinter(CCodePrinter):
             memory_location = 'allocateMemoryOn' + str(memory_location).capitalize()
         else:
             memory_location = 'managedMemory'
-        alloc_code = f"{expr.variable} = \
+        alloc_code = f"{self._print(expr.variable)} = \
             cuda_array_create({len(expr.shape)}, {tmp_shape}, {dtype}, {is_view}, {memory_location});"
         return f"{free_code}\n{shape_Assign}\n{alloc_code}\n"
 
@@ -570,7 +574,8 @@ class CCudaCodePrinter(CCodePrinter):
             self._temporary_args = [ObjectAddress(a) for a in lhs]
             return prefix_code+'{};\n'.format(self._print(rhs))
         # Inhomogenous tuples are unravelled and therefore do not exist in the c printer
-
+        if isinstance(rhs, CudaTime):
+            return prefix_code+self.cuda_time(expr)
         if isinstance(rhs, (CupyFull)):
             return prefix_code+self.cuda_arrayFill(expr)
         if isinstance(rhs, CupyArange):
@@ -717,7 +722,46 @@ class CCudaCodePrinter(CCodePrinter):
         var_name = cuda_Internal_Var[var_name]
         dim_c = ('x', 'y', 'z')[expr.dim]
         return '{}.{}'.format(var_name, dim_c)
-    
+
+    def _print_TimeVal(self, expr):
+        self.add_import(c_imports['sys/time'])
+        return 'timeval'
+
+    def cuda_time(self, expr):
+        self.add_import(c_imports['sys/time'])
+        get_time = f'gettimeofday(&{self._print(expr.lhs)}, NULL);\n'
+        return get_time
+
+    def _print_CudaTimeDiff(self, expr):
+        self.add_import(c_imports['sys/time'])
+        start = self._print(expr.start)
+        end = self._print(expr.end)
+        return f'({end}.tv_sec - {start}.tv_sec) + ({end}.tv_usec - {start}.tv_usec) / 1e6;'
+        # return f'((({self._print(expr.end)} - {self._print(expr.start)}) * 1000) / CLOCKS_PER_SEC)'
+
+    def find_in_dtype_registry(self, dtype, prec):
+        if prec == -1:
+            prec = default_precision[dtype]
+        try :
+            return dtype_registry[(dtype, prec)]
+        except KeyError:
+            errors.report(PYCCEL_RESTRICTION_TODO,
+                    symbol = "{}[kind = {}]".format(dtype, prec),
+                    severity='fatal')
+
+    def get_print_format_and_arg(self, var):
+        try:
+            arg_format = type_to_format[(self._print(var.dtype), get_final_precision(var))]
+        except KeyError:
+            errors.report("{} type is not supported currently".format(var.dtype), severity='fatal')
+        if var.dtype is NativeComplex():
+            arg = '{}, {}'.format(self._print(NumpyReal(var)), self._print(NumpyImag(var)))
+        elif var.dtype is NativeBool():
+            arg = '{} ? "True" : "False"'.format(self._print(var))
+        else:
+            arg = self._print(var)
+        return arg_format, arg
+
     def cudaCopy(self, lhs, rhs):
         from_location = 'Host'
         to_location = 'Host'
@@ -726,10 +770,11 @@ class CCudaCodePrinter(CCodePrinter):
         if rhs.memory_location in ('device', 'managed'):
             to_location = 'Device'
         transfer_type = 'cudaMemcpy{0}To{1}'.format(from_location, to_location)
+        var = self._print(lhs)
         if isinstance(rhs.is_async, LiteralTrue):
-            cpy_data = "cudaMemcpyAsync({0}.raw_data, {1}.raw_data, {0}.buffer_size, {2}, 0);".format(lhs, rhs.arg, transfer_type)
+            cpy_data = "cudaMemcpyAsync({0}.raw_data, {1}.raw_data, {0}.buffer_size, {2}, 0);".format(var, rhs.arg, transfer_type)
         else:
-            cpy_data = "cudaMemcpy({0}.raw_data, {1}.raw_data, {0}.buffer_size, {2});".format(lhs, rhs.arg, transfer_type)
+            cpy_data = "cudaMemcpy({0}.raw_data, {1}.raw_data, {0}.buffer_size, {2});".format(var, rhs.arg, transfer_type)
         return '%s\n' % (cpy_data)
 
 def ccudacode(expr, filename, assign_to=None, **settings):

@@ -377,3 +377,9 @@ def str_dtype(dtype):
         return 'bool'
     else:
         raise TypeError('Unknown datatype {0}'.format(str(dtype)))
+
+
+class TimeVal(DataType):
+    """Class representing timeval datatype"""
+    __slots__ = ()
+    _name = 'timeval'

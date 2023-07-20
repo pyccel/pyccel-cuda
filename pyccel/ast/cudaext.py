@@ -3,7 +3,7 @@ from .builtins       import (PythonTuple,PythonList)
 
 from .core           import Module, PyccelFunctionDef, Import
 
-from .datatypes      import NativeInteger, NativeVoid
+from .datatypes      import NativeInteger, NativeVoid, NativeFloat, TimeVal
 
 from .internals      import PyccelInternalFunction, get_final_precision
 
@@ -26,7 +26,8 @@ __all__ = (
     'CudaMemCopy',
     'CudaNewArray',
     'CudaSynchronize',
-    'CudaThreadIdx'
+    'CudaThreadIdx',
+    'CudaTime'
 )
 
 #==============================================================================
@@ -197,6 +198,47 @@ class CudaInternalVar(PyccelAstNode):
     def dim(self):
         return self._dim
 
+class CudaTime(PyccelInternalFunction):
+    __slots__ = ()
+    _attribute_nodes = ()
+    _shape     = None
+    _rank      = 0
+    _dtype     = TimeVal()
+    _precision = 0
+    _order     = None
+    def __init__(self):
+        super().__init__()
+
+class CudaTimeDiff(PyccelAstNode):
+    """
+    Represents a General Class For Cuda internal Variables Used To locate Thread In the GPU architecture"
+
+    Parameters
+    ----------
+    dim : NativeInteger
+        Represent the dimension where we want to locate our thread.
+
+    """
+    __slots__ = ('_start','_end', '_dtype', '_precision')
+    _attribute_nodes = ('_start','_end',)
+    _shape     = None
+    _rank      = 0
+    _order     = None
+
+    def __init__(self, start=None, end=None):
+        #...
+        self._start = start
+        self._end = end
+        self._dtype     = NativeFloat()
+        self._precision = 8
+        super().__init__()
+
+    @property
+    def start(self):
+        return self._start
+    @property
+    def end(self):
+        return self._end
 
 class CudaCopy(CudaNewArray):
     """
@@ -301,7 +343,10 @@ cuda_funcs = {
     'blockDim'          : PyccelFunctionDef('blockDim'          , CudaBlockDim),
     'blockIdx'          : PyccelFunctionDef('blockIdx'          , CudaBlockIdx),
     'gridDim'           : PyccelFunctionDef('gridDim'           , CudaGridDim),
-    'grid'              : PyccelFunctionDef('grid'              , CudaGrid)
+    'grid'              : PyccelFunctionDef('grid'              , CudaGrid),
+    'time'              : PyccelFunctionDef('time'              , CudaTime),
+    'timediff'          : PyccelFunctionDef('timediff'          , CudaTimeDiff),
+
 }
 
 cuda_Internal_Var = {
