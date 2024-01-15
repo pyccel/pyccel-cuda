@@ -22,6 +22,7 @@ __all__ = (
     'template',
     'types',
     'kernel',
+    'device',
 )
 
 def lambdify(f):
@@ -121,3 +122,14 @@ def kernel(f):
     from numpy import array
     return array([[f]])
 
+def device(f):
+    """
+    This decorator is used to mark a Python function as a GPU device function.
+
+    Parameters
+    ----------
+    f : Function
+        The function to be marked as a device.
+    
+    """
+    return f

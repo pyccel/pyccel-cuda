@@ -76,6 +76,7 @@ void cuda_array_fill_double(double c, t_ndarray arr)
         arr.nd_double[i] = c;
 }
 
+__device__ __host__
 void    device_memory(void** devPtr, size_t size)
 {
     cudaMalloc(devPtr, size);
@@ -90,6 +91,44 @@ void    host_memory(void** devPtr, size_t size)
 {
     cudaMallocHost(devPtr, size);
 }
+// __device__
+// void    shared_array_init(t_ndarray *arr)
+// {
+//     switch (arr->type)
+//     {
+//         case nd_int8:
+//             arr->type_size = sizeof(int8_t);
+//             break;
+//         case nd_int16:
+//             arr->type_size = sizeof(int16_t);
+//             break;
+//         case nd_int32:
+//             arr->type_size = sizeof(int32_t);
+//             break;
+//         case nd_int64:
+//             arr->type_size = sizeof(int64_t);
+//             break;
+//         case nd_float:
+//             arr->type_size = sizeof(float);
+//             break;
+//         case nd_double:
+//             arr->type_size = sizeof(double);
+//             break;
+//         case nd_bool:
+//             arr->type_size = sizeof(bool);
+//             break;
+//     }
+//     arr->length = 1;
+//     for (int32_t i = 0; i < arr->nd; i++)
+//         arr->length *= arr->shape[i];
+//     arr->buffer_size = arr->length * arr->type_size;
+//     for (int32_t i = 0; i < arr->nd; i++)
+//     {
+//         arr->strides[i] = 1;
+//         for (int32_t j = i + 1; j < arr->nd; j++)
+//             arr->strides[i] *= arr->shape[j];
+//     }
+// }
 
 t_ndarray   cuda_array_create(int32_t nd, int64_t *shape,
         enum e_types type, bool is_view, enum e_memory_locations location)
@@ -125,14 +164,14 @@ t_ndarray   cuda_array_create(int32_t nd, int64_t *shape,
     }
     arr.is_view = is_view;
     arr.length = 1;
-    cudaMallocManaged(&(arr.shape), arr.nd * sizeof(int64_t));
+    cudaMallocManaged(&arr.shape, arr.nd * sizeof(int64_t));
     for (int32_t i = 0; i < arr.nd; i++)
     {
         arr.length *= shape[i];
         arr.shape[i] = shape[i];
     }
     arr.buffer_size = arr.length * arr.type_size;
-    cudaMallocManaged(&(arr.strides), nd * sizeof(int64_t));
+    cudaMallocManaged(&arr.strides, nd * sizeof(int64_t));
     for (int32_t i = 0; i < arr.nd; i++)
     {
         arr.strides[i] = 1;
@@ -171,15 +210,15 @@ int32_t cuda_free(t_ndarray arr)
     return (1);
 }
 
-__host__ __device__
-int32_t cuda_free_pointer(t_ndarray arr)
-{
-    if (arr.is_view == false || arr.shape == NULL)
-        return (0);
-    cudaFree(arr.shape);
-    arr.shape = NULL;
-    cudaFree(arr.strides);
-    arr.strides = NULL;
-    return (1);
-}
+// __host__ __device__
+// int32_t cuda_free_pointer(t_ndarray arr)
+// {
+//     if (arr.is_view == false || arr.shape == NULL)
+//         return (0);
+//     cudaFree(arr.shape);
+//     arr.shape = NULL;
+//     cudaFree(arr.strides);
+//     arr.strides = NULL;
+//     return (1);
+// }
 

@@ -18,6 +18,7 @@ from .basic                 import PyccelAstNode
 from .datatypes             import (NativeBool, NativeInteger, NativeFloat,
                                     NativeComplex, NativeString,
                                     NativeNumeric)
+from .datatypes             import TimeVal
 
 from .internals             import max_precision
 
@@ -393,6 +394,7 @@ class PyccelBinaryOperator(PyccelOperator):
         floats    = [a for a in args if a.dtype is NativeFloat()]
         complexes = [a for a in args if a.dtype is NativeComplex()]
         strs      = [a for a in args if a.dtype is NativeString()]
+        time      = [a for a in args if a.dtype is TimeVal()]
 
         if strs:
             assert len(integers + floats + complexes) == 0
@@ -403,6 +405,8 @@ class PyccelBinaryOperator(PyccelOperator):
             return cls._handle_float_type(args)
         elif integers:
             return cls._handle_integer_type(args)
+        elif time:
+            return time
         else:
             raise TypeError('cannot determine the type of {}'.format(args))
 
