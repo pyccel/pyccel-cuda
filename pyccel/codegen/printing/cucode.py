@@ -109,9 +109,7 @@ class CudaCodePrinter(CCodePrinter):
         declaration_type = self.get_declare_type(expr.variable)
         variable = self._print(expr.variable.name)
 
-        if expr.variable.is_stack_array:
-            preface, init = self._init_stack_array(expr.variable,)
-        elif declaration_type == 't_ndarray' and not self._in_header:
+        if declaration_type == 't_ndarray' and not self._in_header:
             preface = ''
             init    = ' = {.shape = NULL}'
         else:
