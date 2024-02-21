@@ -77,7 +77,7 @@ class CudaCodePrinter(CCodePrinter):
         self._current_module = expr.name
         body    = ''.join(self._print(i) for i in expr.body)
 
-        global_variables = ''.join([self._print(d) for d in expr.declarations])
+        global_variables = ''.join(self._print(d) for d in expr.declarations)
 
         # Print imports last to be sure that all additional_imports have been collected
         imports = [Import(expr.name, Module(expr.name,(),())), *self._additional_imports.values()]
