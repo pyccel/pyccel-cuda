@@ -9,31 +9,13 @@ This module is designed to interface Pyccel's Abstract Syntax Tree (AST) with CU
 enabling the direct translation of high-level Pyccel expressions into CUDA code.
 """
 
-from pyccel.codegen.printing.ccode import CCodePrinter, c_imports
+from pyccel.codegen.printing.ccode import CCodePrinter, c_imports, c_library_headers, import_dict
 
 from pyccel.ast.variable    import InhomogeneousTupleVariable
 from pyccel.ast.core        import Declare, Import, Module
 
 from pyccel.errors.errors   import Errors
 
-
-import_dict = {'omp_lib' : 'omp' }
-
-c_library_headers = (
-    "complex",
-    "ctype",
-    "float",
-    "math",
-    "stdarg",
-    "stdbool",
-    "stddef",
-    "stdint",
-    "stdio",
-    "stdlib",
-    "string",
-    "tgmath",
-    "inttypes",
-)
 
 errors = Errors()
 
