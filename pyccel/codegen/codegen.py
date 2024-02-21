@@ -29,9 +29,11 @@ pyccel_stage = PyccelStage()
 class Codegen(object):
 
     """
-    Abstract class for code generator.
+    Class which handles the generation of code.
 
-    Handles the collect of statements, initiating the correct printer and Generating the files.
+    The class which handles the generation of code. This is done by creating an appropriate class
+    inheriting from `CodePrinter` and using it to create strings describing the code that should
+    be printed. This class then takes care of creating the necessary files.
 
     Parameters
     ----------
