@@ -54,31 +54,6 @@ class Codegen(object):
         name: str
             name of the generated module or program.
 
-        Attributes
-        ----------
-        parser
-        name
-        imports
-        variables
-        body
-        routines
-        classes
-        interfaces
-        modules
-        is_program
-        ast
-        language
-
-        Methods
-        -------
-        set_printer()
-            Set the current codeprinter instance.
-        get_printer_imports()
-            return the imports of the current codeprinter
-        doprint()
-            Prints the code in the target language.
-        export(filename=None)
-            Export code in filename
         """
         pyccel_stage.set_stage('codegen')
         self._parser   = parser
