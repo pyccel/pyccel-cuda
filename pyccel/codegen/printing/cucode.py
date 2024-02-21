@@ -46,13 +46,6 @@ class CudaCodePrinter(CCodePrinter):
         errors.set_target(filename, 'file')
 
         super().__init__(filename)
-        self.prefix_module = prefix_module
-        self._additional_imports = {'stdlib':c_imports['stdlib']}
-        self._additional_code = ''
-        self._additional_args = []
-        self._temporary_args = []
-        self._current_module = None
-        self._in_header = False
 
     def _print_Module(self, expr):
         self.set_scope(expr.scope)
