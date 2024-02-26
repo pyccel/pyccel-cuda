@@ -180,7 +180,7 @@ def execute_pyccel(fname, *,
         language = 'fortran'
 
     # Choose Cuda compiler
-    if language == 'cuda':
+    if language == 'cuda' and compiler is None:
         compiler = 'nvidia'
 
     # Choose Fortran compiler
