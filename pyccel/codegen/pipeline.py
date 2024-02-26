@@ -179,13 +179,12 @@ def execute_pyccel(fname, *,
     if language is None:
         language = 'fortran'
 
-    # Choose Cuda compiler
-    if language == 'cuda' and compiler is None:
-        compiler = 'nvidia'
-
-    # Choose Fortran compiler
+    # Choose Default compiler
     if compiler is None:
-        compiler = os.environ.get('PYCCEL_DEFAULT_COMPILER', 'GNU')
+        if language == 'cuda':
+            compiler = 'nvidia'
+        else:
+            compiler = os.environ.get('PYCCEL_DEFAULT_COMPILER', 'GNU')
 
     fflags = [] if fflags is None else fflags.split()
     wrapper_flags = [] if wrapper_flags is None else wrapper_flags.split()
