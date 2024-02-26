@@ -81,13 +81,6 @@ class CudaCodePrinter(CCodePrinter):
         declaration_type = self.get_declare_type(expr.variable)
         variable = self._print(expr.variable.name)
 
-        if declaration_type == 't_ndarray' and not self._in_header:
-            preface = ''
-            init    = ' = {.shape = NULL}'
-        else:
-            preface = ''
-            init    = ''
+        declaration = f'{declaration_type} {variable};\n'
 
-        declaration = f'{declaration_type} {variable}{init};\n'
-
-        return preface + declaration
+        return declaration
