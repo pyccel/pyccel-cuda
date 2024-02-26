@@ -181,10 +181,8 @@ def execute_pyccel(fname, *,
 
     # Choose Default compiler
     if compiler is None:
-        if language == 'cuda':
-            compiler = 'nvidia'
-        else:
-            compiler = os.environ.get('PYCCEL_DEFAULT_COMPILER', 'GNU')
+        default_compiler_family = 'nvidia' if language == 'cuda' else 'GNU'
+        compiler = os.environ.get('PYCCEL_DEFAULT_COMPILER', default_compiler_family)
 
     fflags = [] if fflags is None else fflags.split()
     wrapper_flags = [] if wrapper_flags is None else wrapper_flags.split()
