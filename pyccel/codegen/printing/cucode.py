@@ -49,7 +49,7 @@ class CudaCodePrinter(CCodePrinter):
     def _print_Module(self, expr):
         self.set_scope(expr.scope)
         self._current_module = expr.name
-        body    = ''.join(self._print(i) for i in expr.body)
+        body = ''.join(self._print(i) for i in expr.body)
 
         global_variables = ''.join(self._print(d) for d in expr.declarations)
 
