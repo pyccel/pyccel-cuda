@@ -9,31 +9,13 @@ This module is designed to interface Pyccel's Abstract Syntax Tree (AST) with CU
 enabling the direct translation of high-level Pyccel expressions into CUDA code.
 """
 
-from pyccel.codegen.printing.ccode import CCodePrinter, c_imports
+from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
 
 from pyccel.ast.variable    import InhomogeneousTupleVariable
 from pyccel.ast.core        import Declare, Import, Module
 
 from pyccel.errors.errors   import Errors
 
-
-import_dict = {'omp_lib' : 'omp' }
-
-c_library_headers = (
-    "complex",
-    "ctype",
-    "float",
-    "math",
-    "stdarg",
-    "stdbool",
-    "stddef",
-    "stdint",
-    "stdio",
-    "stdlib",
-    "string",
-    "tgmath",
-    "inttypes",
-)
 
 errors = Errors()
 
@@ -64,20 +46,13 @@ class CudaCodePrinter(CCodePrinter):
         errors.set_target(filename, 'file')
 
         super().__init__(filename)
-        self.prefix_module = prefix_module
-        self._additional_imports = {'stdlib':c_imports['stdlib']}
-        self._additional_code = ''
-        self._additional_args = []
-        self._temporary_args = []
-        self._current_module = None
-        self._in_header = False
 
     def _print_Module(self, expr):
         self.set_scope(expr.scope)
         self._current_module = expr.name
         body    = ''.join(self._print(i) for i in expr.body)
 
-        global_variables = ''.join([self._print(d) for d in expr.declarations])
+        global_variables = ''.join(self._print(d) for d in expr.declarations)
 
         # Print imports last to be sure that all additional_imports have been collected
         imports = [Import(expr.name, Module(expr.name,(),())), *self._additional_imports.values()]
@@ -109,9 +84,7 @@ class CudaCodePrinter(CCodePrinter):
         declaration_type = self.get_declare_type(expr.variable)
         variable = self._print(expr.variable.name)
 
-        if expr.variable.is_stack_array:
-            preface, init = self._init_stack_array(expr.variable,)
-        elif declaration_type == 't_ndarray' and not self._in_header:
+        if declaration_type == 't_ndarray' and not self._in_header:
             preface = ''
             init    = ' = {.shape = NULL}'
         else:
