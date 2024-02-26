@@ -44,17 +44,6 @@ class Codegen(object):
     """
 
     def __init__(self, parser, name):
-        """
-        Constructor for Codegen.
-
-        Parameters
-        ----------
-        parser: pyccel parser
-            The Pyccel parser node.
-        name: str
-            name of the generated module or program.
-
-        """
         pyccel_stage.set_stage('codegen')
         self._parser   = parser
         self._ast      = parser.ast
