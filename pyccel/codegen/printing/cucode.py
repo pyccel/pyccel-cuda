@@ -75,12 +75,3 @@ class CudaCodePrinter(CCodePrinter):
 
         self.exit_scope()
         return code
-
-    def _print_Declare(self, expr):
-
-        declaration_type = self.get_declare_type(expr.variable)
-        variable = self._print(expr.variable.name)
-
-        declaration = f'{declaration_type} {variable};\n'
-
-        return declaration
