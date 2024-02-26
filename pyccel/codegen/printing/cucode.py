@@ -78,8 +78,6 @@ class CudaCodePrinter(CCodePrinter):
         return code
 
     def _print_Declare(self, expr):
-        if isinstance(expr.variable, InhomogeneousTupleVariable):
-            return ''.join(self._print_Declare(Declare(v.dtype,v,intent=expr.intent, static=expr.static)) for v in expr.variable)
 
         declaration_type = self.get_declare_type(expr.variable)
         variable = self._print(expr.variable.name)
