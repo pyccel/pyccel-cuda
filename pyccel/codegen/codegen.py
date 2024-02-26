@@ -37,8 +37,8 @@ class Codegen(object):
 
     Parameters
     ----------
-    parser : BasicParser
-        The Pyccel parser node.
+    parser : SemanticParser
+        The Pyccel Semantic parser node.
     name : str
         Name of the generated module or program.
     """
