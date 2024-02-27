@@ -144,11 +144,6 @@ def test_same_string(language):
     test = epyccel_test(base.isnot_same_string, lang=language)
     test.compare_epyccel()
 
-@pytest.mark.parametrize( 'language', [
-        pytest.param("c", marks = pytest.mark.c),
-        pytest.param("fortran", marks = pytest.mark.fortran)
-    ]
-)
 def test_same_complex(language):
     test = epyccel_test(base.is_same_complex, lang=language)
     test.compare_epyccel( complex(2,3) )
