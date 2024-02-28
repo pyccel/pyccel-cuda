@@ -35,7 +35,6 @@ class CudaCodePrinter(CCodePrinter):
     prefix_module : str
             A prefix to be added to the name of the module.
     """
-    printmethod = "_cucode"
     language = "cuda"
 
     def __init__(self, filename, prefix_module = None):
