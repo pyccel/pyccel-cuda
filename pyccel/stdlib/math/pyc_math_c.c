@@ -52,6 +52,7 @@ double  fsign(double x)
     return (double)((x>0) - (x<0));
 }
 
+#ifndef __NVCC__
 /* numpy.sign for complex for NumPy v1 */
 double complex csgn(double complex x)
 {
@@ -63,6 +64,7 @@ double complex csign(double complex x)
     double absolute = cabs(x);
     return ((absolute == 0) ? 0.0 : (x / absolute));
 }
+#endif
 
 /*---------------------------------------------------------------------------*/
 

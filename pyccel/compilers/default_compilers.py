@@ -185,6 +185,15 @@ nvc_info = {'exec' : 'nvc',
                 },
             'family': 'nvidia',
             }
+#------------------------------------------------------------
+nvcc_info = {'exec'         : 'nvcc',
+             'language'     : 'cuda',
+             'debug_flags'  : ("-g",),
+             'release_flags': ("-O3",),
+             'general_flags': ('--compiler-options', '-fPIC',),
+             'family'       : 'nvidia'
+            }
+
 
 #------------------------------------------------------------
 def change_to_lib_flag(lib):
@@ -288,6 +297,7 @@ pgcc_info.update(python_info)
 pgfortran_info.update(python_info)
 nvc_info.update(python_info)
 nvfort_info.update(python_info)
+nvcc_info.update(python_info)
 
 gcc_info['python']['flags'].append('-Wno-incompatible-pointer-types')
 
@@ -298,6 +308,7 @@ available_compilers = {('GNU', 'c') : gcc_info,
                        ('PGI', 'c') : pgcc_info,
                        ('PGI', 'fortran') : pgfortran_info,
                        ('nvidia', 'c') : nvc_info,
-                       ('nvidia', 'fortran') : nvfort_info}
+                       ('nvidia', 'fortran') : nvfort_info,
+                       ('nvidia', 'cuda'): nvcc_info}
 
 vendors = ('GNU','intel','PGI','nvidia')
