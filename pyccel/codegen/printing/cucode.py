@@ -18,8 +18,6 @@ from pyccel.errors.errors   import Errors
 
 errors = Errors()
 
-# TODO: add examples
-
 __all__ = ["CudaCodePrinter"]
 
 class CudaCodePrinter(CCodePrinter):
