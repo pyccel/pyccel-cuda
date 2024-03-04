@@ -74,14 +74,12 @@ class CudaCodePrinter(CCodePrinter):
         # imports = ''.join(self._print(i) for i in imports)
 
         self.exit_scope()
-        return ('{imports}'
-                'int main()\n{{\n'
-                '{decs}'
-                '{body}'
-                'return 0;\n'
-                '}}').format(imports=imports,
-                                    decs=decs,
-                                    body=body)
+        return f'{imports}\n\
+                int main()\n{{\n\
+                {decs}\n\
+                {body}\n\
+                return 0;\n\
+                }}\n'
 
     def _print_Module(self, expr):
         self.set_scope(expr.scope)
@@ -140,17 +138,14 @@ class CudaCodePrinter(CCodePrinter):
         declare_dtype = self.find_in_dtype_registry(NativeInteger(), 8)
 
         dummy_array_name = self.scope.get_new_name('array_dummy')
-        buffer_array = "{dtype} {name}[{size}];\n".format(
-                dtype = dtype,
-                name  = dummy_array_name,
-                size  = tot_shape)
+        buffer_array = f'{dtype} {dummy_array_name}[{tot_shape}];\n'
         tmp_shape = self.scope.get_new_name(f'tmp_shape_{var.name}')
         shape_init = f'{declare_dtype} {tmp_shape}[] = {{{shape}}};\n'
         tmp_strides = self.scope.get_new_name(f'tmp_strides_{var.name}')
         strides_init = f'{declare_dtype} {tmp_strides}[{var.rank}] = {{0}};\n'
         array_init = f' = (t_ndarray){{\n.{np_dtype}={dummy_array_name},\n .nd={var.rank},\n '
         array_init += f'.shape={tmp_shape},\n .strides={tmp_strides},\n .type={np_dtype},\n .is_view=false\n}};\n'
-        array_init += 'stack_array_init(&{})'.format(self._print(var))
+        array_init += f'stack_array_init(&{self._print(var)})'
         preface = buffer_array + shape_init + strides_init
         self.add_import(c_imports['ndarrays'])
         return preface, array_init
@@ -163,7 +158,7 @@ class CudaCodePrinter(CCodePrinter):
             if  (expr.status == 'unknown'):
                 shape_var = DottedVariable(NativeVoid(), 'shape', lhs = variable)
                 free_code = f'if ({self._print(shape_var)} != NULL)\n'
-                free_code += "{{\n{}}}\n".format(self._print(Deallocate(variable)))
+                free_code += f'{{\n{self._print(Deallocate(variable))}}}\n'
             elif (expr.status == 'allocated'):
                 free_code += self._print(Deallocate(variable))
             self.add_import(c_imports['ndarrays'])
@@ -175,7 +170,7 @@ class CudaCodePrinter(CCodePrinter):
             is_view = 'false' if variable.on_heap else 'true'
             order = "order_f" if expr.order == "F" else "order_c"
             alloc_code = f"{self._print(variable)} = array_create({variable.rank}, {tmp_shape}, {dtype}, {is_view}, {order});\n"
-            return '{}{}{}'.format(free_code, shape_Assign,alloc_code)
+            return f'{free_code}{shape_Assign}{alloc_code}'
         elif variable.is_alias:
             var_code = self._print(ObjectAddress(variable))
             if expr.like:
