@@ -2061,81 +2061,81 @@ def test_array_kwargs_ones(language):
 # TEST: Negative indexes
 #==============================================================================
 
-def test_constant_negative_index(language):
+def test_constant_negative_index(language_with_cuda):
     from numpy.random import randint
     n = randint(2, 10)
     f1 = arrays.constant_negative_index
-    f2 = epyccel( f1 , language = language)
+    f2 = epyccel( f1 , language = language_with_cuda)
     assert f1(n) == f2(n)
 
-def test_almost_negative_index(language):
+def test_almost_negative_index(language_with_cuda):
     from numpy.random import randint
     n = randint(2, 10)
     f1 = arrays.constant_negative_index
-    f2 = epyccel( f1 , language = language)
+    f2 = epyccel( f1 , language = language_with_cuda)
     assert f1(n) == f2(n)
 
-def test_var_negative_index(language):
+def test_var_negative_index(language_with_cuda):
     from numpy.random import randint
     n = randint(2, 10)
     idx = randint(-n,0)
     f1 = arrays.var_negative_index
-    f2 = epyccel( f1 , language = language)
+    f2 = epyccel( f1 , language = language_with_cuda)
     assert f1(n,idx) == f2(n,idx)
 
-def test_expr_negative_index(language):
+def test_expr_negative_index(language_with_cuda):
     from numpy.random import randint
     n = randint(2, 10)
     idx1 = randint(-n,2*n)
     idx2 = randint(idx1,idx1+n+1)
     f1 = arrays.expr_negative_index
-    f2 = epyccel( f1 , language = language)
+    f2 = epyccel( f1 , language = language_with_cuda)
     assert f1(n,idx1,idx2) == f2(n,idx1,idx2)
 
-def test_multiple_negative_index(language):
+def test_multiple_negative_index(language_with_cuda):
     f1 = arrays.test_multiple_negative_index
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(-2, -1) == f2(-2, -1)
 
-def test_multiple_negative_index_2(language):
+def test_multiple_negative_index_2(language_with_cuda):
     f1 = arrays.test_multiple_negative_index_2
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(-4, -2) == f2(-4, -2)
 
-def test_multiple_negative_index_3(language):
+def test_multiple_negative_index_3(language_with_cuda):
     f1 = arrays.test_multiple_negative_index_3
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(-1, -1, -3) == f2(-1, -1, -3)
 
-def test_argument_negative_index_1(language):
+def test_argument_negative_index_1(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.test_argument_negative_index_1
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
     assert f1(a) == f2(a)
 
-def test_argument_negative_index_2(language):
+def test_argument_negative_index_2(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.test_argument_negative_index_2
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
     assert f1(a, a) == f2(a, a)
 
-def test_c_order_argument_negative_index(language):
+def test_c_order_argument_negative_index(language_with_cuda):
     a = np.random.randint(20, size=(3,4))
 
     f1 = arrays.test_c_order_argument_negative_index
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
     assert f1(a, a) == f2(a, a)
 
-def test_f_order_argument_negative_index(language):
+def test_f_order_argument_negative_index(language_with_cuda):
     a = np.array(np.random.randint(20, size=(3,4)), order='F')
 
     f1 = arrays.test_f_order_argument_negative_index
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
     assert f1(a, a) == f2(a, a)
 
 #==============================================================================
@@ -2155,9 +2155,9 @@ def test_array_random_size(language):
     s1, s2 = f2()
     assert s1 == s2
 
-def test_array_variable_size(language):
+def test_array_variable_size(language_with_cuda):
     f1 = arrays.array_variable_size
-    f2 = epyccel( f1 , language = language)
+    f2 = epyccel( f1 , language = language_with_cuda)
     from numpy.random import randint
     n = randint(1, 10)
     m = randint(11,20)
@@ -2168,75 +2168,75 @@ def test_array_variable_size(language):
 # TEST : 1d array slices
 #==============================================================================
 
-def test_array_1d_slice_1(language):
+def test_array_1d_slice_1(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_1
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_2(language):
+def test_array_1d_slice_2(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_2
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_3(language):
+def test_array_1d_slice_3(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_3
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_4(language):
+def test_array_1d_slice_4(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_4
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_5(language):
+def test_array_1d_slice_5(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_5
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_6(language):
+def test_array_1d_slice_6(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_6
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_7(language):
+def test_array_1d_slice_7(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_7
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_8(language):
+def test_array_1d_slice_8(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_8
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
-def test_array_1d_slice_9(language):
+def test_array_1d_slice_9(language_with_cuda):
     a = arrays.a_1d
 
     f1 = arrays.array_1d_slice_9
-    f2 = epyccel(f1, language = language)
+    f2 = epyccel(f1, language = language_with_cuda)
 
     assert f1(a) == f2(a)
 
