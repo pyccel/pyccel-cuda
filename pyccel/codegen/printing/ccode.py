@@ -486,8 +486,8 @@ class CCodePrinter(CodePrinter):
         declare_dtype = self.find_in_dtype_registry(rhs.dtype, rhs.precision)
         dtype = self.find_in_ndarray_type_registry(rhs.dtype, rhs.precision)
         dtype = dtype[3:]
-        fill_value = self._print(rhs.fill_value)
         if rhs.fill_value is not None:
+            fill_value = self._print(rhs.fill_value)
             if isinstance(rhs.fill_value, Literal):
                 code_init += f'_array_fill_{dtype}(({declare_dtype}){fill_value}, {self._print(lhs)});\n'
             else:
