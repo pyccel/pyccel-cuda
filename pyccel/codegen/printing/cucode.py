@@ -17,6 +17,7 @@ from pyccel.ast.datatypes import NativeInteger, NativeVoid
 from pyccel.ast.core      import Deallocate
 from pyccel.ast.variable import DottedVariable
 
+from pyccel.ast.c_concepts import ObjectAddress
 from pyccel.ast.core        import Import, Module, Declare
 from pyccel.ast.operators import PyccelMul
 
