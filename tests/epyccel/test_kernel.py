@@ -16,7 +16,7 @@ def language(request):
 @pytest.mark.gpu
 def test_kernel(language):
     @kernel
-    def add_one_kernel(a: 'int[:]'):
+    def add_one_kernel(a: int):
         print(a)
 
     def f():
