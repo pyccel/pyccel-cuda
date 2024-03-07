@@ -11,6 +11,14 @@ if github_debugging:
     import sys
     sys.stdout = sys.stderr
 
+def pytest_addoption(parser):
+    parser.addoption('--gpu_available', action='store_true', dest="gpu_available",
+                 default=False, help="enable GPU tests")
+
+def pytest_configure(config):
+    if not config.option.gpu_available:
+        setattr(config.option, 'markexpr', 'not gpu')
+
 @pytest.fixture( params=[
         pytest.param("fortran", marks = pytest.mark.fortran),
         pytest.param("c", marks = pytest.mark.c),
