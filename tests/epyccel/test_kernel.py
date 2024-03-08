@@ -3,6 +3,7 @@
 import pytest
 from pyccel.epyccel import epyccel
 from pyccel.decorators import kernel
+from pyccel import cuda
 
 #------------------------------------------------------------------------------
 @pytest.fixture(params=[
@@ -15,14 +16,17 @@ def language(request):
 #==============================================================================
 
 @pytest.mark.gpu
-def test_kernel(language):
+def test_kernel(language, capsys):
     @kernel
-    def add_one_kernel(a: int):
-        print(a)
+    def hello_from_kernel():
+        print("Hello from GPU !")
 
     def f():
         add_one_kernel[1, 1](1)
-        return 1
+        cuda.synchronize()
+        
 
     epyc_f = epyccel(f, language=language)
-    assert epyc_f() == 1
+    f()
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "hHello from GPU !"
