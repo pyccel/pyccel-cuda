@@ -22,11 +22,10 @@ def test_kernel(language, capsys):
         print("Hello from GPU !")
 
     def f():
-        add_one_kernel[1, 1](1)
+        hello_from_kernel[1, 1](1)
         cuda.synchronize()
         
-
     epyc_f = epyccel(f, language=language)
-    f()
+    epyc_f()
     captured = capsys.readouterr()
     assert captured.out.strip() == "hHello from GPU !"
