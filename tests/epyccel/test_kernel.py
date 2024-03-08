@@ -28,4 +28,4 @@ def test_kernel(language, capsys):
     epyc_f = epyccel(f, language=language)
     epyc_f()
     captured = capsys.readouterr()
-    assert captured.out.strip() == "hHello from GPU !"
+    assert captured.out.strip() == "Hello from GPU !"
