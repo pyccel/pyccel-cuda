@@ -154,3 +154,6 @@ class CudaCodePrinter(CCodePrinter):
         self._temporary_args = []
         args = ', '.join([f'{self._print(a)}' for a in args])
         return f"{func.name}<<<{expr.numBlocks}, {expr.tpblock}>>>({args});\n"
+
+    def _print_CudaSynchronize(self, expr):
+        return 'cudaDeviceSynchronize();\n'
