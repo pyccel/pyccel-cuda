@@ -24,7 +24,7 @@ def test_kernel(language, capsys):
     def f():
         hello_from_kernel[1, 1](1)
         cuda.synchronize()
-        
+
     epyc_f = epyccel(f, language=language)
     epyc_f()
     captured = capsys.readouterr()
