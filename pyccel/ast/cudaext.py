@@ -6,7 +6,7 @@
 #------------------------------------------------------------------------------------------#
 """
 CUDA Extension Module
-Provides CUDA functionality for code generation
+Provides CUDA functionality for code generation.
 """
 from .internals      import PyccelInternalFunction
 
@@ -21,7 +21,7 @@ class CudaSynchronize(PyccelInternalFunction):
     """
     Represents a call to  Cuda.deviceSynchronize for code generation
     
-    This class serves as a representation of a synchronization call to the CUDA    
+    This class serves as a representation of a synchronization call to the CUDA.   
     """
     __slots__ = ()
     _attribute_nodes = ()
