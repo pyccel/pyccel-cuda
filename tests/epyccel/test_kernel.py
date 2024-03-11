@@ -3,7 +3,6 @@
 import pytest
 from pyccel.epyccel import epyccel
 from pyccel.decorators import kernel
-from pyccel import cuda
 
 #------------------------------------------------------------------------------
 @pytest.fixture(params=[
@@ -22,6 +21,7 @@ def test_kernel(language, capsys):
         print("Hello from GPU !")
 
     def f():
+        from pyccel import cuda
         hello_from_kernel[1, 1]()
         cuda.synchronize()
 
