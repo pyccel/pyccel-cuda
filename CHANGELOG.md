@@ -11,6 +11,19 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+-   #1739 : Add Python support for set method `clear()`.
+-   #1739 : Add abstract class `SetMethod` to handle calls to various set methods.
+
+### Fixed
+
+### Changed
+
+### Deprecated
+
+## \[1.11.2\] - 2024-03-05
+
+### Added
+
 -   #1689 : Add Python support for list method `append()`.
 -   #1692 : Add Python support for list method `insert()`.
 -   #1690 : Add Python support for list method `pop()`.
@@ -25,6 +38,7 @@ All notable changes to this project will be documented in this file.
 -   #1575 : Fixed inhomogeneous tuple (due to incompatible sizes) being treated as homogeneous tuple.
 -   #1182 : Fix tuples containing objects with different ranks.
 -   #1575 : Fix duplication operator for non-homogeneous tuples with a non-literal but constant multiplier.
+-   #1779 : Fix standalone partial templates.
 
 ### Changed
 
