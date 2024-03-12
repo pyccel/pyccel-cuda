@@ -9,9 +9,17 @@ This module is designed to interface Pyccel's Abstract Syntax Tree (AST) with CU
 enabling the direct translation of high-level Pyccel expressions into CUDA code.
 """
 
-from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
+import functools
 
-from pyccel.ast.core        import Import, Module
+from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers, c_imports
+from pyccel.ast.datatypes import NativeInteger, NativeVoid
+
+from pyccel.ast.core      import Deallocate
+from pyccel.ast.variable import DottedVariable
+
+from pyccel.ast.c_concepts import ObjectAddress
+from pyccel.ast.core        import Import, Module, Declare
+from pyccel.ast.operators import PyccelMul
 
 from pyccel.errors.errors   import Errors
 
@@ -43,6 +51,36 @@ class CudaCodePrinter(CCodePrinter):
 
         super().__init__(filename)
 
+    def _print_Program(self, expr):
+        self.set_scope(expr.scope)
+        body  = self._print(expr.body)
+        variables = self.scope.variables.values()
+        decs = ''.join(self._print(Declare(v)) for v in variables)
+
+        imports = [*expr.imports, *self._additional_imports.values()]
+        c_headers_imports = ''
+        local_imports = ''
+
+        for imp in imports:
+            if imp.source in c_library_headers:
+                c_headers_imports += self._print(imp)
+            else:
+                local_imports += self._print(imp)
+
+        imports = f'{c_headers_imports}\
+                    extern "C"{{\n\
+                    {local_imports}\
+                    }}'
+        # imports = ''.join(self._print(i) for i in imports)
+
+        self.exit_scope()
+        return f'{imports}\n\
+                int main()\n{{\n\
+                {decs}\n\
+                {body}\n\
+                return 0;\n\
+                }}\n'
+
     def _print_Module(self, expr):
         self.set_scope(expr.scope)
         self._current_module = expr.name
@@ -72,3 +110,73 @@ class CudaCodePrinter(CCodePrinter):
 
         self.exit_scope()
         return code
+
+    def _init_stack_array(self, expr):
+        """
+        Return a string which handles the assignment of a stack ndarray.
+
+        Print the code necessary to initialise a ndarray on the stack.
+
+        Parameters
+        ----------
+        expr : TypedAstNode
+            The Assign Node used to get the lhs and rhs.
+
+        Returns
+        -------
+        buffer_array : str
+            String initialising the stack (C) array which stores the data.
+        array_init   : str
+            String containing the rhs of the initialization of a stack array.
+        """
+        var = expr
+        dtype = self.find_in_dtype_registry(var.dtype, var.precision)
+        np_dtype = self.find_in_ndarray_type_registry(var.dtype, var.precision)
+        shape = ", ".join(self._print(i) for i in var.alloc_shape)
+        tot_shape = self._print(functools.reduce(
+            lambda x,y: PyccelMul(x,y,simplify=True), var.alloc_shape))
+        declare_dtype = self.find_in_dtype_registry(NativeInteger(), 8)
+
+        dummy_array_name = self.scope.get_new_name('array_dummy')
+        buffer_array = f'{dtype} {dummy_array_name}[{tot_shape}];\n'
+        tmp_shape = self.scope.get_new_name(f'tmp_shape_{var.name}')
+        shape_init = f'{declare_dtype} {tmp_shape}[] = {{{shape}}};\n'
+        tmp_strides = self.scope.get_new_name(f'tmp_strides_{var.name}')
+        strides_init = f'{declare_dtype} {tmp_strides}[{var.rank}] = {{0}};\n'
+        array_init = f' = (t_ndarray){{\n.{np_dtype}={dummy_array_name},\n .nd={var.rank},\n '
+        array_init += f'.shape={tmp_shape},\n .strides={tmp_strides},\n .type={np_dtype},\n .is_view=false\n}};\n'
+        array_init += f'stack_array_init(&{self._print(var)})'
+        preface = buffer_array + shape_init + strides_init
+        self.add_import(c_imports['ndarrays'])
+        return preface, array_init
+
+    def _print_Allocate(self, expr):
+        free_code = ''
+        variable = expr.variable
+        if variable.rank > 0:
+            #free the array if its already allocated and checking if its not null if the status is unknown
+            if  (expr.status == 'unknown'):
+                shape_var = DottedVariable(NativeVoid(), 'shape', lhs = variable)
+                free_code = f'if ({self._print(shape_var)} != NULL)\n'
+                free_code += f'{{\n{self._print(Deallocate(variable))}}}\n'
+            elif (expr.status == 'allocated'):
+                free_code += self._print(Deallocate(variable))
+            self.add_import(c_imports['ndarrays'])
+            shape = ", ".join(self._print(i) for i in expr.shape)
+            dtype = self.find_in_ndarray_type_registry(variable.dtype, variable.precision)
+            shape_dtype = self.find_in_dtype_registry(NativeInteger(), 8)
+            tmp_shape = self.scope.get_new_name(f'tmp_shape_{self._print(variable)}')
+            shape_Assign = f'{shape_dtype} {tmp_shape}[] = {{{shape}}};\n'
+            is_view = 'false' if variable.on_heap else 'true'
+            order = "order_f" if expr.order == "F" else "order_c"
+            alloc_code = f"{self._print(variable)} = array_create({variable.rank}, {tmp_shape}, {dtype}, {is_view}, {order});\n"
+            return f'{free_code}{shape_Assign}{alloc_code}'
+        elif variable.is_alias:
+            var_code = self._print(ObjectAddress(variable))
+            if expr.like:
+                declaration_type = self.get_declare_type(expr.like)
+                return f'{var_code} = malloc(sizeof({declaration_type}));\n'
+            else:
+                raise NotImplementedError(f"Allocate not implemented for {variable}")
+        else:
+            raise NotImplementedError(f"Allocate not implemented for {variable}")

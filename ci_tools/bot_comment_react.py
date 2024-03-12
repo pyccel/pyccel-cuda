@@ -29,6 +29,7 @@ def get_unique_test_list(keys):
     tests.discard('pr_tests')
     if 'coverage' in tests:
         tests.add('linux')
+        tests.add('cuda')
         # Ensure coverage is last in case dependencies are ready
         tests.discard('coverage')
         result = list(tests)
