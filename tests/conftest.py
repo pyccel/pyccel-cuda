@@ -64,7 +64,11 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     if not config.option.gpu_available:
-        setattr(config.option, 'markexpr', 'not gpu')
+        if hasattr(config.option, 'markexpr'):
+            if 'gpu' not in config.option.markexpr:
+                config.option.markexpr += ' and not gpu'
+        else:
+            setattr(config.option, 'markexpr', 'not gpu')
 
 def pytest_sessionstart(session):
     # setup_stuff
