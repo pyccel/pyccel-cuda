@@ -70,7 +70,7 @@ def compile_pyccel(path_dir, test_file, options = ""):
     assert(p.returncode==0)
     
 #------------------------------------------------------------------------------
-def compile_cuda(path_dir, test_file, dependencies, is_mod=False)
+def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
     """
     compile Cuda coda manually.
     
