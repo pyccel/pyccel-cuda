@@ -68,7 +68,7 @@ def compile_pyccel(path_dir, test_file, options = ""):
     p = subprocess.Popen(cmd, universal_newlines=True, cwd=path_dir)
     p.wait()
     assert(p.returncode==0)
-    
+
 #------------------------------------------------------------------------------
 def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
     """
@@ -94,7 +94,7 @@ def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
     --------
     compile_fortran_or_c : The function that is called.
     """
-    compile_fortran_or_c(shutil.which('nvcc'), '.cu', path_dir, test_file, dependencies, deps, is_mod)
+    compile_fortran_or_c(shutil.which('nvcc'), '.cu', path_dir, test_file, dependencies, (), is_mod)
 
 #------------------------------------------------------------------------------
 def compile_c(path_dir, test_file, dependencies, is_mod=False):
@@ -763,8 +763,8 @@ def test_elemental(language):
 def test_hello_kernel():
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
-                dependencies = ("scripts/kernel/func.py") , 
-                language="cuda", output_dtype=types)
+            dependencies = ("scripts/kernel/func.py") , 
+            language="cuda", output_dtype=types)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
