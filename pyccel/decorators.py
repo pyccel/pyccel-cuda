@@ -121,6 +121,7 @@ def allow_negative_index(f,*args):
     def identity(f):
         return f
     return identity
+
 def kernel(f):
     """
     Kernel decoraters.
@@ -139,3 +140,4 @@ def kernel(f):
             Function to which the decorator is applied.
     """
     return f
+

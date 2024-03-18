@@ -1,6 +1,6 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 from pyccel.decorators import kernel
-# from pyccel import cuda
+from pyccel
 
 @kernel
 def say_hello():
@@ -8,5 +8,5 @@ def say_hello():
 
 def f():
     say_hello[1,1]()
-    # cuda.synchronize()
+    # cuda_mod.synchronize()
 
