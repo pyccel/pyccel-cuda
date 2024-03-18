@@ -140,4 +140,3 @@ def kernel(f):
             Function to which the decorator is applied.
     """
     return f
-
