@@ -10,7 +10,7 @@ Provides CUDA functionality for code generation.
 """
 from .internals      import PyccelInternalFunction
 
-from .datatypes import (NativeVoid)
+from .datatypes import (VoidType)
 from .core           import Module, PyccelFunctionDef
 
 __all__ = (
@@ -27,7 +27,7 @@ class CudaSynchronize(PyccelInternalFunction):
     _attribute_nodes = ()
     _shape     = None
     _rank      = 0
-    _dtype     = NativeVoid()
+    _dtype     = VoidType()
     _precision = None
     _order     = None
     def __init__(self):
