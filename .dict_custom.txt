@@ -3,6 +3,8 @@ Pythran
 numba
 NumPy
 NumPy's
+CuPy
+CuPy's
 BLAS
 LAPACK
 MPI
@@ -109,3 +111,6 @@ oneAPI
 Cuda
 getter
 setter
+bitwise
+datatyping
+datatypes
