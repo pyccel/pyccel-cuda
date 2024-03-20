@@ -27,7 +27,7 @@ class CudaSynchronize(PyccelInternalFunction):
     _attribute_nodes = ()
     _shape     = None
     _rank      = 0
-    _dtype     = VoidType()
+    _class_type = VoidType()
     _precision = None
     _order     = None
     def __init__(self):
