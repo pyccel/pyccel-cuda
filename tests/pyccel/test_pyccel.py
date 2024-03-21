@@ -374,7 +374,6 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
     test_file = get_abs_path(test_file)
 
     pyth_out = get_python_output(test_file, cwd)
-
     if language:
         pyccel_commands += " --language="+language
     else:
@@ -406,6 +405,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_cuda(cwd, dependencies[i], [], is_mod = True)
                 
             else:
+                print("dependencies ----->", dependencies[i]):
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
