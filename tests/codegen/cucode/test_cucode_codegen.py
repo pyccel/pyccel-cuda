@@ -45,8 +45,8 @@ def test_codegen(f):
     name = os.path.basename(f)
     name = os.path.splitext(name)[0]
 
-    codegen = Codegen(ast, name)
-    codegen.doprint(language='cuda')
+    codegen = Codegen(ast, name, 'cuda')
+    codegen.printer.doprint(codegen.ast)
 
     # Assert codegen success
     assert(not errors.has_errors())
