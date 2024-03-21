@@ -62,7 +62,9 @@ def compile_pyccel(path_dir, test_file, options = ""):
     cmd = [shutil.which("pyccel"), test_file]
     if options != "":
         cmd += options.strip().split()
+    print("cmd", cmd)
     p = subprocess.Popen(cmd, universal_newlines=True, cwd=path_dir)
+    print("p" , p)
     p.wait()
     assert(p.returncode==0)
 
@@ -382,11 +384,13 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
     if output_dir is None:
         if language=="python":
             output_dir = os.path.join(get_abs_path(rel_test_dir), '__pyccel__')
-
+    
     if dependencies:
         if isinstance(dependencies, str):
+            print(1)
             dependencies = [dependencies]
         for i, d in enumerate(dependencies):
+            print(dependencies[i])
             dependencies[i] = get_abs_path(d)
             if output_dir:
                 rel_path = os.path.relpath(os.path.dirname(d), start=rel_test_dir)
@@ -405,7 +409,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_cuda(cwd, dependencies[i], [], is_mod = True)
                 
             else:
-                print("dependencies ----->", dependencies[i])
+                # print(3)
+                # print(pyc_command)
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
