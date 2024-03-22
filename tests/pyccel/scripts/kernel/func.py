@@ -8,5 +8,5 @@ def say_hello():
 
 def f():
     say_hello[1,1]()
-    cuda.synchronize()
+    # cuda.synchronize()
 
