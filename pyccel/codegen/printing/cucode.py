@@ -15,8 +15,11 @@ from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
 from pyccel.ast.core        import Import, Module
 from pyccel.ast.core      import SeparatorComment
 from pyccel.ast.core      import Declare
-from pyccel.ast.core      import FuncAddressDeclare
+from pyccel.ast.core      import FuncAddressDeclare , FunctionAddress
 from pyccel.ast.core      import Assign
+
+from pyccel.ast.datatypes import VoidType
+
 
 from pyccel.errors.errors   import Errors
 
@@ -83,51 +86,68 @@ class CudaCodePrinter(CCodePrinter):
         self.exit_scope()
         return code
 
-    def _print_FunctionDef(self, expr):
-        if expr.is_inline:
-            return ''
+    def function_signature(self, expr, print_arg_names = True):
+        """
+        Get the Cuda representation of the function signature.
+        Extract from the function definition `expr` all the
+        information (name, input, output) needed to create the
+        function signature and return a string describing the
+        function.
+        This is not a declaration as the signature does not end
+        with a semi-colon.
+        Parameters
+        ----------
+        expr : FunctionDef
+            The function definition for which a signature is needed.
+        print_arg_names : bool, default : True
+            Indicates whether argument names should be printed.
+        Returns
+        -------
+        str
+            Signature of the function.
+        """
+        arg_vars = [a.var for a in expr.arguments]
+        result_vars = [r.var for r in expr.results if not r.is_argument]
 
-        self.set_scope(expr.scope)
+        n_results = len(result_vars)
 
-        arguments = [a.var for a in expr.arguments]
-        results = [r.var for r in expr.results]
-        if len(expr.results) > 1:
-            self._additional_args.append(results)
+        if n_results == 1:
+            ret_type = self.get_declare_type(result_vars[0])
+        elif n_results > 1:
+            ret_type = self.find_in_dtype_registry(PythonNativeInt())
+            arg_vars.extend(result_vars)
+            self._additional_args.append(result_vars) # Ensure correct result for is_c_pointer
+        else:
+            ret_type = self.find_in_dtype_registry(VoidType())
 
-        body  = self._print(expr.body)
-        decs  = [Declare(i) if isinstance(i, Variable) else FuncAddressDeclare(i) for i in expr.local_vars]
+        name = expr.name
+        if not arg_vars:
+            arg_code = 'void'
+        else:
+            def get_arg_declaration(var):
+                """ Get the code which declares the argument variable.
+                """
+                code = "const " * var.is_const
+                code += self.get_declare_type(var)
+                if print_arg_names:
+                    code += ' ' + var.name
+                return code
 
-        if len(results) == 1 :
-            res = results[0]
-            if isinstance(res, Variable) and not res.is_temp:
-                decs += [Declare(res)]
-            elif not isinstance(res, Variable):
-                raise NotImplementedError(f"Can't return {type(res)} from a function")
-        decs += [Declare(v) for v in self.scope.variables.values() \
-                if v not in chain(expr.local_vars, results, arguments)]
-        decs  = ''.join(self._print(i) for i in decs)
+            arg_code_list = [self.function_signature(var, False) if isinstance(var, FunctionAddress)
+                                else get_arg_declaration(var) for var in arg_vars]
+            arg_code = ', '.join(arg_code_list)
 
-        sep = self._print(SeparatorComment(40))
         if self._additional_args :
             self._additional_args.pop()
-        for i in expr.imports:
-            self.add_import(i)
-        docstring = self._print(expr.docstring) if expr.docstring else ''
-        cuda_decorater = ''
-        if 'kernel' in expr.decorators:
-            cuda_decorater = "__global__ "
-        parts = [sep,
-                 cuda_decorater,
-                 docstring,
-                 f'{self.function_signature(expr)}\n{{\n',
-                 decs,
-                 body,
-                 '}\n',
-                 sep]
 
-        self.exit_scope()
-
-        return ''.join(p for p in parts if p)
+        static = 'static ' if expr.is_static else ''
+        cuda_decorater = ""
+        if('kernel' in expr.decorators):
+            cuda_decorater = "__global__"
+        if isinstance(expr, FunctionAddress):
+            return f'{static}{ret_type} (*{name})({arg_code})'
+        else:
+            return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
 
     def _print_KernelCall(self, expr):
         func = expr.funcdef

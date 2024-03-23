@@ -62,9 +62,7 @@ def compile_pyccel(path_dir, test_file, options = ""):
     cmd = [shutil.which("pyccel"), test_file]
     if options != "":
         cmd += options.strip().split()
-    print("cmd", cmd)
     p = subprocess.Popen(cmd, universal_newlines=True, cwd=path_dir)
-    print("p" , p)
     p.wait()
     assert(p.returncode==0)
 
@@ -387,7 +385,6 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
     
     if dependencies:
         if isinstance(dependencies, str):
-            print(1)
             dependencies = [dependencies]
         for i, d in enumerate(dependencies):
             print(dependencies[i])
