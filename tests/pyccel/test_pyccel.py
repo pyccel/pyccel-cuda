@@ -95,6 +95,7 @@ def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
 
 #------------------------------------------------------------------------------
 def compile_c(path_dir, test_file, dependencies, is_mod=False):
+    print("gcc", path_dir)
     """
     Compile C code manually.
 
@@ -172,7 +173,7 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
         The compiler (gfortran/gcc).
 
     extension : str
-        The extension of the generated file (.c/.f90).
+        The extension of the generated file (.c/.f90/.cu).
 
     path_dir : str
         The path to the directory where the compilation command should be run from.
