@@ -464,6 +464,7 @@ class Compiler:
 
     @staticmethod
     def run_command(cmd, verbose):
+        print("cmd------>", cmd);
         """
         Run the provided command and collect the output.
 
@@ -488,6 +489,7 @@ class Compiler:
             Raises `RuntimeError` if the file does not compile.
         """
         cmd = [os.path.expandvars(c) for c in cmd]
+        print("cmd------>", cmd);
         if verbose:
             print(' '.join(cmd))
 
