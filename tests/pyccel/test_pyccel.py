@@ -407,8 +407,10 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_cuda(cwd, dependencies[i], [], is_mod = True)
                 
             else:
-                # print(3)
-                # print(pyc_command)
+                print(3)
+                print(pyc_command)
+                print(dependencies[i])
+                print(cwd)
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
