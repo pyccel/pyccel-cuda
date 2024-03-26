@@ -402,6 +402,7 @@ class Compiler:
         return compile_obj.program_target
 
     def compile_shared_library(self, compile_obj, output_folder, verbose = False, sharedlib_modname=None):
+        
         """
         Compile a module to a shared library.
 

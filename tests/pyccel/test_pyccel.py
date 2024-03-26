@@ -95,7 +95,6 @@ def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
 
 #------------------------------------------------------------------------------
 def compile_c(path_dir, test_file, dependencies, is_mod=False):
-    print("gcc", path_dir)
     """
     Compile C code manually.
 
@@ -190,6 +189,7 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
     is_mod : bool, default=False
         True if translating a module, False if translating a program
     """
+    print("compiler", compiler)
     root = insert_pyccel_folder(test_file)[:-3]
 
     assert(os.path.isfile(root+extension))
