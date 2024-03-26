@@ -2,11 +2,11 @@
 from pyccel.decorators import kernel
 from pyccel import cuda
 
-@kernel
+# @kernel
 def say_hello():
     print("Hello")
 
 def f():
-    say_hello[1,1]()
+    say_hello()
     cuda.synchronize()
 
