@@ -403,8 +403,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_fortran(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'c':
                     compile_c(cwd, dependencies[i], [], is_mod = True)
-                # elif language == 'cuda':
-                #     compile_cuda(cwd, dependencies[i], [], is_mod = True)
+                elif language == 'cuda':
+                    compile_cuda(cwd, dependencies[i], [], is_mod = True)
                 
             else:
                 # print(3)
@@ -770,7 +770,7 @@ def test_hello_kernel():
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
             dependencies = ("scripts/kernel/func.py") ,
-            language="c", output_dtype=types)
+            language="cuda", output_dtype=types)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
