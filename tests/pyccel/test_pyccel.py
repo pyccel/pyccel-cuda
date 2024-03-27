@@ -362,7 +362,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                 The folder in which the generated files should be
                 saved
     """
-    
+
     rel_test_dir = os.path.dirname(test_file)
 
     test_file = os.path.normpath(test_file)
@@ -420,9 +420,9 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         output_test_file = test_file
 
     if compile_with_pyccel:
-        compile_pyccel(cwd, test_file, "--language=c")
+        compile_pyccel(cwd, test_file, "--language=c --output "+output_dir)
     else:
-        compile_pyccel (cwd, test_file, "--language=c"+" -t")
+        compile_pyccel (cwd, test_file, "--language=c --output "+output_dir+" -t")
         if not dependencies:
             dependencies = []
         if language=='fortran':
@@ -432,8 +432,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         elif language == 'cuda':
             compile_cuda(cwd, output_test_file, dependencies)
 
-    lang_out = get_lang_output(output_test_file, "c")
-    compare_pyth_fort_output(pyth_out, lang_out, output_dtype, "c")
+    lang_out = get_lang_output(output_test_file, language)
+    compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
 
 #==============================================================================
 # UNIT TESTS
