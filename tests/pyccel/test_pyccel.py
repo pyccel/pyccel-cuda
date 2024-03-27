@@ -772,7 +772,7 @@ def test_hello_kernel():
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
             dependencies = ("scripts/kernel/func.py") ,
-            language="cuda", output_dtype=types)
+            language="cuda", output_dtype=types,compile_with_pyccel = False)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
