@@ -57,6 +57,8 @@ def get_python_output(abs_path, cwd = None):
 
 #------------------------------------------------------------------------------
 def compile_pyccel(path_dir, test_file, options = ""):
+    print("hello from compile_pyccel")
+        print(options)
     if "python" in options and "--output" not in options:
         options += " --output=__pyccel__"
     cmd = [shutil.which("pyccel"), test_file]
@@ -393,9 +395,9 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             if output_dir:
                 rel_path = os.path.relpath(os.path.dirname(d), start=rel_test_dir)
                 output = get_abs_path(os.path.join(output_dir, rel_path))
-                pyc_command = " --language="+"c" + ' --output={}'.format(output)
+                pyc_command = pyccel_commands + ' --output={}'.format(output)
             else:
-                pyc_command = " --language="+"c"
+                pyc_command = pyccel_commands
 
             if not compile_with_pyccel:
                 compile_pyccel (cwd, dependencies[i], pyc_command+" -t")
