@@ -376,7 +376,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
 
     pyth_out = get_python_output(test_file, cwd)
     if language:
-        pyccel_commands += " --language="+"c"
+        pyccel_commands += " --language="+language
     else:
         language='fortran'
 
