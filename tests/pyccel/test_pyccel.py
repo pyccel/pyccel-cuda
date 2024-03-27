@@ -769,8 +769,8 @@ def test_elemental(language):
 def test_hello_kernel():
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
-            dependencies = (["scripts/kernel/func.py"]) ,
-            language="cuda", output_dtype=types)
+            dependencies = ("scripts/kernel/func.py") ,
+            language="c", output_dtype=types)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
