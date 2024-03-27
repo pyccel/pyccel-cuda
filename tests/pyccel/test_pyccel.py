@@ -432,8 +432,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         elif language == 'cuda':
             compile_c(cwd, output_test_file, dependencies)
 
-    lang_out = get_lang_output(output_test_file, language)
-    compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
+    lang_out = get_lang_output(output_test_file, "c")
+    compare_pyth_fort_output(pyth_out, lang_out, output_dtype, "c")
 
 #==============================================================================
 # UNIT TESTS
@@ -770,7 +770,7 @@ def test_hello_kernel():
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
             dependencies = ("scripts/kernel/func.py") ,
-            language="c", output_dtype=types)
+            language="cuda", output_dtype=types)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
