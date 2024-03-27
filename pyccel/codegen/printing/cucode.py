@@ -86,94 +86,94 @@ class CudaCodePrinter(CCodePrinter):
     #     self.exit_scope()
     #     return code
 
-    # def function_signature(self, expr, print_arg_names = True):
-    #     """
-    #     Get the Cuda representation of the function signature.
-    #     Extract from the function definition `expr` all the
-    #     information (name, input, output) needed to create the
-    #     function signature and return a string describing the
-    #     function.
-    #     This is not a declaration as the signature does not end
-    #     with a semi-colon.
-    #     Parameters
-    #     ----------
-    #     expr : FunctionDef
-    #         The function definition for which a signature is needed.
-    #     print_arg_names : bool, default : True
-    #         Indicates whether argument names should be printed.
-    #     Returns
-    #     -------
-    #     str
-    #         Signature of the function.
-    #     """
-    #     arg_vars = [a.var for a in expr.arguments]
-    #     result_vars = [r.var for r in expr.results if not r.is_argument]
+    def function_signature(self, expr, print_arg_names = True):
+        """
+        Get the Cuda representation of the function signature.
+        Extract from the function definition `expr` all the
+        information (name, input, output) needed to create the
+        function signature and return a string describing the
+        function.
+        This is not a declaration as the signature does not end
+        with a semi-colon.
+        Parameters
+        ----------
+        expr : FunctionDef
+            The function definition for which a signature is needed.
+        print_arg_names : bool, default : True
+            Indicates whether argument names should be printed.
+        Returns
+        -------
+        str
+            Signature of the function.
+        """
+        arg_vars = [a.var for a in expr.arguments]
+        result_vars = [r.var for r in expr.results if not r.is_argument]
 
-    #     n_results = len(result_vars)
+        n_results = len(result_vars)
 
-    #     if n_results == 1:
-    #         ret_type = self.get_declare_type(result_vars[0])
-    #     elif n_results > 1:
-    #         ret_type = self.find_in_dtype_registry(PythonNativeInt())
-    #         arg_vars.extend(result_vars)
-    #         self._additional_args.append(result_vars) # Ensure correct result for is_c_pointer
-    #     else:
-    #         ret_type = self.find_in_dtype_registry(VoidType())
+        if n_results == 1:
+            ret_type = self.get_declare_type(result_vars[0])
+        elif n_results > 1:
+            ret_type = self.find_in_dtype_registry(PythonNativeInt())
+            arg_vars.extend(result_vars)
+            self._additional_args.append(result_vars) # Ensure correct result for is_c_pointer
+        else:
+            ret_type = self.find_in_dtype_registry(VoidType())
 
-    #     name = expr.name
-    #     if not arg_vars:
-    #         arg_code = 'void'
-    #     else:
-    #         def get_arg_declaration(var):
-    #             """ Get the code which declares the argument variable.
-    #             """
-    #             code = "const " * var.is_const
-    #             code += self.get_declare_type(var)
-    #             if print_arg_names:
-    #                 code += ' ' + var.name
-    #             return code
+        name = expr.name
+        if not arg_vars:
+            arg_code = 'void'
+        else:
+            def get_arg_declaration(var):
+                """ Get the code which declares the argument variable.
+                """
+                code = "const " * var.is_const
+                code += self.get_declare_type(var)
+                if print_arg_names:
+                    code += ' ' + var.name
+                return code
 
-    #         arg_code_list = [self.function_signature(var, False) if isinstance(var, FunctionAddress)
-    #                             else get_arg_declaration(var) for var in arg_vars]
-    #         arg_code = ', '.join(arg_code_list)
+            arg_code_list = [self.function_signature(var, False) if isinstance(var, FunctionAddress)
+                                else get_arg_declaration(var) for var in arg_vars]
+            arg_code = ', '.join(arg_code_list)
 
-    #     if self._additional_args :
-    #         self._additional_args.pop()
+        if self._additional_args :
+            self._additional_args.pop()
 
-    #     static = 'static ' if expr.is_static else ''
-    #     cuda_decorater = ""
-    #     if('kernel' in expr.decorators):
-    #         cuda_decorater = "__global__"
-    #     if isinstance(expr, FunctionAddress):
-    #         return f'{static}{ret_type} (*{name})({arg_code})'
-    #     else:
-    #         return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
+        static = 'static ' if expr.is_static else ''
+        cuda_decorater = ""
+        if('kernel' in expr.decorators):
+            cuda_decorater = "__global__"
+        if isinstance(expr, FunctionAddress):
+            return f'{static}{ret_type} (*{name})({arg_code})'
+        else:
+            return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
 
-    # def _print_KernelCall(self, expr):
-    #     func = expr.funcdef
-    #     if func.is_inline:
-    #         return self._handle_inline_func_call(expr)
-    #     args = []
-    #     for a, f in zip(expr.args, func.arguments):
-    #         arg_val = a.value or Nil()
-    #         f = f.var
-    #         if self.is_c_pointer(f):
-    #             if isinstance(arg_val, Variable):
-    #                 args.append(ObjectAddress(arg_val))
-    #             elif not self.is_c_pointer(arg_val):
-    #                 tmp_var = self.scope.get_temporary_variable(f.dtype)
-    #                 assign = Assign(tmp_var, arg_val)
-    #                 self._additional_code += self._print(assign)
-    #                 args.append(ObjectAddress(tmp_var))
-    #             else:
-    #                 args.append(arg_val)
-    #         else :
-    #             args.append(arg_val)
+    def _print_KernelCall(self, expr):
+        func = expr.funcdef
+        if func.is_inline:
+            return self._handle_inline_func_call(expr)
+        args = []
+        for a, f in zip(expr.args, func.arguments):
+            arg_val = a.value or Nil()
+            f = f.var
+            if self.is_c_pointer(f):
+                if isinstance(arg_val, Variable):
+                    args.append(ObjectAddress(arg_val))
+                elif not self.is_c_pointer(arg_val):
+                    tmp_var = self.scope.get_temporary_variable(f.dtype)
+                    assign = Assign(tmp_var, arg_val)
+                    self._additional_code += self._print(assign)
+                    args.append(ObjectAddress(tmp_var))
+                else:
+                    args.append(arg_val)
+            else :
+                args.append(arg_val)
 
-    #     args += self._temporary_args
-    #     self._temporary_args = []
-    #     args = ', '.join([f'{self._print(a)}' for a in args])
-    #     return f"{func.name}<<<{expr.numBlocks}, {expr.tpblock}>>>({args});\n"
+        args += self._temporary_args
+        self._temporary_args = []
+        args = ', '.join([f'{self._print(a)}' for a in args])
+        return f"{func.name}<<<{expr.numBlocks}, {expr.tpblock}>>>({args});\n"
 
-    # def _print_CudaSynchronize(self, expr):
-    #     return 'cudaDeviceSynchronize();\n'
+    def _print_CudaSynchronize(self, expr):
+        return 'cudaDeviceSynchronize();\n'
