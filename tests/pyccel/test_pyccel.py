@@ -376,7 +376,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
 
     pyth_out = get_python_output(test_file, cwd)
     if language:
-        pyccel_commands += " --language="+language
+        pyccel_commands += " --language="+"c"
     else:
         language='fortran'
 
@@ -414,7 +414,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
-        pyccel_commands = "--language=c"+" --output "+output_dir
+        pyccel_commands += " --output "+output_dir
         output_test_file = os.path.join(output_dir, os.path.basename(test_file))
     else:
         output_test_file = test_file
