@@ -58,7 +58,7 @@ def get_python_output(abs_path, cwd = None):
 #------------------------------------------------------------------------------
 def compile_pyccel(path_dir, test_file, options = ""):
     print("hello from compile_pyccel")
-        print(options)
+    print(options)
     if "python" in options and "--output" not in options:
         options += " --output=__pyccel__"
     cmd = [shutil.which("pyccel"), test_file]
