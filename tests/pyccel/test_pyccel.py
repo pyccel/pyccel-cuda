@@ -393,9 +393,9 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             if output_dir:
                 rel_path = os.path.relpath(os.path.dirname(d), start=rel_test_dir)
                 output = get_abs_path(os.path.join(output_dir, rel_path))
-                pyc_command = pyccel_commands + ' --output={}'.format(output)
+                pyc_command = "--language=c" + ' --output={}'.format(output)
             else:
-                pyc_command = pyccel_commands
+                pyc_command = "--language=c"
 
             if not compile_with_pyccel:
                 compile_pyccel (cwd, dependencies[i], pyc_command+" -t")
