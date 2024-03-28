@@ -42,3 +42,4 @@ cuda_mod = Module('cuda',
     funcs=cuda_funcs.values(),
     imports=[]
 )
+

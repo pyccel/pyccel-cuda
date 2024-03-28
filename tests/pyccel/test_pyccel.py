@@ -407,7 +407,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_c(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'cuda':
                     compile_cuda(cwd, dependencies[i], [], is_mod = True)
-                
+
             else:
                 # print(3)
                 # print(pyc_command)
