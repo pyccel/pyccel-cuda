@@ -56,35 +56,35 @@ class CudaCodePrinter(CCodePrinter):
 
         super().__init__(filename)
 
-    # def _print_Module(self, expr):
-    #     self.set_scope(expr.scope)
-    #     self._current_module = expr.name
-    #     body = ''.join(self._print(i) for i in expr.body)
+    def _print_Module(self, expr):
+        self.set_scope(expr.scope)
+        self._current_module = expr.name
+        body = ''.join(self._print(i) for i in expr.body)
 
-    #     global_variables = ''.join(self._print(d) for d in expr.declarations)
+        global_variables = ''.join(self._print(d) for d in expr.declarations)
 
-    #     # Print imports last to be sure that all additional_imports have been collected
-    #     imports = [Import(expr.name, Module(expr.name,(),())), *self._additional_imports.values()]
-    #     c_headers_imports = ''
-    #     local_imports = ''
+        # Print imports last to be sure that all additional_imports have been collected
+        imports = [Import(expr.name, Module(expr.name,(),())), *self._additional_imports.values()]
+        c_headers_imports = ''
+        local_imports = ''
 
-    #     for imp in imports:
-    #         if imp.source in c_library_headers:
-    #             c_headers_imports += self._print(imp)
-    #         else:
-    #             local_imports += self._print(imp)
+        for imp in imports:
+            if imp.source in c_library_headers:
+                c_headers_imports += self._print(imp)
+            else:
+                local_imports += self._print(imp)
 
-    #     imports = f'{c_headers_imports}\
-    #                 extern "C"{{\n\
-    #                 {local_imports}\
-    #                 }}'
+        imports = f'{c_headers_imports}\
+                    extern "C"{{\n\
+                    {local_imports}\
+                    }}'
 
-    #     code = f'{imports}\n\
-    #              {global_variables}\n\
-    #              {body}\n'
+        code = f'{imports}\n\
+                 {global_variables}\n\
+                 {body}\n'
 
-    #     self.exit_scope()
-    #     return code
+        self.exit_scope()
+        return code
 
     def function_signature(self, expr, print_arg_names = True):
         """
