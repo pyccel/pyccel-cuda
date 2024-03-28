@@ -402,7 +402,6 @@ class Compiler:
         return compile_obj.program_target
 
     def compile_shared_library(self, compile_obj, output_folder, verbose = False, sharedlib_modname=None):
-        
         """
         Compile a module to a shared library.
 
@@ -501,7 +500,6 @@ class Compiler:
         if p.returncode != 0:
             err_msg = "Failed to build module"
             err_msg += "\n" + err
-            print("cmd------>", cmd);
             raise RuntimeError(err_msg)
         if err:
             warnings.warn(UserWarning(err))

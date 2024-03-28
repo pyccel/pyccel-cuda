@@ -131,7 +131,7 @@ class kernel:
     """
     def __init__(self, f):
         self._f = f
-    
+
     def __getitem__(self, *args):
         """
         Get item method for the kernel class.
