@@ -8,3 +8,4 @@ This module contains CUDA methods for Pyccel.
 def synchronize():
     """Synchronize CUDA device execution."""
     # No action needed for synchronization at this point
+
