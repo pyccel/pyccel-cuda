@@ -10,10 +10,12 @@ def increment_value_inplace(a : int):
 
 # ...
 @kernel
-def make_it_ten(a: int):
-    a = 10
-def main():
-    a = 1
-    make_it_ten[1, 1](a)
-if __name__ == "__main__":
-    main()
+def say_hello():
+    print("Hello")
+
+def f():
+    say_hello[1,1]()
+    cuda.synchronize()
+
+
+
