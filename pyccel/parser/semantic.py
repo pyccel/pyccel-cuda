@@ -69,7 +69,7 @@ from pyccel.ast.datatypes import PrimitiveIntegerType, HomogeneousListType, Stri
 from pyccel.ast.datatypes import PythonNativeBool, PythonNativeInt, PythonNativeFloat
 from pyccel.ast.datatypes import DataTypeFactory, PrimitiveFloatingPointType
 from pyccel.ast.datatypes import InhomogeneousTupleType, HomogeneousTupleType
-from pyccel.ast.datatypes import PrimitiveComplexType, FixedSizeNumericType
+from pyccel.ast.datatypes import PrimitiveComplexType, FixedSizeNumericType, PrimitiveIntegerType
 
 from pyccel.ast.functionalexpr import FunctionalSum, FunctionalMax, FunctionalMin, GeneratorComprehension, FunctionalFor
 
@@ -1250,7 +1250,7 @@ class SemanticParser(BasicParser):
         if not isinstance(expr.launch_config[0], (LiteralInteger, PythonTuple)):
             if isinstance(expr.launch_config[0], PyccelSymbol):
                 numBlocks = self.get_variable(expr.launch_config[0])
-                if not isinstance(numBlocks.dtype, NativeInteger):
+                if not isinstance(numBlocks.dtype, PrimitiveIntegerType):
                     errors.report(INVALID_KERNEL_CALL_BP_GRID,
                     symbol = expr,
                     severity='error')
@@ -1261,7 +1261,7 @@ class SemanticParser(BasicParser):
         if not isinstance(expr.launch_config[1], (LiteralInteger, PythonTuple)):
             if isinstance(expr.launch_config[1], PyccelSymbol):
                 tpblock = self.get_variable(expr.launch_config[1])
-                if not isinstance(tpblock.dtype, NativeInteger):
+                if not isinstance(tpblock.dtype, PrimitiveIntegerType):
                     errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
                     symbol = expr,
                     severity='error')
