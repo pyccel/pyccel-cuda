@@ -14,7 +14,8 @@ from pyccel.ast.core        import Import, Module
 from pyccel.ast.core      import FunctionAddress
 from pyccel.ast.core      import Assign
 
-from pyccel.ast.datatypes import VoidType , PythonNativeInt
+from pyccel.ast.datatypes import VoidType
+
 
 from pyccel.errors.errors   import Errors
 
@@ -70,8 +71,9 @@ class CudaCodePrinter(CCodePrinter):
                 local_imports += self._print(imp)
 
         imports = f'{c_headers_imports}\
-                {local_imports}\n'
-
+                    extern "C"{{\n\
+                    {local_imports}\
+                    }}'
 
         code = f'{imports}\n\
                  {global_variables}\n\
