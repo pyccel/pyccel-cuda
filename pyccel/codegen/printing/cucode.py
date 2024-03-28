@@ -12,7 +12,7 @@ from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
 
 from pyccel.ast.core        import Import, Module
 from pyccel.ast.core      import FunctionAddress
-from pyccel.ast.core      import Assign
+from pyccel.ast.core      import Assign, PythonNativeInt
 
 from pyccel.ast.datatypes import VoidType
 
