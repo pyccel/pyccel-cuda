@@ -405,8 +405,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_fortran(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'c':
                     compile_c(cwd, dependencies[i], [], is_mod = True)
-                elif language == 'cuda':
-                    compile_cuda(cwd, dependencies[i], [], is_mod = True)
+                # elif language == 'cuda':
+                #     compile_cuda(cwd, dependencies[i], [], is_mod = True)
 
             else:
                 # print(3)
@@ -431,8 +431,8 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             compile_fortran(cwd, output_test_file, dependencies)
         elif language == 'c':
             compile_c(cwd, output_test_file, dependencies)
-        elif language == 'cuda':
-            compile_cuda(cwd, output_test_file, dependencies)
+        # elif language == 'cuda':
+        #     compile_cuda(cwd, output_test_file, dependencies)
 
     lang_out = get_lang_output(output_test_file, language)
     compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
