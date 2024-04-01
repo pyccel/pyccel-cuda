@@ -27,6 +27,7 @@ def test_invalid_block_number():
         epyccel(invalid_block_number, language="cuda")
 
     assert errors.has_errors()
+
     assert errors.num_messages() == 1
 
     error_info = [*errors.error_info_map.values()][0][0]
@@ -49,10 +50,8 @@ def test_invalid_thread_per_block():
 
     with pytest.raises(PyccelSemanticError):
         epyccel(invalid_thread_per_block, language="cuda")
-
     assert errors.has_errors()
     assert errors.num_messages() == 1
-
     error_info = [*errors.error_info_map.values()][0][0]
     assert error_info.symbol.funcdef == 'kernel_call'
     assert INVALID_KERNEL_CALL_TP_BLOCK == error_info.message
