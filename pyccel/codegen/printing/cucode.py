@@ -71,8 +71,9 @@ class CudaCodePrinter(CCodePrinter):
                 local_imports += self._print(imp)
 
         imports = f'{c_headers_imports}\
-                    {local_imports}'
-
+                    extern "C"{{\n\
+                    {local_imports}\
+                    }}'
 
         code = f'{imports}\n\
                  {global_variables}\n\
