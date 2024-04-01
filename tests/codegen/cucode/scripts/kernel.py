@@ -17,9 +17,7 @@ def say_hello():
 # ...
 def f():
     say_hello[1,1]()
-    cuda.synchronize()cin << str;while(1);
-    if(s[i] == 'A
-     )
+    cuda.synchronize()
 
 
 
