@@ -60,16 +60,14 @@ from pyccel.ast.core import Decorator
 from pyccel.ast.core import PyccelFunctionDef
 from pyccel.ast.core import Assert
 
-from pyccel.ast.cuda import KernelCall
-
 from pyccel.ast.class_defs import NumpyArrayClass, TupleClass, get_cls_base
 
 from pyccel.ast.datatypes import CustomDataType, PyccelType, TupleType, VoidType, GenericType
-from pyccel.ast.datatypes import PythonNativeInt, HomogeneousListType, StringType, SymbolicType
+from pyccel.ast.datatypes import PrimitiveIntegerType, HomogeneousListType, StringType, SymbolicType
 from pyccel.ast.datatypes import PythonNativeBool, PythonNativeInt, PythonNativeFloat
 from pyccel.ast.datatypes import DataTypeFactory, PrimitiveFloatingPointType
 from pyccel.ast.datatypes import InhomogeneousTupleType, HomogeneousTupleType
-from pyccel.ast.datatypes import PrimitiveComplexType, FixedSizeNumericType, PythonNativeInt
+from pyccel.ast.datatypes import PrimitiveComplexType, FixedSizeNumericType
 
 from pyccel.ast.functionalexpr import FunctionalSum, FunctionalMax, FunctionalMin, GeneratorComprehension, FunctionalFor
 
@@ -138,10 +136,9 @@ from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_TH
         PYCCEL_RESTRICTION_LIST_COMPREHENSION_LIMITS, PYCCEL_RESTRICTION_LIST_COMPREHENSION_SIZE,
         UNUSED_DECORATORS, UNSUPPORTED_POINTER_RETURN_VALUE, PYCCEL_RESTRICTION_OPTIONAL_NONE,
         PYCCEL_RESTRICTION_PRIMITIVE_IMMUTABLE, PYCCEL_RESTRICTION_IS_ISNOT,
-        FOUND_DUPLICATED_IMPORT, UNDEFINED_WITH_ACCESS, MACRO_MISSING_HEADER_OR_FUNC,
+        FOUND_DUPLICATED_IMPORT, UNDEFINED_WITH_ACCESS, MACRO_MISSING_HEADER_OR_FUNC, PYCCEL_RESTRICTION_INHOMOG_SET,
         MISSING_KERNEL_CONFIGURATION,INVALID_KERNEL_LAUNCH_CONFIG_HEIGHT,
-        INVALID_KERNEL_LAUNCH_CONFIG_LOW, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK
-        )
+        INVALID_KERNEL_LAUNCH_CONFIG_LOW, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
 
 from pyccel.parser.base      import BasicParser
 from pyccel.parser.syntactic import SyntaxParser
@@ -858,7 +855,7 @@ class SemanticParser(BasicParser):
                     return self._visit(var[indices[0]][indices[1:]])
             else:
                 var_type = type(var)
-                errors.report(f"Can't index  {var_type}", symbol=expr,
+                errors.report(f"Can't index {var_type}", symbol=expr,
                     severity='fatal')
 
         indices = tuple(indices)
@@ -909,7 +906,7 @@ class SemanticParser(BasicParser):
 
         for arg in var[indices].indices:
             if not isinstance(arg, (Slice, LiteralEllipsis)) and not (hasattr(arg, 'dtype') and
-                    isinstance(getattr(arg.dtype, 'primitive_type', None), PythonNativeInt)):
+                    isinstance(getattr(arg.dtype, 'primitive_type', None), PrimitiveIntegerType)):
                 errors.report(INVALID_INDICES, symbol=var[indices],
                     bounding_box=(self.current_ast_node.lineno, self.current_ast_node.col_offset),
                     severity='error')
@@ -1139,7 +1136,6 @@ class SemanticParser(BasicParser):
         FunctionCall/PyccelInternalFunction
             The semantic representation of the call.
         """
-
         if isinstance(func, PyccelFunctionDef):
             argument_description = func.argument_description
             func = func.cls_name
