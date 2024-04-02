@@ -77,6 +77,8 @@ from pyccel.ast.headers import MacroFunction, MacroVariable
 from pyccel.ast.internals import PyccelInternalFunction, Slice, PyccelSymbol, PyccelArrayShapeElement
 from pyccel.ast.itertoolsext import Product
 
+from pyccel.ast.cuda import KernelCall
+
 from pyccel.ast.literals import LiteralTrue, LiteralFalse
 from pyccel.ast.literals import LiteralInteger, LiteralFloat
 from pyccel.ast.literals import Nil, LiteralString, LiteralImaginaryUnit

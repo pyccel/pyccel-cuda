@@ -85,18 +85,22 @@ class CudaCodePrinter(CCodePrinter):
     def function_signature(self, expr, print_arg_names = True):
         """
         Get the Cuda representation of the function signature.
+
         Extract from the function definition `expr` all the
         information (name, input, output) needed to create the
         function signature and return a string describing the
         function.
         This is not a declaration as the signature does not end
         with a semi-colon.
+
         Parameters
         ----------
         expr : FunctionDef
             The function definition for which a signature is needed.
+
         print_arg_names : bool, default : True
             Indicates whether argument names should be printed.
+
         Returns
         -------
         str
@@ -104,7 +108,6 @@ class CudaCodePrinter(CCodePrinter):
         """
         arg_vars = [a.var for a in expr.arguments]
         result_vars = [r.var for r in expr.results if not r.is_argument]
-
         n_results = len(result_vars)
 
         if n_results == 1:

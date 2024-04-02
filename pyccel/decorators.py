@@ -128,6 +128,11 @@ class kernel:
 
     This class serves as a decorator to mark a Python function
     as a kernel function, typically used for GPU computations.
+    
+    Parameters
+    ----------
+    f : function
+        The function to which the decorator is applied.
     """
     def __init__(self, f):
         self._f = f
