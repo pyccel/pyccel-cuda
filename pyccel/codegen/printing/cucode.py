@@ -61,16 +61,16 @@ class CudaCodePrinter(CCodePrinter):
 
         # Print imports last to be sure that all additional_imports have been collected
         imports = [Import(expr.name, Module(expr.name,(),())), *self._additional_imports.values()]
-        c_headers_imports = ''
+        cuda_headers_imports = ''
         local_imports = ''
 
         for imp in imports:
             if imp.source in c_library_headers:
-                c_headers_imports += self._print(imp)
+                cuda_headers_imports += self._print(imp)
             else:
                 local_imports += self._print(imp)
 
-        imports = f'{c_headers_imports}\
+        imports = f'{cuda_headers_imports}\
                     extern "C"{{\n\
                     {local_imports}\
                     }}'
