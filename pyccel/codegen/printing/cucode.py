@@ -72,31 +72,15 @@ class CudaCodePrinter(CCodePrinter):
 
         self.exit_scope()
         return code
+
     def _print_ModuleHeader(self, expr):
         self.set_scope(expr.module.scope)
         self._in_header = True
         name = expr.module.name
         if isinstance(name, AsName):
             name = name.name
-        # TODO: Add interfaces
-        classes = ""
+
         funcs = ""
-        for classDef in expr.module.classes:
-            if classDef.docstring is not None:
-                classes += self._print(classDef.docstring)
-            classes += f"struct {classDef.name} {{\n"
-            classes += ''.join(self._print(Declare(var)) for var in classDef.attributes)
-            class_scope = classDef.scope
-            for method in classDef.methods:
-                if not method.is_inline:
-                    class_scope.rename_function(method, f"{classDef.name}__{method.name.lstrip('__')}")
-                    funcs += f"{self.function_signature(method)};\n"
-            for interface in classDef.interfaces:
-                for func in interface.functions:
-                    if not func.is_inline:
-                        class_scope.rename_function(func, f"{classDef.name}__{func.name.lstrip('__')}")
-                        funcs += f"{self.function_signature(func)};\n"
-            classes += "};\n"
         cuda_headers = ''
         for f in expr.module.funcs:
             if not f.is_inline:
@@ -119,6 +103,5 @@ class CudaCodePrinter(CCodePrinter):
         return (f"#ifndef {name.upper()}_H\n \
                 #define {name.upper()}_H\n\n \
                 {global_variables}\n \
-                {classes}\n \
                 {imports}\n \
                 #endif // {name}_H\n")
