@@ -4,7 +4,7 @@
 # go to https://github.com/pyccel/pyccel/blob/master/LICENSE for full license details.     #
 #------------------------------------------------------------------------------------------#
 """
-Module describing the code-wrapping class : CudaToCWrapper
+Module describing the code-wrapping class : CudaToPythonWrapper
 which creates an interface exposing Cuda code to C.
 """
 
@@ -16,7 +16,7 @@ from pyccel.ast.core import Module
 
 cwrapper_ndarray_imports = [Import('cwrapper_ndarrays', Module('cwrapper_ndarrays', (), ()))]
 
-class CudaToCWrapper(CToPythonWrapper):
+class CudaToPythonWrapper(CToPythonWrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
 

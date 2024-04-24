@@ -21,7 +21,7 @@ from pyccel.parser.scope                         import Scope
 from pyccel.utilities.stage                      import PyccelStage
 from .compiling.basic                            import CompileObj
 from pyccel.codegen.printing.ccode               import CCodePrinter
-from pyccel.codegen.wrapper.cuda_to_c_wrapper import CudaToCWrapper
+from pyccel.codegen.wrapper.cuda_to_c_wrapper import CudaToPythonWrapper
 from pyccel.codegen.printing.cucode import CudaCodePrinter
 
 from pyccel.errors.errors import Errors
@@ -177,7 +177,7 @@ def create_shared_library(codegen,
     wrapper_codegen = CWrapperCodePrinter(codegen.parser.filename, language)
     Scope.name_clash_checker = name_clash_checkers['c']
     if language == 'cuda':
-        wrapper = CudaToCWrapper(base_dirpath)
+        wrapper = CudaToPythonWrapper(base_dirpath)
     else:
         wrapper = CToPythonWrapper(base_dirpath)
     start_wrapper_creation = time.time()
