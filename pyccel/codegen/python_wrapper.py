@@ -123,6 +123,7 @@ def create_shared_library(codegen,
 
     if language == 'fortran':
         start_bind_c_wrapping = time.time()
+        # Construct static interface for passing array shapes and write it to file bind_c_MOD.f90
         wrapper = FortranToCWrapper()
         bind_c_mod = wrapper.wrap(codegen.ast)
         timings['Bind C wrapping'] = time.time() - start_bind_c_wrapping
