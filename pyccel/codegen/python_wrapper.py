@@ -111,7 +111,6 @@ def create_shared_library(codegen,
     # Name of shared library
     if sharedlib_modname is None:
         sharedlib_modname = module_name
-    print(sharedlib_modname)
 
     wrapper_filename_root = f'{module_name}_wrapper'
     wrapper_header_filename = f'{wrapper_filename_root}.h'
