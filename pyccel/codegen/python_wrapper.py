@@ -20,9 +20,7 @@ from pyccel.naming                               import name_clash_checkers
 from pyccel.parser.scope                         import Scope
 from pyccel.utilities.stage                      import PyccelStage
 from .compiling.basic                            import CompileObj
-from pyccel.codegen.printing.ccode               import CCodePrinter
-from pyccel.codegen.wrapper.cuda_to_c_wrapper import CudaToPythonWrapper
-from pyccel.codegen.printing.cucode import CudaCodePrinter
+from pyccel.codegen.wrapper.cuda_to_c_wrapper    import CudaToCWrapper
 
 from pyccel.errors.errors import Errors
 
@@ -147,6 +145,12 @@ def create_shared_library(codegen,
                 verbose=verbose)
         timings['Bind C wrapping'] = time.time() - start_bind_c_compiling
         c_ast = bind_c_mod
+
+    elif language == 'cuda':
+        wrapper = CudaToCWrapper()
+        bind_c_mod = wrapper.wrap(codegen.ast)
+        c_ast = bind_c_mod
+
     else:
         c_ast = codegen.ast
 
@@ -176,10 +180,7 @@ def create_shared_library(codegen,
     codegen.ast.set_name(sharedlib_modname)
     wrapper_codegen = CWrapperCodePrinter(codegen.parser.filename, language)
     Scope.name_clash_checker = name_clash_checkers['c']
-    if language == 'cuda':
-        wrapper = CudaToPythonWrapper(base_dirpath)
-    else:
-        wrapper = CToPythonWrapper(base_dirpath)
+    wrapper = CToPythonWrapper(base_dirpath)
     start_wrapper_creation = time.time()
     cwrap_ast = wrapper.wrap(c_ast)
     timings['Wrapper creation'] = time.time() - start_wrapper_creation

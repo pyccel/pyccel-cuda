@@ -4,19 +4,18 @@
 # go to https://github.com/pyccel/pyccel/blob/master/LICENSE for full license details.     #
 #------------------------------------------------------------------------------------------#
 """
-Module describing the code-wrapping class : CudaToPythonWrapper
+Module describing the code-wrapping class : CudaToCWrapper
 which creates an interface exposing Cuda code to C.
 """
 
-from pyccel.codegen.wrapper.c_to_python_wrapper import CToPythonWrapper
 from pyccel.parser.scope import Scope
 from pyccel.ast.core import Import, FunctionDef
 from pyccel.ast.cwrapper      import PyModule
-from pyccel.ast.core import Module
+from pyccel.ast.core import AsName
+from .wrapper import Wrapper
 
-cwrapper_ndarray_imports = [Import('cwrapper_ndarrays', Module('cwrapper_ndarrays', (), ()))]
 
-class CudaToPythonWrapper(CToPythonWrapper):
+class CudaToCWrapper(Wrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
 
@@ -24,21 +23,17 @@ class CudaToPythonWrapper(CToPythonWrapper):
     objects such that the resulting AST is C-compatible. This new AST is
     printed as an intermediary layer.
     """
-    def __init__(self, file_location):
-        self._wrapper_names_dict = {}
-        super().__init__(file_location)
-
+    def __init__(self):
+        super().__init__()
+    
     def _wrap_Module(self, expr):
         """
         Build a `PyModule` from a `Module`.
-
         Create a `PyModule` which wraps a C-compatible `Module`.
-
         Parameters
         ----------
         expr : Module
             The module which can be called from C.
-
         Returns
         -------
         PyModule
@@ -98,3 +93,4 @@ class CudaToPythonWrapper(CToPythonWrapper):
                         interfaces = interfaces, classes = classes, scope = mod_scope,
                         init_func = init_func, import_func = import_func , external_funcs = external_funcs)
 
+    
