@@ -14,8 +14,8 @@ from pyccel.ast.bind_c import BindCModule
 from pyccel.ast.core import Import
 from pyccel.ast.core import Module
 from .wrapper import Wrapper
-cwrapper_ndarray_imports = [Import('cwrapper_ndarrays', Module('cwrapper_ndarrays', (), ()))]
-
+from pyccel.errors.errors import Errors
+errors = Errors()
 class CudaToCWrapper(Wrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
