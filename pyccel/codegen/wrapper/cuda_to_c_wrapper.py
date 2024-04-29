@@ -8,11 +8,8 @@ Module describing the code-wrapping class : CudaToPythonWrapper
 which creates an interface exposing Cuda code to C.
 """
 
-from pyccel.ast.core import Module
 from .wrapper import Wrapper
 from pyccel.ast.bind_c import BindCModule
-from pyccel.ast.core import Import
-from pyccel.ast.core import Module
 from .wrapper import Wrapper
 from pyccel.errors.errors import Errors
 errors = Errors()
@@ -56,5 +53,3 @@ class CudaToCWrapper(Wrapper):
         return BindCModule(expr.name, expr.variables, expr.funcs,
                 scope = expr.scope,
                 original_module=expr)
-    def _wrap_FunctionDef(self, expr):
-        return expr
