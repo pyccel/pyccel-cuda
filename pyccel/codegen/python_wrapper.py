@@ -13,6 +13,7 @@ from pyccel.codegen.printing.cwrappercode        import CWrapperCodePrinter
 from pyccel.codegen.printing.fcode               import FCodePrinter
 from pyccel.codegen.wrapper.fortran_to_c_wrapper import FortranToCWrapper
 from pyccel.codegen.wrapper.c_to_python_wrapper  import CToPythonWrapper
+from pyccel.codegen.wrapper.cuda_to_c_wrapper    import CudaToCWrapper
 from pyccel.codegen.utilities                    import recompile_object
 from pyccel.codegen.utilities                    import copy_internal_library
 from pyccel.codegen.utilities                    import internal_libs
@@ -20,7 +21,6 @@ from pyccel.naming                               import name_clash_checkers
 from pyccel.parser.scope                         import Scope
 from pyccel.utilities.stage                      import PyccelStage
 from .compiling.basic                            import CompileObj
-from pyccel.codegen.wrapper.cuda_to_c_wrapper    import CudaToCWrapper
 
 from pyccel.errors.errors import Errors
 
