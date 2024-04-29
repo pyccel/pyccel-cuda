@@ -148,8 +148,7 @@ def create_shared_library(codegen,
 
     elif language == 'cuda':
         wrapper = CudaToCWrapper()
-        bind_c_mod = wrapper.wrap(codegen.ast)
-        c_ast = bind_c_mod
+        c_ast = wrapper.wrap(codegen.ast)
 
     else:
         c_ast = codegen.ast
@@ -181,6 +180,7 @@ def create_shared_library(codegen,
     wrapper_codegen = CWrapperCodePrinter(codegen.parser.filename, language)
     Scope.name_clash_checker = name_clash_checkers['c']
     wrapper = CToPythonWrapper(base_dirpath)
+
     start_wrapper_creation = time.time()
     cwrap_ast = wrapper.wrap(c_ast)
     timings['Wrapper creation'] = time.time() - start_wrapper_creation

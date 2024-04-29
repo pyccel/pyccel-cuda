@@ -87,8 +87,7 @@ class CudaCodePrinter(CCodePrinter):
                     cuda_headers += self.function_signature(f) + ';'
                 else:
                     funcs += self.function_signature(f) + ';'
-        global_variables = ''.join(['extern '+self._print(d) for d in expr.module.declarations if not d.variable.is_private])
-
+        global_variables = ''.join('extern '+self._print(d) for d in expr.module.declarations if not d.variable.is_private)
         # Print imports last to be sure that all additional_imports have been collected
         imports = [*expr.module.imports, *self._additional_imports.values()]
         imports = ''.join(self._print(i) for i in imports)

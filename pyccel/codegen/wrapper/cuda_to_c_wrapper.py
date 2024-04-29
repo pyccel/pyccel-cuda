@@ -8,14 +8,11 @@ Module describing the code-wrapping class : CudaToPythonWrapper
 which creates an interface exposing Cuda code to C.
 """
 
-from pyccel.codegen.wrapper.c_to_python_wrapper import CToPythonWrapper
-from pyccel.parser.scope import Scope
 from pyccel.ast.core import Module
 from .wrapper import Wrapper
 from pyccel.ast.bind_c import BindCModule
 from pyccel.ast.core import Import
 from pyccel.ast.core import Module
-from pyccel.parser.scope import Scope
 from .wrapper import Wrapper
 cwrapper_ndarray_imports = [Import('cwrapper_ndarrays', Module('cwrapper_ndarrays', (), ()))]
 
@@ -49,15 +46,15 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.Module
             The C-compatible module.
         """
-        # Define scope
-        scope = expr.scope
-        mod_scope = Scope(used_symbols = scope.local_used_symbols.copy(), original_symbols = scope.python_names.copy())
-        self.scope = mod_scope
+        if expr.interfaces:
+             errors.report("Interface wrapping is not yet supported for Cuda",
+                      severity='warning', symbol=expr)
+        if expr.classes:
+             errors.report("Class wrapping is not yet supported for Cuda",
+                      severity='warning', symbol=expr)
 
-        name = mod_scope.get_new_name(f'bind_c_{expr.name.target}')
-        self.exit_scope()
-        return BindCModule(name, expr.variables, expr.funcs,
-                scope = mod_scope,
+        return BindCModule(expr.name, expr.variables, expr.funcs,
+                scope = expr.scope,
                 original_module=expr)
     def _wrap_FunctionDef(self, expr):
         return expr
