@@ -78,6 +78,7 @@ class CudaCodePrinter(CCodePrinter):
         name = expr.module.name
         if isinstance(name, AsName):
             name = name.name
+        # TODO: Add interfaces
 
         funcs = ""
         cuda_headers = ''

@@ -43,11 +43,15 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.Module
             The C-compatible module.
         """
+        print(expr)
         if expr.interfaces:
             errors.report("Interface wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
         if expr.classes:
             errors.report("Class wrapping is not yet supported for Cuda",
+                      severity='warning', symbol=expr)
+        if expr.variables:
+            errors.report("Variable wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
 
         return BindCModule(expr.name, expr.variables, expr.funcs,
