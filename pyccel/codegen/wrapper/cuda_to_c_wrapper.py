@@ -11,6 +11,23 @@ which creates an interface exposing Cuda code to C.
 from pyccel.ast.bind_c import BindCModule
 from pyccel.errors.errors import Errors
 from .wrapper import Wrapper
+import warnings
+from pyccel.ast.bind_c import BindCFunctionDefArgument, BindCFunctionDefResult
+from pyccel.ast.bind_c import BindCPointer, BindCFunctionDef, C_F_Pointer
+from pyccel.ast.bind_c import CLocFunc, BindCModule, BindCVariable
+from pyccel.ast.bind_c import BindCArrayVariable, BindCClassDef, DeallocatePointer
+from pyccel.ast.bind_c import BindCClassProperty
+from pyccel.ast.core import Assign, FunctionCall, FunctionCallArgument
+from pyccel.ast.core import Allocate, EmptyNode, FunctionAddress
+from pyccel.ast.core import If, IfSection, Import, Interface, FunctionDefArgument
+from pyccel.ast.core import AsName, Module, AliasAssign, FunctionDefResult
+from pyccel.ast.datatypes import CustomDataType, FixedSizeNumericType
+from pyccel.ast.internals import Slice
+from pyccel.ast.literals import LiteralInteger, Nil, LiteralTrue
+from pyccel.ast.operators import PyccelIsNot, PyccelMul
+from pyccel.ast.variable import Variable, IndexedElement, DottedVariable
+from pyccel.parser.scope import Scope
+from .wrapper import Wrapper
 
 errors = Errors()
 class CudaToCWrapper(Wrapper):
@@ -43,17 +60,18 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.Module
             The C-compatible module.
         """
-        print(expr)
         if expr.interfaces:
             errors.report("Interface wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
         if expr.classes:
             errors.report("Class wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
-        if expr.variables:
-            errors.report("Variable wrapping is not yet supported for Cuda",
-                      severity='warning', symbol=expr)
 
-        return BindCModule(expr.name, expr.variables, expr.funcs,
+        variables = [self._wrap(v) for v in expr.variables]
+
+        return BindCModule(expr.name, variables, expr.funcs,
                 scope = expr.scope,
                 original_module=expr)
+
+    def _wrap_Variable(self, expr):
+        return expr.clone(expr.name, new_class = BindCVariable)

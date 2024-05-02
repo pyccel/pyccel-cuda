@@ -1700,6 +1700,13 @@ class CToPythonWrapper(Wrapper):
         # Ensure that cwrapper_ndarrays is imported
         if expr.rank > 0:
             self._wrapping_arrays = True
+        py_equiv = self.scope.get_temporary_variable(PyccelPyObject(), memory_handling='alias')
+        # Save the Variable so it can be located later
+        self._python_object_map[expr] = py_equiv
+
+        # Cast the C variable into a Python variable
+        wrapper_function = C_to_Python(expr)
+        return [AliasAssign(py_equiv, FunctionCall(wrapper_function, [expr]))]
 
         # Create the resulting Variable with datatype `PyccelPyObject`
         py_equiv = self.scope.get_temporary_variable(PyccelPyObject(), memory_handling='alias')
