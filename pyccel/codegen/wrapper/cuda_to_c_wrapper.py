@@ -10,23 +10,7 @@ which creates an interface exposing Cuda code to C.
 
 from pyccel.ast.bind_c import BindCModule
 from pyccel.errors.errors import Errors
-from .wrapper import Wrapper
-import warnings
-from pyccel.ast.bind_c import BindCFunctionDefArgument, BindCFunctionDefResult
-from pyccel.ast.bind_c import BindCPointer, BindCFunctionDef, C_F_Pointer
-from pyccel.ast.bind_c import CLocFunc, BindCModule, BindCVariable
-from pyccel.ast.bind_c import BindCArrayVariable, BindCClassDef, DeallocatePointer
-from pyccel.ast.bind_c import BindCClassProperty
-from pyccel.ast.core import Assign, FunctionCall, FunctionCallArgument
-from pyccel.ast.core import Allocate, EmptyNode, FunctionAddress
-from pyccel.ast.core import If, IfSection, Import, Interface, FunctionDefArgument
-from pyccel.ast.core import AsName, Module, AliasAssign, FunctionDefResult
-from pyccel.ast.datatypes import CustomDataType, FixedSizeNumericType
-from pyccel.ast.internals import Slice
-from pyccel.ast.literals import LiteralInteger, Nil, LiteralTrue
-from pyccel.ast.operators import PyccelIsNot, PyccelMul
-from pyccel.ast.variable import Variable, IndexedElement, DottedVariable
-from pyccel.parser.scope import Scope
+from pyccel.ast.bind_c import BindCVariable
 from .wrapper import Wrapper
 
 errors = Errors()
