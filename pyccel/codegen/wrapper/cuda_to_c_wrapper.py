@@ -12,6 +12,8 @@ from pyccel.ast.bind_c import BindCModule
 from pyccel.errors.errors import Errors
 from pyccel.ast.bind_c import BindCVariable
 from .wrapper import Wrapper
+from pyccel.ast.datatypes import FixedSizeNumericType
+
 
 errors = Errors()
 class CudaToCWrapper(Wrapper):
@@ -41,7 +43,7 @@ class CudaToCWrapper(Wrapper):
 
         Returns
         -------
-        pyccel.ast.core.Module
+        pyccel.ast.core.BindCModule
             The C-compatible module.
         """
         if expr.interfaces:
@@ -58,5 +60,20 @@ class CudaToCWrapper(Wrapper):
                 original_module=expr)
 
     def _wrap_Variable(self, expr):
-        if(isinstance(expr.class_type, FixedSizeNumericType)):
-            return expr.clone(expr.name, new_class = BindCVariable)
+        """
+        Create all objects necessary to expose a module variable to C.
+
+        Create and return the objects which must be printed in the wrapping
+        module in order to expose the variable to C
+        Parameters
+        ----------
+        expr : pyccel.ast.variables.Variable
+            The module variable.
+
+        Returns
+        -------
+        pyccel.ast.core.BindCVariable
+        """
+        return expr.clone(expr.name, new_class = BindCVariable)
+
+       
