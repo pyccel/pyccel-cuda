@@ -12,7 +12,6 @@ from pyccel.ast.bind_c import BindCModule
 from pyccel.errors.errors import Errors
 from pyccel.ast.bind_c import BindCVariable
 from .wrapper import Wrapper
-from pyccel.ast.datatypes import FixedSizeNumericType
 
 
 errors = Errors()
@@ -76,4 +75,4 @@ class CudaToCWrapper(Wrapper):
         """
         return expr.clone(expr.name, new_class = BindCVariable)
 
-       
+
