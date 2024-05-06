@@ -73,3 +73,18 @@ def test_function(language):
     h_fast(x)
 
     assert np.array_equal(x, x_expected)
+
+#================================================================================
+@pytest.mark.parallel
+def test_module_3(language):
+    import modules.Module_9 as mod
+
+    modnew = epyccel(mod, language=language)
+
+    atts = ('g', 'R0', 'rMin', 'rMax', 'skip_centre',
+            'method', 'tiny')
+    for att in atts:
+        mod_att = getattr(mod, att)
+        modnew_att = getattr(modnew, att)
+        assert mod_att == modnew_att
+        assert type(mod_att) is type(modnew_att)

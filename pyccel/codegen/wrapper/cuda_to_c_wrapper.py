@@ -58,4 +58,5 @@ class CudaToCWrapper(Wrapper):
                 original_module=expr)
 
     def _wrap_Variable(self, expr):
-        return expr.clone(expr.name, new_class = BindCVariable)
+        if(isinstance(expr.class_type, FixedSizeNumericType)):
+            return expr.clone(expr.name, new_class = BindCVariable)
