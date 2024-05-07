@@ -45,6 +45,11 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.BindCModule
             The C-compatible module.
         """
+        funcs = [f for f in expr.funcs if f.is_semantic and not f.is_inline]
+        if expr.init_func:
+            init_func = funcs[next(i for i,f in enumerate(funcs) if f == expr.init_func)]
+        else:
+            init_func = None
         if expr.interfaces:
             errors.report("Interface wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
@@ -55,6 +60,7 @@ class CudaToCWrapper(Wrapper):
         variables = [self._wrap(v) for v in expr.variables]
 
         return BindCModule(expr.name, variables, expr.funcs,
+                init_func=init_func,
                 scope = expr.scope,
                 original_module=expr)
 
