@@ -104,3 +104,4 @@ class CudaCodePrinter(CCodePrinter):
                 {global_variables}\n \
                 {imports}\n \
                 #endif // {name.upper()}_H\n")
+
