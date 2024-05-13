@@ -195,5 +195,3 @@ def test_cuda_module(language_with_cuda):
         modnew_att = getattr(modnew, att)
         assert mod_att == modnew_att
         assert type(mod_att) is type(modnew_att)
-
-

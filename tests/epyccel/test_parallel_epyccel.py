@@ -73,4 +73,3 @@ def test_function(language):
     h_fast(x)
 
     assert np.array_equal(x, x_expected)
-
