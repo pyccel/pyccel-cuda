@@ -77,7 +77,8 @@ class CudaCodePrinter(CCodePrinter):
         name = expr.module.name
         if isinstance(name, AsName):
             name = name.name
-        # TODO: Add interfaces
+        if expr.interfaces:
+            raise errors.report("CUDA does not support interfaces", severity='fatal')
 
         funcs = ""
         cuda_headers = ""

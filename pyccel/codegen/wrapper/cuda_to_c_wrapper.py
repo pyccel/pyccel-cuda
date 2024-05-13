@@ -19,11 +19,11 @@ class CudaToCWrapper(Wrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
 
-    A class which provides all necessary functions for wrapping different AST
-    objects such that the resulting AST is C-compatible. This new AST is
-    printed as an intermediary layer.
+    While CUDA is typically compatible with C by default, this wrapper becomes necessary in
+    scenarios where specific adaptations or modifications are
+    required to ensure seamless integration with C.
     """
-    def __init__(self):
+    def __init__():
         super().__init__()
 
     def _wrap_Module(self, expr):
@@ -44,7 +44,6 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.BindCModule
             The C-compatible module.
         """
-        funcs = [f for f in expr.funcs if f.is_semantic and not f.is_inline]
         init_func = expr.init_func
         if expr.interfaces:
             errors.report("Interface wrapping is not yet supported for Cuda",
