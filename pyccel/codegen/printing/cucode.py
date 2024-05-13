@@ -61,10 +61,8 @@ class CudaCodePrinter(CCodePrinter):
             else:
                 local_imports += self._print(imp)
 
-        imports = f'{c_headers_imports}\
-                   \n\
-                    {local_imports}\
-                    '
+        imports = f'{c_headers_imports}\n\
+                    {local_imports}\n'
 
         code = f'{imports}\n\
                  {global_variables}\n\
@@ -86,9 +84,9 @@ class CudaCodePrinter(CCodePrinter):
         for f in expr.module.funcs:
             if not f.is_inline:
                 if 'kernel' in f.decorators:  # Checking for 'kernel' decorator
-                    cuda_headers += self.function_signature(f) + ';'
+                    cuda_headers += self.function_signature(f) + ';\n'
                 else:
-                    funcs += self.function_signature(f) + ';'
+                    funcs += self.function_signature(f) + ';\n'
         global_variables = ''.join('extern '+self._print(d) for d in expr.module.declarations if not d.variable.is_private)
         # Print imports last to be sure that all additional_imports have been collected
         imports = [*expr.module.imports, *self._additional_imports.values()]

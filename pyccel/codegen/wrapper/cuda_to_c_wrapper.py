@@ -13,8 +13,8 @@ from pyccel.errors.errors   import Errors
 from pyccel.ast.bind_c      import BindCVariable
 from .wrapper               import Wrapper
 
-
 errors = Errors()
+
 class CudaToCWrapper(Wrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
@@ -26,7 +26,6 @@ class CudaToCWrapper(Wrapper):
     def __init__(self):
         self._wrapper_names_dict = {}
         super().__init__()
-
 
     def _wrap_Module(self, expr):
         """
@@ -80,5 +79,4 @@ class CudaToCWrapper(Wrapper):
         pyccel.ast.core.BindCVariable
         """
         return expr.clone(expr.name, new_class = BindCVariable)
-
 
