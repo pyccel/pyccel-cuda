@@ -23,8 +23,6 @@ class CudaToCWrapper(Wrapper):
     scenarios where specific adaptations or modifications are
     required to ensure seamless integration with C.
     """
-    def __init__():
-        super().__init__()
 
     def _wrap_Module(self, expr):
         """
