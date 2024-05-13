@@ -24,7 +24,6 @@ class CudaToCWrapper(Wrapper):
     printed as an intermediary layer.
     """
     def __init__(self):
-        self._wrapper_names_dict = {}
         super().__init__()
 
     def _wrap_Module(self, expr):
@@ -32,7 +31,8 @@ class CudaToCWrapper(Wrapper):
         Create a Module which is compatible with C.
 
         Create a Module which provides an interface between C and the
-        Module described by expr
+
+        Module described by expr.
 
         Parameters
         ----------
@@ -45,10 +45,7 @@ class CudaToCWrapper(Wrapper):
             The C-compatible module.
         """
         funcs = [f for f in expr.funcs if f.is_semantic and not f.is_inline]
-        if expr.init_func:
-            init_func = funcs[next(i for i,f in enumerate(funcs) if f == expr.init_func)]
-        else:
-            init_func = None
+        init_func = expr.init_func
         if expr.interfaces:
             errors.report("Interface wrapping is not yet supported for Cuda",
                       severity='warning', symbol=expr)
@@ -69,6 +66,7 @@ class CudaToCWrapper(Wrapper):
 
         Create and return the objects which must be printed in the wrapping
         module in order to expose the variable to C
+
         Parameters
         ----------
         expr : pyccel.ast.variables.Variable

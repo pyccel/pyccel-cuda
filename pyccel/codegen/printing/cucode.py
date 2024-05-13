@@ -61,8 +61,8 @@ class CudaCodePrinter(CCodePrinter):
             else:
                 local_imports += self._print(imp)
 
-        imports = f'{c_headers_imports}\n\
-                    {local_imports}\n'
+        imports = (f'{c_headers_imports}\n'
+                   f'{local_imports}\n')
 
         code = f'{imports}\n\
                  {global_variables}\n\
@@ -80,7 +80,7 @@ class CudaCodePrinter(CCodePrinter):
         # TODO: Add interfaces
 
         funcs = ""
-        cuda_headers = ''
+        cuda_headers = ""
         for f in expr.module.funcs:
             if not f.is_inline:
                 if 'kernel' in f.decorators:  # Checking for 'kernel' decorator
@@ -102,4 +102,4 @@ class CudaCodePrinter(CCodePrinter):
                 #define {name.upper()}_H\n\n \
                 {global_variables}\n \
                 {imports}\n \
-                #endif // {name}_H\n")
+                #endif // {name.upper()}_H\n")
