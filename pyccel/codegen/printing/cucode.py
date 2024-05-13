@@ -40,6 +40,7 @@ class CudaCodePrinter(CCodePrinter):
     def __init__(self, filename, prefix_module = None):
 
         errors.set_target(filename)
+
         super().__init__(filename)
 
     def _print_Module(self, expr):
