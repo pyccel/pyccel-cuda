@@ -19,9 +19,9 @@ class CudaToCWrapper(Wrapper):
     """
     Class for creating a wrapper exposing Fortran code to C.
 
-    While CUDA is typically compatible with C by default, this wrapper becomes necessary in
-    scenarios where specific adaptations or modifications are
-    required to ensure seamless integration with C.
+    While CUDA is typically compatible with C by default.
+    this wrapper becomes necessary inscenarios where specific adaptations
+    or modifications are required to ensure seamless integration with C.
     """
 
     def _wrap_Module(self, expr):
