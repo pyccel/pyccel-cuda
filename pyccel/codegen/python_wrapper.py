@@ -145,14 +145,11 @@ def create_shared_library(codegen,
                 verbose=verbose)
         timings['Bind C wrapping'] = time.time() - start_bind_c_compiling
         c_ast = bind_c_mod
-
     elif language == 'cuda':
         wrapper = CudaToCWrapper()
         c_ast = wrapper.wrap(codegen.ast)
-
     else:
         c_ast = codegen.ast
-
     #---------------------------------------
     #     Compile cwrapper from stdlib
     #---------------------------------------
