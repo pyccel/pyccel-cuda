@@ -98,7 +98,7 @@ class CudaCodePrinter(CCodePrinter):
                     {funcs}\
                     }}'
         return (f"#ifndef {name.upper()}_H\n \
-                #define {name.upper()}_H\n \
+                #define {name.upper()}_H \
                 {global_variables}\n \
                 { function_declaration}\n \
                 #endif // {name.upper()}_H\n")
