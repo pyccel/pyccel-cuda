@@ -17,7 +17,7 @@ errors = Errors()
 
 class CudaToCWrapper(Wrapper):
     """
-    Class for creating a wrapper exposing Fortran code to C.
+    Class for creating a wrapper exposing Cuda code to C.
 
     While CUDA is typically compatible with C by default.
     this wrapper becomes necessary inscenarios where specific adaptations
