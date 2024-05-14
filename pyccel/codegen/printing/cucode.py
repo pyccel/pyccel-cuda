@@ -95,10 +95,10 @@ class CudaCodePrinter(CCodePrinter):
         self.exit_scope()
         function_declaration = f'{cuda_headers}\n\
                     extern "C"{{\n\
-                    {funcs}\n\
+                    {funcs}\
                     }}'
         return (f"#ifndef {name.upper()}_H\n \
-                #define {name.upper()}_H\n\n \
+                #define {name.upper()}_H\n \
                 {global_variables}\n \
                 { function_declaration}\n \
                 #endif // {name.upper()}_H\n")
