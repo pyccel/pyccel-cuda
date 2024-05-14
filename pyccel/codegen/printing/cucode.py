@@ -61,10 +61,10 @@ class CudaCodePrinter(CCodePrinter):
             else:
                 local_imports += self._print(imp)
 
-        function_declaration = (f'{c_headers_imports}\n'
+        imports = (f'{c_headers_imports}\n'
                    f'{local_imports}\n')
 
-        code = f'{function_declaration}\n\
+        code = f'{imports}\n\
                  {global_variables}\n\
                  {body}\n'
 
@@ -93,13 +93,13 @@ class CudaCodePrinter(CCodePrinter):
 
         self._in_header = False
         self.exit_scope()
-        imports = f'{cuda_headers}\n\
+        function_declaration = f'{cuda_headers}\n\
                     extern "C"{{\n\
                     {funcs}\n\
                     }}'
         return (f"#ifndef {name.upper()}_H\n \
                 #define {name.upper()}_H\n\n \
                 {global_variables}\n \
-                {imports}\n \
+                { function_declaration}\n \
                 #endif // {name.upper()}_H\n")
 
