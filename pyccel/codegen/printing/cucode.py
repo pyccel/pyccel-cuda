@@ -61,10 +61,10 @@ class CudaCodePrinter(CCodePrinter):
             else:
                 local_imports += self._print(imp)
 
-        functions_declaration = (f'{c_headers_imports}\n'
+        function_declaration = (f'{c_headers_imports}\n'
                    f'{local_imports}\n')
 
-        code = f'{functions_declaration}\n\
+        code = f'{function_declaration}\n\
                  {global_variables}\n\
                  {body}\n'
 
