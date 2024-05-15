@@ -29,7 +29,6 @@ class CudaToCWrapper(Wrapper):
         Create a Module which is compatible with C.
 
         Create a Module which provides an interface between C and the
-
         Module described by expr.
 
         Parameters
@@ -72,6 +71,8 @@ class CudaToCWrapper(Wrapper):
         Returns
         -------
         pyccel.ast.core.BindCVariable
+            The C-compatible variable. which must be printed in
+            the wrapping module to expose the variable.
         """
         return expr.clone(expr.name, new_class = BindCVariable)
 

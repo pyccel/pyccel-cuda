@@ -150,6 +150,7 @@ def create_shared_library(codegen,
         c_ast = wrapper.wrap(codegen.ast)
     else:
         c_ast = codegen.ast
+
     #---------------------------------------
     #     Compile cwrapper from stdlib
     #---------------------------------------
