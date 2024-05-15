@@ -65,8 +65,6 @@ class CudaCodePrinter(CCodePrinter):
         self.set_scope(expr.module.scope)
         self._in_header = True
         name = expr.module.name
-        if isinstance(name, AsName):
-            name = name.name
 
         funcs = ""
         cuda_headers = ""
