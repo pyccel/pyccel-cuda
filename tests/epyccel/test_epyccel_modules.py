@@ -258,3 +258,16 @@ def test_module_11(language):
     len_pyc = modnew.set_union()
 
     assert len_pyt == len_pyc
+
+def test_cuda_module(language_with_cuda):
+    import modules.cuda_module as mod
+
+    modnew = epyccel(mod, language=language_with_cuda)
+
+    atts = ('g', 'r0', 'rmin', 'rmax', 'skip_centre',
+            'method', 'tiny')
+    for att in atts:
+        mod_att = getattr(mod, att)
+        modnew_att = getattr(modnew, att)
+        assert mod_att == modnew_att
+        assert type(mod_att) is type(modnew_att)
