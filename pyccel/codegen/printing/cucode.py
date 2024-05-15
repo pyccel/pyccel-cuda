@@ -84,10 +84,11 @@ class CudaCodePrinter(CCodePrinter):
         function_declaration = f'{cuda_headers}\n\
                     extern "C"{{\n\
                     {funcs}\
-                    }}'
-        return (f"#ifndef {name.upper()}_H\n \
-                #define {name.upper()}_H \
-                {global_variables}\n \
-                { function_declaration}\n\n \
-                #endif // {name.upper()}_H\n")
+                    }}\n'
+        return '\n'.join((f"#ifndef {name.upper()}_H",
+                          f"#define {name.upper()}_H",
+                          global_variables,
+                          function_declaration,
+                          "#endif // {name.upper()}_H\n"))
 
+        
