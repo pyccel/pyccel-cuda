@@ -91,4 +91,3 @@ class CudaCodePrinter(CCodePrinter):
                           function_declaration,
                           "#endif // {name.upper()}_H\n"))
 
-
