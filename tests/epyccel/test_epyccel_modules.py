@@ -243,3 +243,16 @@ def test_module_type_alias_expression(language):
     assert np.isclose( max_pyt, max_pyc, rtol=1e-14, atol=1e-14 )
     assert np.allclose( x, x_pyc, rtol=1e-14, atol=1e-14 )
     assert np.allclose( y, y_pyc, rtol=1e-14, atol=1e-14 )
+
+def test_cuda_module(language_with_cuda):
+    import modules.cuda_module as mod
+
+    modnew = epyccel(mod, language=language_with_cuda)
+
+    atts = ('g', 'r0', 'rmin', 'rmax', 'skip_centre',
+            'method', 'tiny')
+    for att in atts:
+        mod_att = getattr(mod, att)
+        modnew_att = getattr(modnew, att)
+        assert mod_att == modnew_att
+        assert type(mod_att) is type(modnew_att)
