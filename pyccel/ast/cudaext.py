@@ -8,7 +8,7 @@
 CUDA Extension Module
 Provides CUDA functionality for code generation.
 """
-from .internals      import PyccelInternalFunction
+from .internals      import PyccelFunction
 
 from .datatypes import (VoidType)
 from .core           import Module, PyccelFunctionDef
@@ -17,7 +17,7 @@ __all__ = (
     'CudaSynchronize',
 )
 
-class CudaSynchronize(PyccelInternalFunction):
+class CudaSynchronize(PyccelFunction):
     """
     Represents a call to  Cuda.deviceSynchronize for code generation.
     
