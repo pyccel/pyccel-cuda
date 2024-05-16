@@ -28,7 +28,6 @@ def get_exe(filename, language=None):
         exefile1 = os.path.splitext(filename)[0]
     else:
         exefile1 = filename
-
     if sys.platform == "win32" and language!="python":
         exefile1 += ".exe"
 
@@ -162,7 +161,6 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
     is_mod : bool, default=False
         True if translating a module, False if translating a program
     """
-    print("compiler", compiler)
     root = insert_pyccel_folder(test_file)[:-3]
 
     assert os.path.isfile(root+extension)
@@ -348,6 +346,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
     test_file = get_abs_path(test_file)
 
     pyth_out = get_python_output(test_file, cwd)
+
     if language:
         pyccel_commands += " --language="+language
     else:
@@ -361,7 +360,6 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         if isinstance(dependencies, str):
             dependencies = [dependencies]
         for i, d in enumerate(dependencies):
-            print(dependencies[i])
             dependencies[i] = get_abs_path(d)
             if output_dir:
                 rel_path = os.path.relpath(os.path.dirname(d), start=rel_test_dir)
