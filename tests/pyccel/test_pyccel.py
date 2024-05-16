@@ -57,8 +57,6 @@ def get_python_output(abs_path, cwd = None):
 
 #------------------------------------------------------------------------------
 def compile_pyccel(path_dir, test_file, options = ""):
-    print("hello from compile_pyccel")
-    print(options)
     if "python" in options and "--output" not in options:
         options += " --output=__pyccel__"
     cmd = [shutil.which("pyccel"), test_file]
@@ -67,33 +65,6 @@ def compile_pyccel(path_dir, test_file, options = ""):
     p = subprocess.Popen(cmd, universal_newlines=True, cwd=path_dir)
     p.wait()
     assert p.returncode==0
-
-#------------------------------------------------------------------------------
-def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
-    """
-    compile Cuda coda manually.
-    
-    Compile Cuda code manually.
-
-    Parameters
-    ----------
-    path_dir : str
-        The path to the directory where the compilation command should be run from.
-
-    test_file : str
-        The Python file which was translated.
-
-    dependencies : list of str
-        A list of any Python dependencies of the file.
-
-    is_mod : bool, default=False
-        True if translating a module, False if translating a program
-
-    See also
-    --------
-    compile_fortran_or_c : The function that is called.
-    """
-    compile_fortran_or_c(shutil.which('nvcc'), '.cu', path_dir, test_file, dependencies, (), is_mod)
 
 #------------------------------------------------------------------------------
 def compile_c(path_dir, test_file, dependencies, is_mod=False):
@@ -174,7 +145,7 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
         The compiler (gfortran/gcc).
 
     extension : str
-        The extension of the generated file (.c/.f90/.cu).
+        The extension of the generated file (.c/.f90).
 
     path_dir : str
         The path to the directory where the compilation command should be run from.
@@ -405,14 +376,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                     compile_fortran(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'c':
                     compile_c(cwd, dependencies[i], [], is_mod = True)
-                # elif language == 'cuda':
-                #     compile_cuda(cwd, dependencies[i], [], is_mod = True)
-
             else:
-                # print(3)
-                # print(pyc_command)
-                # print(dependencies[i])
-                # print(cwd)
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
@@ -431,8 +395,6 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             compile_fortran(cwd, output_test_file, dependencies)
         elif language == 'c':
             compile_c(cwd, output_test_file, dependencies)
-        # elif language == 'cuda':
-        #     compile_cuda(cwd, output_test_file, dependencies)
 
     lang_out = get_lang_output(output_test_file, language)
     compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
