@@ -33,7 +33,7 @@ def get_exe(filename, language=None):
     dirname = os.path.dirname(filename)
     basename = os.path.basename(exefile1)
     exefile2 = os.path.join(dirname, basename)
-   
+
     if os.path.isfile(exefile2):
         return exefile2
     else:
@@ -206,7 +206,6 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
 
 #------------------------------------------------------------------------------
 def get_lang_output(abs_path, language):
-    print("> testing %s" % abs_path)
     abs_path = get_exe(abs_path, language)
     if language=="python":
         return get_python_output(abs_path)
