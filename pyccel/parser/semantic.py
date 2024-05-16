@@ -1139,19 +1139,24 @@ class SemanticParser(BasicParser):
     def _handle_kernel(self, expr, func, args, **settings):
         """
         Create the node representing the kernel function call.
+
         Create a FunctionCall or an instance of a PyccelInternalFunction
         from the function information and arguments.
 
         Parameters
         ----------
         expr : PyccelAstNode
-               The expression where this call is found (used for error output).
+               The expression where this call is found (used for error output).\
+
         func : FunctionDef instance, Interface instance or PyccelInternalFunction type
                The function being called.
+
         args : tuple
                The arguments passed to the function.
+
         **settings : dict
             The settings passed to _visit functions.
+
         Returns
         -------
         FunctionCall/PyccelInternalFunction
