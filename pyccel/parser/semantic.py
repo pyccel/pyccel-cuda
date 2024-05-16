@@ -1141,6 +1141,7 @@ class SemanticParser(BasicParser):
         Create the node representing the kernel function call.
         Create a FunctionCall or an instance of a PyccelInternalFunction
         from the function information and arguments.
+
         Parameters
         ----------
         expr : PyccelAstNode
