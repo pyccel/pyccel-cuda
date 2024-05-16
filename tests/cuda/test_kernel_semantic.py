@@ -1,7 +1,7 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 import pytest
 
-from pyccel.epyccel import epyccel
+from pyccel import epyccel
 from pyccel.decorators import kernel
 from pyccel.errors.errors import Errors, PyccelSemanticError
 from pyccel.errors.messages import (INVALID_KERNEL_CALL_TP_BLOCK,
