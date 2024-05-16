@@ -75,8 +75,6 @@ from pyccel.ast.headers import MacroFunction, MacroVariable
 from pyccel.ast.internals import PyccelFunction, Slice, PyccelSymbol, PyccelArrayShapeElement
 from pyccel.ast.itertoolsext import Product
 
-from pyccel.ast.cuda import KernelCall
-
 from pyccel.ast.literals import LiteralTrue, LiteralFalse
 from pyccel.ast.literals import LiteralInteger, LiteralFloat
 from pyccel.ast.literals import Nil, LiteralString, LiteralImaginaryUnit
@@ -117,6 +115,8 @@ from pyccel.ast.variable import Variable
 from pyccel.ast.variable import InhomogeneousTupleVariable
 from pyccel.ast.variable import IndexedElement, AnnotatedPyccelSymbol
 from pyccel.ast.variable import DottedName, DottedVariable
+
+from pyccel.ast.cuda import     KernelCall
 
 from pyccel.errors.errors import Errors
 from pyccel.errors.errors import PyccelSemanticError
@@ -1136,28 +1136,21 @@ class SemanticParser(BasicParser):
                             func, func.is_elemental)
 
             return new_expr
-
     def _handle_kernel(self, expr, func, args, **settings):
         """
         Create the node representing the kernel function call.
-
         Create a FunctionCall or an instance of a PyccelInternalFunction
         from the function information and arguments.
-
         Parameters
         ----------
         expr : PyccelAstNode
                The expression where this call is found (used for error output).
-
         func : FunctionDef instance, Interface instance or PyccelInternalFunction type
                The function being called.
-
         args : tuple
                The arguments passed to the function.
-
         **settings : dict
             The settings passed to _visit functions.
-
         Returns
         -------
         FunctionCall/PyccelInternalFunction
@@ -2851,97 +2844,6 @@ class SemanticParser(BasicParser):
         else:
             return PyccelPow(base, exponent)
 
-    def _visit_MathSqrt(self, expr):
-        func = self.scope.find(expr.funcdef, 'functions')
-        arg, = self._handle_function_args(expr.args) #pylint: disable=unbalanced-tuple-unpacking
-        if isinstance(arg.value, PyccelMul):
-            mul1, mul2 = arg.value.args
-            mul1_syn, mul2_syn = expr.args[0].value.args
-            is_abs = False
-            if mul1 is mul2 and isinstance(mul1.dtype.primitive_type, (PythonNativeInt, PrimitiveFloatingPointType)):
-                pyccel_stage.set_stage('syntactic')
-
-                fabs_name = self.scope.get_new_name('fabs')
-                imp_name = AsName('fabs', fabs_name)
-                new_import = Import('math',imp_name)
-                self._visit(new_import)
-                new_call = FunctionCall(fabs_name, [mul1_syn])
-
-                pyccel_stage.set_stage('semantic')
-
-                return self._visit(new_call)
-            elif isinstance(mul1, (NumpyConjugate, PythonConjugate)) and mul1.internal_var is mul2:
-                is_abs = True
-                abs_arg = mul2_syn
-            elif isinstance(mul2, (NumpyConjugate, PythonConjugate)) and mul1 is mul2.internal_var:
-                is_abs = True
-                abs_arg = mul1_syn
-
-            if is_abs:
-                pyccel_stage.set_stage('syntactic')
-
-                abs_name = self.scope.get_new_name('abs')
-                imp_name = AsName('abs', abs_name)
-                new_import = Import('numpy',imp_name)
-                self._visit(new_import)
-                new_call = FunctionCall(abs_name, [abs_arg])
-
-                pyccel_stage.set_stage('semantic')
-
-                # Cast to preserve final dtype
-                return PythonComplex(self._visit(new_call))
-        elif isinstance(arg.value, PyccelPow):
-            base, exponent = arg.value.args
-            base_syn, _ = expr.args[0].value.args
-            if exponent == 2 and isinstance(base.dtype.primitive_type, (PythonNativeInt, PrimitiveFloatingPointType)):
-                pyccel_stage.set_stage('syntactic')
-
-                fabs_name = self.scope.get_new_name('fabs')
-                imp_name = AsName('fabs', fabs_name)
-                new_import = Import('math',imp_name)
-                self._visit(new_import)
-                new_call = FunctionCall(fabs_name, [base_syn])
-
-                pyccel_stage.set_stage('semantic')
-
-                return self._visit(new_call)
-
-        return self._handle_function(expr, func, (arg,))
-
-    def _visit_CmathPolar(self, expr):
-        arg, = self._handle_function_args(expr.args) #pylint: disable=unbalanced-tuple-unpacking
-        z = arg.value
-        x = PythonReal(z)
-        y = PythonImag(z)
-        x_var = self.scope.get_temporary_variable(z, class_type=PythonNativeFloat())
-        y_var = self.scope.get_temporary_variable(z, class_type=PythonNativeFloat())
-        self._additional_exprs[-1].append(Assign(x_var, x))
-        self._additional_exprs[-1].append(Assign(y_var, y))
-        r = MathSqrt(PyccelAdd(PyccelMul(x_var,x_var), PyccelMul(y_var,y_var)))
-        t = MathAtan2(y_var, x_var)
-        self.insert_import('math', AsName(MathSqrt, 'sqrt'))
-        self.insert_import('math', AsName(MathAtan2, 'atan2'))
-        return PythonTuple(r,t)
-
-    def _visit_CmathRect(self, expr):
-        arg_r, arg_phi = self._handle_function_args(expr.args) #pylint: disable=unbalanced-tuple-unpacking
-        r = arg_r.value
-        phi = arg_phi.value
-        x = PyccelMul(r, MathCos(phi))
-        y = PyccelMul(r, MathSin(phi))
-        self.insert_import('math', AsName(MathCos, 'cos'))
-        self.insert_import('math', AsName(MathSin, 'sin'))
-        return PyccelAdd(x, PyccelMul(y, LiteralImaginaryUnit()))
-
-    def _visit_CmathPhase(self, expr):
-        arg, = self._handle_function_args(expr.args) #pylint: disable=unbalanced-tuple-unpacking
-        var = arg.value
-        if not isinstance(var.dtype.primitive_type, PrimitiveComplexType):
-            return LiteralFloat(0.0)
-        else:
-            self.insert_import('math', AsName(MathAtan2, 'atan2'))
-            return MathAtan2(PythonImag(var), PythonReal(var))
-
     def _visit_Lambda(self, expr):
         errors.report("Lambda functions are not currently supported",
                 symbol=expr, severity='fatal')
@@ -2966,6 +2868,22 @@ class SemanticParser(BasicParser):
                 expr_new = expr.expr.subs(func, f)
                 expr = Lambda(tuple(expr.variables), expr_new)
         return expr
+
+    def _visit_IndexedFunctionCall(self, expr, **settings):
+        name     = expr.funcdef
+        try:
+            name = self.scope.get_expected_name(name)
+        except RuntimeError:
+            pass
+
+        func     = self.scope.find(name, 'functions')
+
+        args = self._handle_function_args(expr.args, **settings)
+        if('kernel' in func.decorators):
+            return self._handle_kernel(expr, func, args, **settings)
+        else:
+            return errors.report("Unknown function type",
+                symbol=expr, severity='fatal')
 
     def _visit_FunctionCall(self, expr):
         name     = expr.funcdef
@@ -3085,21 +3003,6 @@ class SemanticParser(BasicParser):
                         severity='fatal')
             else:
                 return self._handle_function(expr, func, args)
-
-    def _visit_IndexedFunctionCall(self, expr, **settings):
-        name     = expr.funcdef
-        try:
-            name = self.scope.get_expected_name(name)
-        except RuntimeError:
-            pass
-        func     = self.scope.find(name, 'functions')
-
-        args = self._handle_function_args(expr.args, **settings)
-        if('kernel' in func.decorators):
-            return self._handle_kernel(expr, func, args, **settings)
-        else:
-            return errors.report("Unknown function type",
-                symbol=expr, severity='fatal')
 
     def _visit_Assign(self, expr):
         # TODO unset position at the end of this part
