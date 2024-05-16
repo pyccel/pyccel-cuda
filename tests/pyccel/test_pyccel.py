@@ -30,11 +30,10 @@ def get_exe(filename, language=None):
         exefile1 = filename
     if sys.platform == "win32" and language!="python":
         exefile1 += ".exe"
-
     dirname = os.path.dirname(filename)
     basename = os.path.basename(exefile1)
     exefile2 = os.path.join(dirname, basename)
-
+   
     if os.path.isfile(exefile2):
         return exefile2
     else:
@@ -207,6 +206,7 @@ def compile_fortran_or_c(compiler, extension, path_dir, test_file, dependencies,
 
 #------------------------------------------------------------------------------
 def get_lang_output(abs_path, language):
+    print("> testing %s" % abs_path)
     abs_path = get_exe(abs_path, language)
     if language=="python":
         return get_python_output(abs_path)
@@ -289,7 +289,26 @@ def compare_pyth_fort_output( p_output, f_output, dtype=float, language=None):
         f_output = f_output.strip().split()
         for p, f in zip(p_output, f_output):
             compare_pyth_fort_output_by_type(p, f, dtype)
-
+def compile_cuda(path_dir, test_file, dependencies, is_mod=False):
+    """
+    compile Cuda coda manually.
+    
+    Compile Cuda code manually.
+    Parameters
+    ----------
+    path_dir : str
+        The path to the directory where the compilation command should be run from.
+    test_file : str
+        The Python file which was translated.
+    dependencies : list of str
+        A list of any Python dependencies of the file.
+    is_mod : bool, default=False
+        True if translating a module, False if translating a program
+    See also
+    --------
+    compile_fortran_or_c : The function that is called.
+    """
+    compile_fortran_or_c(shutil.which('nvcc'), '.cu', path_dir, test_file, dependencies, (), is_mod)
 #------------------------------------------------------------------------------
 def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         cwd = None, pyccel_commands = "", output_dtype = float,
@@ -389,10 +408,15 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         compile_pyccel (cwd, test_file, pyccel_commands+" -t")
         if not dependencies:
             dependencies = []
+        print("> compiling %s" % output_test_file)
+        print("> dependencies: %s" % dependencies)
+        print("> language: %s" % language)
         if language=='fortran':
             compile_fortran(cwd, output_test_file, dependencies)
         elif language == 'c':
             compile_c(cwd, output_test_file, dependencies)
+        elif language == 'cuda':
+            compile_cuda(cwd, output_test_file, dependencies)
 
     lang_out = get_lang_output(output_test_file, language)
     compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
