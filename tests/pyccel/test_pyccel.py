@@ -28,8 +28,10 @@ def get_exe(filename, language=None):
         exefile1 = os.path.splitext(filename)[0]
     else:
         exefile1 = filename
+
     if sys.platform == "win32" and language!="python":
         exefile1 += ".exe"
+
     dirname = os.path.dirname(filename)
     basename = os.path.basename(exefile1)
     exefile2 = os.path.join(dirname, basename)
