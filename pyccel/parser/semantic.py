@@ -2877,13 +2877,7 @@ class SemanticParser(BasicParser):
 
     def _visit_IndexedFunctionCall(self, expr, **settings):
         name     = expr.funcdef
-        try:
-            name = self.scope.get_expected_name(name)
-        except RuntimeError:
-            pass
-
         func     = self.scope.find(name, 'functions')
-
         args = self._handle_function_args(expr.args, **settings)
         if('kernel' in func.decorators):
             return self._handle_kernel(expr, func, args, **settings)
