@@ -8,19 +8,15 @@ Pyccel now supports NVIDIA CUDA, empowering users to accelerate numerical comput
 The kernel decorator allows the user to declare a CUDA kernel. The kernel can be defined in Python, and the syntax is similar to Numba."
 
 ```python
-from pyccel.drcoretes import kernel
+from pyccel.decorators import kernel
 
 @kernel
 def my_kernel():
     pass
 
-def main():
+blockspergrid = 1
+threadsperblock = 1
+# Call your kernel function
+my_kernel[blockspergrid, threadsperblock]()
 
-    blockspergrid = 1
-    threadsperblock = 1
-    # Call your kernel function
-    my_kernel[blockspergrid, threadsperblock]()
-
-if __name__ == "__main__":
-    main()
 ```
