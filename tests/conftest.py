@@ -69,14 +69,6 @@ def pytest_generate_tests(metafunc):
         else:
             metafunc.parametrize("gpu_available", [False])
 
-def pytest_configure(config):
-    if not config.option.gpu_available:
-        if hasattr(config.option, 'markexpr') and config.option.markexpr:
-            if 'gpu' not in config.option.markexpr:
-                config.option.markexpr += ' and not gpu'
-        else:
-            setattr(config.option, 'markexpr', 'not gpu')
-
 def pytest_sessionstart(session):
     # setup_stuff
     if session.config.option.developer_mode:
