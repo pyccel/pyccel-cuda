@@ -408,6 +408,7 @@ class SyntaxParser(BasicParser):
         return Nil()
 
     def _visit_str(self, stmt):
+
         return stmt
 
     def _visit_Assign(self, stmt):
