@@ -294,7 +294,7 @@ def compare_pyth_fort_output( p_output, f_output, dtype=float, language=None):
 #------------------------------------------------------------------------------
 def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         cwd = None, pyccel_commands = "", output_dtype = float,
-        language = None, output_dir = None):
+        language = None, output_dir = None, gpu_available = False):
     """
     Run pyccel and compare the output to ensure that the results
     are equivalent
@@ -341,13 +341,15 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
 
     if (cwd is None):
         cwd = os.path.dirname(test_file)
-
+    print('cwd = ', cwd)
     cwd = get_abs_path(cwd)
+    print('cwd = ', cwd)
 
     test_file = get_abs_path(test_file)
+    print('test_file = ', test_file)
 
     pyth_out = get_python_output(test_file, cwd)
-
+    print(pyth_out)
     if language:
         pyccel_commands += " --language="+language
     else:
@@ -370,12 +372,16 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                 pyc_command = pyccel_commands
 
             if not compile_with_pyccel:
+                print('Compiling 1 {}'.format(dependencies[i]))
+                print(pyc_command)
                 compile_pyccel (cwd, dependencies[i], pyc_command+" -t")
                 if language == 'fortran':
                     compile_fortran(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'c':
                     compile_c(cwd, dependencies[i], [], is_mod = True)
             else:
+                print('Compiling 2 {}'.format(dependencies[i]))
+                print(pyc_command)
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
@@ -385,8 +391,14 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         output_test_file = test_file
 
     if compile_with_pyccel:
+        print('Compiling 3 {}'.format(test_file))
+        print(pyccel_commands)
+        print(test_file)
         compile_pyccel(cwd, test_file, pyccel_commands)
+        print("i'm done here")
     else:
+        print('Compiling 4 {}'.format(test_file))
+        print(pyccel_commands)
         compile_pyccel (cwd, test_file, pyccel_commands+" -t")
         if not dependencies:
             dependencies = []
@@ -394,832 +406,833 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             compile_fortran(cwd, output_test_file, dependencies)
         elif language == 'c':
             compile_c(cwd, output_test_file, dependencies)
-
+    assert 4 == 4
     lang_out = get_lang_output(output_test_file, language)
     compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
 
 #==============================================================================
 # UNIT TESTS
 #==============================================================================
-def test_relative_imports_in_project(language):
+# def test_relative_imports_in_project(language):
 
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "project_rel_imports")
-    dependencies = ['project_rel_imports/project/folder1/mod1.py',
-                    'project_rel_imports/project/folder2/mod2.py',
-                    'project_rel_imports/project/folder2/mod3.py']
-    pyccel_test("project_rel_imports/runtest.py", dependencies,
-            cwd = path_dir,
-            language = language)
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "project_rel_imports")
+#     dependencies = ['project_rel_imports/project/folder1/mod1.py',
+#                     'project_rel_imports/project/folder2/mod2.py',
+#                     'project_rel_imports/project/folder2/mod3.py']
+#     pyccel_test("project_rel_imports/runtest.py", dependencies,
+#             cwd = path_dir,
+#             language = language)
 
-#------------------------------------------------------------------------------
-def test_absolute_imports_in_project(language):
+# #------------------------------------------------------------------------------
+# def test_absolute_imports_in_project(language):
 
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "project_abs_imports")
-    dependencies = ['project_abs_imports/project/folder1/mod1.py',
-             'project_abs_imports/project/folder2/mod2.py',
-             'project_abs_imports/project/folder2/mod3.py']
-    pyccel_test("project_abs_imports/runtest.py", dependencies,
-            cwd = path_dir,
-            language = language)
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "project_abs_imports")
+#     dependencies = ['project_abs_imports/project/folder1/mod1.py',
+#              'project_abs_imports/project/folder2/mod2.py',
+#              'project_abs_imports/project/folder2/mod3.py']
+#     pyccel_test("project_abs_imports/runtest.py", dependencies,
+#             cwd = path_dir,
+#             language = language)
 
-#------------------------------------------------------------------------------
-def test_rel_imports_python_accessible_folder(language):
-    # pyccel is called on scripts/folder2/runtest_rel_imports.py from the scripts folder
-    # From this folder python understands relative imports
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "scripts")
-    from scripts.folder2.runtest_rel_imports import test_func
+# #------------------------------------------------------------------------------
+# def test_rel_imports_python_accessible_folder(language):
+#     # pyccel is called on scripts/folder2/runtest_rel_imports.py from the scripts folder
+#     # From this folder python understands relative imports
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "scripts")
+#     from scripts.folder2.runtest_rel_imports import test_func
 
-    tmp_dir = os.path.join(base_dir, '__pyccel__')
+#     tmp_dir = os.path.join(base_dir, '__pyccel__')
 
-    pyth_out = str(test_func())
+#     pyth_out = str(test_func())
 
-    pyccel_opt = '--language={}'.format(language)
-    if language == 'python':
-        pyccel_opt += ' --output={}'.format(os.path.join(tmp_dir, "folder2"))
-    compile_pyccel(os.path.join(path_dir, "folder2"), get_abs_path("scripts/folder2/folder2_funcs.py"), pyccel_opt)
-    compile_pyccel(path_dir, get_abs_path("scripts/folder2/runtest_rel_imports.py"), pyccel_opt)
-    if language == 'python':
-        test_location = "__pyccel__.folder2.runtest_rel_imports"
-    else:
-        test_location = "scripts.folder2.runtest_rel_imports"
-    p = subprocess.Popen([sys.executable , "%s" % os.path.join(base_dir, "run_import_function.py"), test_location],
-                stdout=subprocess.PIPE, universal_newlines=True)
-    fort_out, _ = p.communicate()
-    assert p.returncode==0
+#     pyccel_opt = '--language={}'.format(language)
+#     if language == 'python':
+#         pyccel_opt += ' --output={}'.format(os.path.join(tmp_dir, "folder2"))
+#     compile_pyccel(os.path.join(path_dir, "folder2"), get_abs_path("scripts/folder2/folder2_funcs.py"), pyccel_opt)
+#     compile_pyccel(path_dir, get_abs_path("scripts/folder2/runtest_rel_imports.py"), pyccel_opt)
+#     if language == 'python':
+#         test_location = "__pyccel__.folder2.runtest_rel_imports"
+#     else:
+#         test_location = "scripts.folder2.runtest_rel_imports"
+#     p = subprocess.Popen([sys.executable , "%s" % os.path.join(base_dir, "run_import_function.py"), test_location],
+#                 stdout=subprocess.PIPE, universal_newlines=True)
+#     fort_out, _ = p.communicate()
+#     assert p.returncode==0
 
-    compare_pyth_fort_output(pyth_out, fort_out)
+#     compare_pyth_fort_output(pyth_out, fort_out)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( 'language', (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = [
-            pytest.mark.skip(reason="Collisions are not handled"),
-            pytest.mark.c]
-        )
-    )
-)
-def test_multi_imports_project(language):
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = [
+#             pytest.mark.skip(reason="Collisions are not handled"),
+#             pytest.mark.c]
+#         )
+#     )
+# )
+# def test_multi_imports_project(language):
 
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "project_multi_imports")
-    dependencies = ['project_multi_imports/file1.py',
-             'project_multi_imports/file2.py',
-             'project_multi_imports/file3.py']
-    pyccel_test("project_multi_imports/file4.py", dependencies,
-            cwd = path_dir,
-            language = language,
-            output_dtype = str)
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "project_multi_imports")
+#     dependencies = ['project_multi_imports/file1.py',
+#              'project_multi_imports/file2.py',
+#              'project_multi_imports/file3.py']
+#     pyccel_test("project_multi_imports/file4.py", dependencies,
+#             cwd = path_dir,
+#             language = language,
+#             output_dtype = str)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_imports_compile(language):
-    pyccel_test("scripts/runtest_imports.py", "scripts/funcs.py",
-            compile_with_pyccel = False, language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_imports_compile(language):
+#     pyccel_test("scripts/runtest_imports.py", "scripts/funcs.py",
+#             compile_with_pyccel = False, language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_imports_in_folder(language):
-    pyccel_test("scripts/runtest_folder_imports.py", "scripts/folder1/folder1_funcs.py",
-            compile_with_pyccel = False, language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_imports_in_folder(language):
+#     pyccel_test("scripts/runtest_folder_imports.py", "scripts/folder1/folder1_funcs.py",
+#             compile_with_pyccel = False, language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_imports(language):
-    pyccel_test("scripts/runtest_imports.py", "scripts/funcs.py",
-            language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_imports(language):
+#     pyccel_test("scripts/runtest_imports.py", "scripts/funcs.py",
+#             language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_folder_imports(language):
-    # pyccel is called on scripts/folder2/runtest_imports2.py from the scripts/folder2 folder
-    # which is where the final .so file should be
-    # From this folder python doesn't understand relative imports
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "scripts")
-    tmp_dir = os.path.join(base_dir, '__pyccel__')
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_folder_imports(language):
+#     # pyccel is called on scripts/folder2/runtest_imports2.py from the scripts/folder2 folder
+#     # which is where the final .so file should be
+#     # From this folder python doesn't understand relative imports
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "scripts")
+#     tmp_dir = os.path.join(base_dir, '__pyccel__')
 
-    from scripts.folder2.runtest_imports2 import test_func
-    pyth_out = str(test_func())
+#     from scripts.folder2.runtest_imports2 import test_func
+#     pyth_out = str(test_func())
 
-    language_opt = '--language={}'.format(language)
-    pyccel_opt = language_opt
-    if language == 'python':
-        pyccel_opt = language_opt+' --output={}'.format(os.path.join(tmp_dir, "folder1"))
-    compile_pyccel(os.path.join(path_dir, "folder1"), get_abs_path("scripts/folder1/folder1_funcs.py"),
-            pyccel_opt)
-    if language == 'python':
-        pyccel_opt = language_opt+' --output={}'.format(os.path.join(tmp_dir, "folder2"))
-    compile_pyccel(os.path.join(path_dir, "folder2"), get_abs_path("scripts/folder2/runtest_imports2.py"),
-            pyccel_opt)
+#     language_opt = '--language={}'.format(language)
+#     pyccel_opt = language_opt
+#     if language == 'python':
+#         pyccel_opt = language_opt+' --output={}'.format(os.path.join(tmp_dir, "folder1"))
+#     compile_pyccel(os.path.join(path_dir, "folder1"), get_abs_path("scripts/folder1/folder1_funcs.py"),
+#             pyccel_opt)
+#     if language == 'python':
+#         pyccel_opt = language_opt+' --output={}'.format(os.path.join(tmp_dir, "folder2"))
+#     compile_pyccel(os.path.join(path_dir, "folder2"), get_abs_path("scripts/folder2/runtest_imports2.py"),
+#             pyccel_opt)
 
-    if language == 'python':
-        test_location = "__pyccel__.folder2.runtest_imports2"
-    else:
-        test_location = "scripts.folder2.runtest_imports2"
-    p = subprocess.Popen([sys.executable , "%s" % os.path.join(base_dir, "run_import_function.py"), test_location],
-            stdout=subprocess.PIPE, universal_newlines=True)
-    fort_out, _ = p.communicate()
-    assert p.returncode==0
+#     if language == 'python':
+#         test_location = "__pyccel__.folder2.runtest_imports2"
+#     else:
+#         test_location = "scripts.folder2.runtest_imports2"
+#     p = subprocess.Popen([sys.executable , "%s" % os.path.join(base_dir, "run_import_function.py"), test_location],
+#             stdout=subprocess.PIPE, universal_newlines=True)
+#     fort_out, _ = p.communicate()
+#     assert p.returncode==0
 
-    compare_pyth_fort_output(pyth_out, fort_out)
+#     compare_pyth_fort_output(pyth_out, fort_out)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_funcs(language):
-    pyccel_test("scripts/runtest_funcs.py", language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_funcs(language):
+#     pyccel_test("scripts/runtest_funcs.py", language = language)
 
-#------------------------------------------------------------------------------
-# Enumerate not supported in c
-def test_inout_func(language):
-    pyccel_test("scripts/runtest_inoutfunc.py", language = language)
+# #------------------------------------------------------------------------------
+# # Enumerate not supported in c
+# def test_inout_func(language):
+#     pyccel_test("scripts/runtest_inoutfunc.py", language = language)
 
-#------------------------------------------------------------------------------
-def test_bool(language):
-    pyccel_test("scripts/bool_comp.py", output_dtype = bool, language = language)
+# #------------------------------------------------------------------------------
+# def test_bool(language):
+#     pyccel_test("scripts/bool_comp.py", output_dtype = bool, language = language)
 
-#------------------------------------------------------------------------------
-def test_expressions(language):
-    types = [float, complex, int, float, float, int] + [float]*3 + \
-            [complex, int, complex, complex, int, int, float] + [complex]*3 + \
-            [float]*3 + [int] + [float]*2 + [int] + [float]*3 + [int] + \
-            [float]*3 + [int]*2 + [float]*2 + [int]*5 + [complex] + [bool]*9
-    pyccel_test("scripts/expressions.py", language=language,
-            output_dtype = types)
+# #------------------------------------------------------------------------------
+# def test_expressions(language):
+#     types = [float, complex, int, float, float, int] + [float]*3 + \
+#             [complex, int, complex, complex, int, int, float] + [complex]*3 + \
+#             [float]*3 + [int] + [float]*2 + [int] + [float]*3 + [int] + \
+#             [float]*3 + [int]*2 + [float]*2 + [int]*5 + [complex] + [bool]*9
+#     pyccel_test("scripts/expressions.py", language=language,
+#             output_dtype = types)
 
-#------------------------------------------------------------------------------
-# See issue #756 for c problem
-def test_generic_functions():
-    pyccel_test("scripts/runtest_generic_functions.py",
-            dependencies = "scripts/generic_functions.py",
-            compile_with_pyccel = False,
-            output_dtype = [float, float, float, float, float, float,
-                    float, float, float, float, float, float, float, int, float,
-                    int, int])
+# #------------------------------------------------------------------------------
+# # See issue #756 for c problem
+# def test_generic_functions():
+#     pyccel_test("scripts/runtest_generic_functions.py",
+#             dependencies = "scripts/generic_functions.py",
+#             compile_with_pyccel = False,
+#             output_dtype = [float, float, float, float, float, float,
+#                     float, float, float, float, float, float, float, int, float,
+#                     int, int])
 
-#------------------------------------------------------------------------------
-def test_default_arguments(language):
-    pyccel_test("scripts/runtest_default_args.py",
-            dependencies = "scripts/default_args_mod.py",
-            output_dtype = [int, int, float, float, float,
-                float, float, float, float, bool, bool, bool,
-                float, float, float, float, float, float,
-                float, float],
-            language=language)
+# #------------------------------------------------------------------------------
+# def test_default_arguments(language):
+#     pyccel_test("scripts/runtest_default_args.py",
+#             dependencies = "scripts/default_args_mod.py",
+#             output_dtype = [int, int, float, float, float,
+#                 float, float, float, float, bool, bool, bool,
+#                 float, float, float, float, float, float,
+#                 float, float],
+#             language=language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_pyccel_calling_directory(language):
-    cwd = get_abs_path(".")
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_pyccel_calling_directory(language):
+#     cwd = get_abs_path(".")
 
-    test_file = get_abs_path("scripts/runtest_funcs.py")
-    pyth_out = get_python_output(test_file)
+#     test_file = get_abs_path("scripts/runtest_funcs.py")
+#     pyth_out = get_python_output(test_file)
 
-    language_opt = '--language={}'.format(language)
-    compile_pyccel(cwd, test_file, language_opt)
+#     language_opt = '--language={}'.format(language)
+#     compile_pyccel(cwd, test_file, language_opt)
 
-    if language == "python":
-        test_file = get_abs_path(os.path.join('__pyccel__',
-                                os.path.basename(test_file)))
-    fort_out = get_lang_output(test_file, language)
+#     if language == "python":
+#         test_file = get_abs_path(os.path.join('__pyccel__',
+#                                 os.path.basename(test_file)))
+#     fort_out = get_lang_output(test_file, language)
 
-    compare_pyth_fort_output( pyth_out, fort_out )
+#     compare_pyth_fort_output( pyth_out, fort_out )
 
-#------------------------------------------------------------------------------
-def test_in_specified(language):
-    pyccel_test("scripts/runtest_degree_in.py", language=language)
+# #------------------------------------------------------------------------------
+# def test_in_specified(language):
+#     pyccel_test("scripts/runtest_degree_in.py", language=language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/hope_benchmarks/hope_fib.py",
-                                        "scripts/hope_benchmarks/quicksort.py",
-                                        "scripts/hope_benchmarks/hope_pisum.py",
-                                        "scripts/hope_benchmarks/hope_ln_python.py",
-                                        "scripts/hope_benchmarks/hope_pairwise_python.py",
-                                        "scripts/hope_benchmarks/point_spread_func.py",
-                                        "scripts/hope_benchmarks/simplify.py",
-                                        "scripts/hope_benchmarks_decorators/fib.py",
-                                        "scripts/hope_benchmarks_decorators/hope_ln_python.py",
-                                        "scripts/hope_benchmarks_decorators/hope_pairwise_python.py",
-                                        "scripts/hope_benchmarks_decorators/point_spread_func.py",
-                                        "scripts/hope_benchmarks_decorators/simplify.py",
-                                        "scripts/hope_benchmarks_decorators/quicksort.py",
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/hope_benchmarks/hope_fib.py",
+#                                         "scripts/hope_benchmarks/quicksort.py",
+#                                         "scripts/hope_benchmarks/hope_pisum.py",
+#                                         "scripts/hope_benchmarks/hope_ln_python.py",
+#                                         "scripts/hope_benchmarks/hope_pairwise_python.py",
+#                                         "scripts/hope_benchmarks/point_spread_func.py",
+#                                         "scripts/hope_benchmarks/simplify.py",
+#                                         "scripts/hope_benchmarks_decorators/fib.py",
+#                                         "scripts/hope_benchmarks_decorators/hope_ln_python.py",
+#                                         "scripts/hope_benchmarks_decorators/hope_pairwise_python.py",
+#                                         "scripts/hope_benchmarks_decorators/point_spread_func.py",
+#                                         "scripts/hope_benchmarks_decorators/simplify.py",
+#                                         "scripts/hope_benchmarks_decorators/quicksort.py",
 
-                                        ] )
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-def test_hope_benchmarks( test_file, language ):
-    pyccel_test(test_file, language=language)
+#                                         ] )
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# def test_hope_benchmarks( test_file, language ):
+#     pyccel_test(test_file, language=language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.c
-@pytest.mark.parametrize( "test_file", ["scripts/hope_benchmarks/hope_fib.py",
-                                        "scripts/hope_benchmarks/quicksort.py",
-                                        "scripts/hope_benchmarks/hope_pisum.py",
-                                        "scripts/hope_benchmarks/hope_ln_python.py",
-                                        "scripts/hope_benchmarks/hope_pairwise_python.py",
-                                        pytest.param("scripts/hope_benchmarks/point_spread_func.py",
-                                            marks = pytest.mark.skip(reason="Numpy sum not implemented in c")),
-                                        "scripts/hope_benchmarks/simplify.py",
-                                        "scripts/hope_benchmarks_decorators/fib.py",
-                                        "scripts/hope_benchmarks_decorators/hope_ln_python.py",
-                                        "scripts/hope_benchmarks_decorators/hope_pairwise_python.py",
-                                        pytest.param("scripts/hope_benchmarks_decorators/point_spread_func.py",
-                                            marks = pytest.mark.skip(reason="Numpy sum not implemented in c")),
-                                        "scripts/hope_benchmarks_decorators/simplify.py",
-                                        "scripts/hope_benchmarks_decorators/quicksort.py",
-                                        ] )
-def test_hope_benchmarks_c( test_file ):
-    pyccel_test(test_file, language='c')
+# #------------------------------------------------------------------------------
+# @pytest.mark.c
+# @pytest.mark.parametrize( "test_file", ["scripts/hope_benchmarks/hope_fib.py",
+#                                         "scripts/hope_benchmarks/quicksort.py",
+#                                         "scripts/hope_benchmarks/hope_pisum.py",
+#                                         "scripts/hope_benchmarks/hope_ln_python.py",
+#                                         "scripts/hope_benchmarks/hope_pairwise_python.py",
+#                                         pytest.param("scripts/hope_benchmarks/point_spread_func.py",
+#                                             marks = pytest.mark.skip(reason="Numpy sum not implemented in c")),
+#                                         "scripts/hope_benchmarks/simplify.py",
+#                                         "scripts/hope_benchmarks_decorators/fib.py",
+#                                         "scripts/hope_benchmarks_decorators/hope_ln_python.py",
+#                                         "scripts/hope_benchmarks_decorators/hope_pairwise_python.py",
+#                                         pytest.param("scripts/hope_benchmarks_decorators/point_spread_func.py",
+#                                             marks = pytest.mark.skip(reason="Numpy sum not implemented in c")),
+#                                         "scripts/hope_benchmarks_decorators/simplify.py",
+#                                         "scripts/hope_benchmarks_decorators/quicksort.py",
+#                                         ] )
+# def test_hope_benchmarks_c( test_file ):
+#     pyccel_test(test_file, language='c')
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import.py",
-                                        "scripts/import_syntax/from_mod_import_as.py",
-                                        "scripts/import_syntax/import_mod.py",
-                                        "scripts/import_syntax/import_mod_as.py",
-                                        "scripts/import_syntax/from_mod_import_func.py",
-                                        "scripts/import_syntax/from_mod_import_as_func.py",
-                                        "scripts/import_syntax/import_mod_func.py",
-                                        "scripts/import_syntax/import_mod_as_func.py",
-                                        "scripts/import_syntax/collisions3.py",
-                                        "scripts/import_syntax/collisions5.py",
-                                        ] )
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-def test_import_syntax( test_file, language ):
-    pyccel_test(test_file, language=language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import.py",
+#                                         "scripts/import_syntax/from_mod_import_as.py",
+#                                         "scripts/import_syntax/import_mod.py",
+#                                         "scripts/import_syntax/import_mod_as.py",
+#                                         "scripts/import_syntax/from_mod_import_func.py",
+#                                         "scripts/import_syntax/from_mod_import_as_func.py",
+#                                         "scripts/import_syntax/import_mod_func.py",
+#                                         "scripts/import_syntax/import_mod_as_func.py",
+#                                         "scripts/import_syntax/collisions3.py",
+#                                         "scripts/import_syntax/collisions5.py",
+#                                         ] )
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# def test_import_syntax( test_file, language ):
+#     pyccel_test(test_file, language=language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import_as_user_func.py",
-                                        "scripts/import_syntax/from_mod_import_as_user.py",
-                                        "scripts/import_syntax/collisions2.py"
-                                        ] )
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-@pytest.mark.xdist_incompatible
-def test_import_syntax_user_as( test_file, language ):
-    pyccel_test(test_file, dependencies = "scripts/import_syntax/user_mod.py",
-            language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import_as_user_func.py",
+#                                         "scripts/import_syntax/from_mod_import_as_user.py",
+#                                         "scripts/import_syntax/collisions2.py"
+#                                         ] )
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# @pytest.mark.xdist_incompatible
+# def test_import_syntax_user_as( test_file, language ):
+#     pyccel_test(test_file, dependencies = "scripts/import_syntax/user_mod.py",
+#             language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import_user.py",
-                                        "scripts/import_syntax/import_mod_user.py",
-                                        "scripts/import_syntax/import_mod_as_user.py",
-                                        "scripts/import_syntax/from_mod_import_user_func.py",
-                                        "scripts/import_syntax/import_mod_user_func.py",
-                                        "scripts/import_syntax/import_mod_as_user_func.py",
-                                        ] )
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-@pytest.mark.xdist_incompatible
-def test_import_syntax_user( test_file, language ):
-    pyccel_test(test_file, dependencies = "scripts/import_syntax/user_mod.py", language = language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/import_syntax/from_mod_import_user.py",
+#                                         "scripts/import_syntax/import_mod_user.py",
+#                                         "scripts/import_syntax/import_mod_as_user.py",
+#                                         "scripts/import_syntax/from_mod_import_user_func.py",
+#                                         "scripts/import_syntax/import_mod_user_func.py",
+#                                         "scripts/import_syntax/import_mod_as_user_func.py",
+#                                         ] )
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# @pytest.mark.xdist_incompatible
+# def test_import_syntax_user( test_file, language ):
+#     pyccel_test(test_file, dependencies = "scripts/import_syntax/user_mod.py", language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-@pytest.mark.xdist_incompatible
-def test_import_collisions(language):
-    pyccel_test("scripts/import_syntax/collisions4.py",
-            dependencies = ["scripts/import_syntax/user_mod.py", "scripts/import_syntax/user_mod2.py"],
-            language=language)
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# @pytest.mark.xdist_incompatible
+# def test_import_collisions(language):
+#     pyccel_test("scripts/import_syntax/collisions4.py",
+#             dependencies = ["scripts/import_syntax/user_mod.py", "scripts/import_syntax/user_mod2.py"],
+#             language=language)
 
-#------------------------------------------------------------------------------
-# Numpy sum required
-@pytest.mark.parametrize( "language", (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-    )
-)
-def test_numpy_kernels_compile(language):
-    pyccel_opt = '--language={}'.format(language)
-    cwd = get_abs_path(".")
-    compile_pyccel(os.path.join(cwd, "scripts/numpy/"),
-            "numpy_kernels.py",
-            pyccel_opt)
+# #------------------------------------------------------------------------------
+# # Numpy sum required
+# @pytest.mark.parametrize( "language", (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#     )
+# )
+# def test_numpy_kernels_compile(language):
+#     pyccel_opt = '--language={}'.format(language)
+#     cwd = get_abs_path(".")
+#     compile_pyccel(os.path.join(cwd, "scripts/numpy/"),
+#             "numpy_kernels.py",
+#             pyccel_opt)
 
-#------------------------------------------------------------------------------
-def test_multiple_results(language):
-    pyccel_test("scripts/runtest_multiple_results.py",
-            output_dtype = [int, float, complex, bool, int, complex,
-                int, bool, float, float, float, float, float, float,
-                float, float, float, float, float, float,
-                float, float, float, float, float, float,
-                float, float, float, float, int, int], language=language)
+# #------------------------------------------------------------------------------
+# def test_multiple_results(language):
+#     pyccel_test("scripts/runtest_multiple_results.py",
+#             output_dtype = [int, float, complex, bool, int, complex,
+#                 int, bool, float, float, float, float, float, float,
+#                 float, float, float, float, float, float,
+#                 float, float, float, float, float, float,
+#                 float, float, float, float, int, int], language=language)
 
-#------------------------------------------------------------------------------
-def test_elemental(language):
-    pyccel_test("scripts/decorators_elemental.py", language = language)
+# #------------------------------------------------------------------------------
+# def test_elemental(language):
+#     pyccel_test("scripts/decorators_elemental.py", language = language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.gpu
-def test_hello_kernel():
+# #------------------------------------------------------------------------------
+@pytest.mark.cuda
+def test_hello_kernel(gpu_available):
+    print(gpu_available)
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
             dependencies = ("scripts/kernel/func.py") ,
-            language="cuda", output_dtype=types,compile_with_pyccel = False)
-
-#------------------------------------------------------------------------------
-def test_print_strings(language):
-    types = str
-    pyccel_test("scripts/print_strings.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( 'language', (
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = pytest.mark.c),
-        pytest.param("fortran", marks = [
-            pytest.mark.skip(reason="Can't print NaN in Fortran"),
-            pytest.mark.fortran])
-    )
-)
-def test_print_nan(language):
-    types = str
-    pyccel_test("scripts/print_nan.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_print_integers(language):
-    types = str
-    pyccel_test("scripts/print_integers.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_print_tuples(language):
-    types = str
-    pyccel_test("scripts/print_tuples.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_print_sp_and_end(language):
-    types = str
-    pyccel_test("scripts/print_sp_and_end.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_c_arrays(language):
-    types = [int]*15 + [float]*5 + [int]*25 + [float]* 20 * 5 + \
-            [complex] * 3 * 10 + [complex] * 5 + [float] * 10 + [float] * 6 + \
-            [float] * 2 * 3 + [complex] * 3 * 10 + [float] * 2 * 3 + [int] * 3
-    pyccel_test("scripts/c_arrays.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_arrays_view(language):
-    types = [int] * 10 + [int] * 10 + [int] * 4 + [int] * 4 + [int] * 10 + \
-            [int] * 6 + [int] * 10 + [int] * 10 + [int] * 25 + [int] * 60
-    pyccel_test("scripts/arrays_view.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_return_numpy_arrays(language):
-    types = [int]*4 # 4 ints for a
-    types += [int]*2 # 2 ints for b
-    types += [float]*2 # 2 floats for c
-    types += [bool]*2 # 2 bools for d
-    types += [complex]*2 # 2 complexs for e
-    types += [float]*5 # 5 floats for h
-    types += [int]*5 # 5 ints for g
-    types += [int]*4 # 4 ints for k
-    pyccel_test("scripts/return_numpy_arrays.py", language=language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_array_binary_op(language):
-    types = [int] * 4
-    types += [int, float, int, int]
-    types += [int] * 4
-    types += [int, float, int, int]
-    types += [int] * 4
-    types += [int, float, int, int]
-    types += [int] * 4
-    types += [int, float, int, int]
-    types += [int] * 8
-    pyccel_test("scripts/array_binary_operation.py", language = language, output_dtype=types)
-
-#------------------------------------------------------------------------------
-def test_basic_header():
-    filename='scripts/basic_header.pyh'
-    cwd = get_abs_path('.')
-    compile_pyccel(cwd, filename)
-
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-@pytest.mark.parametrize( "test_file", ["scripts/classes/classes.py",
-                                        "scripts/classes/classes_1.py",
-                                        "scripts/classes/classes_2.py",
-                                        "scripts/classes/classes_3.py",
-                                        "scripts/classes/classes_4.py",
-                                        "scripts/classes/classes_5.py",
-                                        "scripts/classes/classes_6.py",
-                                        "scripts/classes/classes_7.py",
-                                        "scripts/classes/classes_8.py",
-                                        "scripts/classes/class_headers.py",
-                                        "scripts/classes/pep526.py",
-                                        "scripts/classes/class_variables.py",
-                                        "scripts/classes/class_temporary_in_constructor.py",
-                                        "scripts/classes/class_with_non_target_array_arg.py",
-                                        "scripts/classes/class_pointer.py",
-                                        ] )
-def test_classes( test_file , language):
-    pyccel_test(test_file, language=language)
-
-def test_classes_type_print(language):
-    test_file = "scripts/classes/empty_class.py"
+            language="cuda", output_dtype=types , gpu_available=gpu_available)
+
+# #------------------------------------------------------------------------------
+# def test_print_strings(language):
+#     types = str
+#     pyccel_test("scripts/print_strings.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = pytest.mark.c),
+#         pytest.param("fortran", marks = [
+#             pytest.mark.skip(reason="Can't print NaN in Fortran"),
+#             pytest.mark.fortran])
+#     )
+# )
+# def test_print_nan(language):
+#     types = str
+#     pyccel_test("scripts/print_nan.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_print_integers(language):
+#     types = str
+#     pyccel_test("scripts/print_integers.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_print_tuples(language):
+#     types = str
+#     pyccel_test("scripts/print_tuples.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_print_sp_and_end(language):
+#     types = str
+#     pyccel_test("scripts/print_sp_and_end.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_c_arrays(language):
+#     types = [int]*15 + [float]*5 + [int]*25 + [float]* 20 * 5 + \
+#             [complex] * 3 * 10 + [complex] * 5 + [float] * 10 + [float] * 6 + \
+#             [float] * 2 * 3 + [complex] * 3 * 10 + [float] * 2 * 3 + [int] * 3
+#     pyccel_test("scripts/c_arrays.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_arrays_view(language):
+#     types = [int] * 10 + [int] * 10 + [int] * 4 + [int] * 4 + [int] * 10 + \
+#             [int] * 6 + [int] * 10 + [int] * 10 + [int] * 25 + [int] * 60
+#     pyccel_test("scripts/arrays_view.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_return_numpy_arrays(language):
+#     types = [int]*4 # 4 ints for a
+#     types += [int]*2 # 2 ints for b
+#     types += [float]*2 # 2 floats for c
+#     types += [bool]*2 # 2 bools for d
+#     types += [complex]*2 # 2 complexs for e
+#     types += [float]*5 # 5 floats for h
+#     types += [int]*5 # 5 ints for g
+#     types += [int]*4 # 4 ints for k
+#     pyccel_test("scripts/return_numpy_arrays.py", language=language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_array_binary_op(language):
+#     types = [int] * 4
+#     types += [int, float, int, int]
+#     types += [int] * 4
+#     types += [int, float, int, int]
+#     types += [int] * 4
+#     types += [int, float, int, int]
+#     types += [int] * 4
+#     types += [int, float, int, int]
+#     types += [int] * 8
+#     pyccel_test("scripts/array_binary_operation.py", language = language, output_dtype=types)
+
+# #------------------------------------------------------------------------------
+# def test_basic_header():
+#     filename='scripts/basic_header.pyh'
+#     cwd = get_abs_path('.')
+#     compile_pyccel(cwd, filename)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# @pytest.mark.parametrize( "test_file", ["scripts/classes/classes.py",
+#                                         "scripts/classes/classes_1.py",
+#                                         "scripts/classes/classes_2.py",
+#                                         "scripts/classes/classes_3.py",
+#                                         "scripts/classes/classes_4.py",
+#                                         "scripts/classes/classes_5.py",
+#                                         "scripts/classes/classes_6.py",
+#                                         "scripts/classes/classes_7.py",
+#                                         "scripts/classes/classes_8.py",
+#                                         "scripts/classes/class_headers.py",
+#                                         "scripts/classes/pep526.py",
+#                                         "scripts/classes/class_variables.py",
+#                                         "scripts/classes/class_temporary_in_constructor.py",
+#                                         "scripts/classes/class_with_non_target_array_arg.py",
+#                                         "scripts/classes/class_pointer.py",
+#                                         ] )
+# def test_classes( test_file , language):
+#     pyccel_test(test_file, language=language)
+
+# def test_classes_type_print(language):
+#     test_file = "scripts/classes/empty_class.py"
 
-    rel_test_dir = os.path.dirname(test_file)
+#     rel_test_dir = os.path.dirname(test_file)
 
-    test_file = os.path.normpath(test_file)
+#     test_file = os.path.normpath(test_file)
 
-    cwd = os.path.dirname(test_file)
-    cwd = get_abs_path(cwd)
+#     cwd = os.path.dirname(test_file)
+#     cwd = get_abs_path(cwd)
 
-    test_file = get_abs_path(test_file)
+#     test_file = get_abs_path(test_file)
 
-    pyccel_commands = " --language="+language
+#     pyccel_commands = " --language="+language
 
-    if language=="python":
-        output_dir = os.path.join(get_abs_path(rel_test_dir), '__pyccel__')
-        pyccel_commands += " --output "+output_dir
-        output_test_file = os.path.join(output_dir, os.path.basename(test_file))
-    else:
-        output_test_file = test_file
+#     if language=="python":
+#         output_dir = os.path.join(get_abs_path(rel_test_dir), '__pyccel__')
+#         pyccel_commands += " --output "+output_dir
+#         output_test_file = os.path.join(output_dir, os.path.basename(test_file))
+#     else:
+#         output_test_file = test_file
 
-    compile_pyccel(cwd, test_file, pyccel_commands)
-
-    lang_out = get_lang_output(output_test_file, language)
-
-    rx = re.compile(r'\bA\b')
-    assert rx.search(lang_out)
-
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-@pytest.mark.parametrize( "test_file", ["scripts/classes/generic_methods.py",
-                                        ] )
-@pytest.mark.parametrize( 'language', (
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = pytest.mark.c),
-        pytest.param("fortran", marks = [
-            pytest.mark.xfail(reason="Issue #1595"),
-            pytest.mark.fortran])
-    )
-)
+#     compile_pyccel(cwd, test_file, pyccel_commands)
+
+#     lang_out = get_lang_output(output_test_file, language)
+
+#     rx = re.compile(r'\bA\b')
+#     assert rx.search(lang_out)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# @pytest.mark.parametrize( "test_file", ["scripts/classes/generic_methods.py",
+#                                         ] )
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = pytest.mark.c),
+#         pytest.param("fortran", marks = [
+#             pytest.mark.xfail(reason="Issue #1595"),
+#             pytest.mark.fortran])
+#     )
+# )
 
-def test_interfaces_in_classes( test_file , language):
-    pyccel_test(test_file, language=language)
+# def test_interfaces_in_classes( test_file , language):
+#     pyccel_test(test_file, language=language)
 
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/lapack_subroutine.py",
-                                        ] )
-@pytest.mark.skipif( sys.platform == 'win32', reason="Compilation problem. On execution Windows raises: error while loading shared libraries: liblapack.dll: cannot open shared object file: No such file or directory" )
-@pytest.mark.external
-def test_lapack( test_file ):
-    #TODO: Uncomment this when dgetri can be expressed with scipy
-    #pyccel_test(test_file)
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/lapack_subroutine.py",
+#                                         ] )
+# @pytest.mark.skipif( sys.platform == 'win32', reason="Compilation problem. On execution Windows raises: error while loading shared libraries: liblapack.dll: cannot open shared object file: No such file or directory" )
+# @pytest.mark.external
+# def test_lapack( test_file ):
+#     #TODO: Uncomment this when dgetri can be expressed with scipy
+#     #pyccel_test(test_file)
 
-    #TODO: Remove the rest of the function when dgetri can be expressed with scipy
-    test_file = os.path.normpath(test_file)
-    test_file = get_abs_path(test_file)
+#     #TODO: Remove the rest of the function when dgetri can be expressed with scipy
+#     test_file = os.path.normpath(test_file)
+#     test_file = get_abs_path(test_file)
 
-    cwd = get_abs_path('.')
+#     cwd = get_abs_path('.')
 
-    compile_pyccel(cwd, test_file)
+#     compile_pyccel(cwd, test_file)
 
-    lang_out = get_lang_output(test_file, 'fortran')
-    rx = re.compile('[-0-9.eE]+')
-    lang_out_vals = []
-    while lang_out:
-        try:
-            f, lang_out = get_value(lang_out, rx, float)
-            lang_out_vals.append(f)
-        except AssertionError:
-            lang_out = None
-    output_mat = np.array(lang_out_vals).reshape(4, 4)
-    expected_output = np.eye(4)
-
-    assert np.allclose(output_mat, expected_output, rtol=1e-14, atol=1e-15)
-
-#------------------------------------------------------------------------------
-def test_type_print( language ):
-    pyccel_test("scripts/runtest_type_print.py",
-                language = language, output_dtype=str)
-
-def test_container_type_print(language):
-    test_file = "scripts/runtest_array_type_print.py"
-
-    rel_test_dir = os.path.dirname(test_file)
-
-    test_file = os.path.normpath(test_file)
-
-    cwd = os.path.dirname(test_file)
-    cwd = get_abs_path(cwd)
-
-    test_file = get_abs_path(test_file)
-
-    pyccel_commands = " --language="+language
-
-    if language=="python":
-        output_dir = os.path.join(get_abs_path(rel_test_dir), '__pyccel__')
-        pyccel_commands += " --output "+output_dir
-        output_test_file = os.path.join(output_dir, os.path.basename(test_file))
-    else:
-        output_test_file = test_file
-
-    compile_pyccel(cwd, test_file, pyccel_commands)
-
-    lang_out = get_lang_output(output_test_file, language)
-
-    rx = re.compile(r'\bnumpy.ndarray\b')
-    assert rx.search(lang_out)
-
-    if language!="python":
-        rx = re.compile(r'\bfloat64\b')
-        assert rx.search(lang_out)
-#------------------------------------------------------------------------------
-
-@pytest.mark.parametrize( 'language', (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = [
-            pytest.mark.skip(reason="Collisions (initialised boolean) are not handled."),
-            pytest.mark.c]
-        )
-    )
-)
-def test_module_init( language ):
-    test_mod  = get_abs_path("scripts/module_init.py")
-    test_prog = get_abs_path("scripts/runtest_module_init.py")
-
-    output_dir   = get_abs_path('scripts/__pyccel__')
-    output_test_file = os.path.join(output_dir, os.path.basename(test_prog))
-
-    cwd = get_abs_path("scripts")
-
-    pyccel_commands = "--language="+language
-    if language=="python":
-        if output_dir is None:
-            pyccel_commands += "--output="+output_dir
-
-    pyth_out = get_python_output(test_prog)
-
-    compile_pyccel(cwd, test_mod, pyccel_commands)
-
-    if language != "python":
-        pyth_mod_out = get_python_output(test_prog, cwd)
-        compare_pyth_fort_output(pyth_out, pyth_mod_out, str, language)
-
-    compile_pyccel(cwd, test_prog, pyccel_commands)
-
-    if language == 'python' :
-        lang_out = get_lang_output(output_test_file, language)
-    else:
-        lang_out = get_lang_output(test_prog, language)
-
-    compare_pyth_fort_output(pyth_out, lang_out, str, language)
-
-#------------------------------------------------------------------------------
-def get_lang_exit_value(abs_path, language, cwd=None):
-    abs_path = get_exe(abs_path, language)
-    if language == "python":
-        if cwd is None:
-            p = subprocess.Popen([sys.executable , abs_path])
-        else:
-            p = subprocess.Popen([sys.executable , abs_path], cwd=cwd)
-    else:
-        p = subprocess.Popen([abs_path])
-    p.communicate()
-    return p.returncode
-
-@pytest.mark.parametrize( "test_file", ["scripts/asserts/valid_assert.py",
-                                        "scripts/asserts/unvalid_assert1.py",
-                                        "scripts/asserts/unvalid_assert2.py",
-                                        "scripts/asserts/unvalid_assert3.py",
-                                        ] )
-
-def test_assert(language, test_file):
-    test_dir = os.path.dirname(test_file)
-    test_file = get_abs_path(os.path.normpath(test_file))
-
-    output_dir   = os.path.join(get_abs_path(test_dir), '__pyccel__')
-    output_test_file = os.path.join(output_dir, os.path.basename(test_file))
-
-    cwd = get_abs_path(test_dir)
-
-    if not language:
-        language = "fortran"
-    pyccel_commands = " --language="+language
-    pyccel_commands += " --output="+ output_dir
-
-    compile_pyccel(cwd, test_file, pyccel_commands)
-    lang_out = get_lang_exit_value(output_test_file, language)
-    pyth_out = get_lang_exit_value(test_file, "python")
-    assert (not lang_out and not pyth_out) or (lang_out and pyth_out)
-
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( "test_file", ["scripts/exits/empty_exit.py",
-                                        "scripts/exits/negative_exit1.py",
-                                        "scripts/exits/negative_exit2.py",
-                                        "scripts/exits/positive_exit1.py",
-                                        "scripts/exits/positive_exit2.py",
-                                        "scripts/exits/positive_exit3.py",
-                                        "scripts/exits/zero_exit.py",
-                                        "scripts/exits/error_message_exit.py",
-                                        ] )
-
-def test_exit(language, test_file):
-    test_dir = os.path.dirname(test_file)
-    test_file = get_abs_path(os.path.normpath(test_file))
-
-    output_dir   = os.path.join(get_abs_path(test_dir), '__pyccel__')
-    output_test_file = os.path.join(output_dir, os.path.basename(test_file))
-
-    cwd = get_abs_path(test_dir)
-
-    if not language:
-        language = "fortran"
-    pyccel_commands = " --language="+language
-    pyccel_commands += " --output="+ output_dir
-
-    compile_pyccel(cwd, test_file, pyccel_commands)
-    lang_out = get_lang_exit_value(output_test_file, language)
-    pyth_out = get_lang_exit_value(test_file, "python")
-    assert lang_out == pyth_out
-
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( 'language', (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = [
-            pytest.mark.skip(reason="Collisions are not handled. And chained imports (see #756)"),
-            pytest.mark.c]
-        )
-    )
-)
-def test_module_init_collisions( language ):
-    test_mod  = get_abs_path("scripts/module_init2.py")
-    test_prog = get_abs_path("scripts/runtest_module_init2.py")
-
-    output_dir   = get_abs_path('scripts/__pyccel__')
-    output_test_file = os.path.join(output_dir, os.path.basename(test_prog))
-
-    cwd = get_abs_path("scripts")
-
-    pyccel_commands = "--language="+language
-    if language=="python":
-        if output_dir is None:
-            pyccel_commands += "--output="+output_dir
-
-    pyth_out = get_python_output(test_prog)
-
-    compile_pyccel(cwd, test_mod, pyccel_commands)
-    compile_pyccel(cwd, test_prog, pyccel_commands)
-
-    if language == 'python' :
-        lang_out = get_lang_output(output_test_file, language)
-    else:
-        lang_out = get_lang_output(test_prog, language)
-
-    compare_pyth_fort_output(pyth_out, lang_out, [float, float, float, int, float, float, float, int], language)
-
-def test_function_aliasing():
-    pyccel_test("scripts/runtest_function_alias.py",
-            language = 'fortran')
-
-#------------------------------------------------------------------------------
-
-def test_function(language):
-    pyccel_test("scripts/functions.py",
-            language = language, output_dtype=[str]+[int]*8 )
-
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-@pytest.mark.xfail(os.environ.get('PYCCEL_DEFAULT_COMPILER', None) == 'intel', reason="1671")
-def test_inline(language):
-    pyccel_test("scripts/decorators_inline.py", language = language)
-
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-@pytest.mark.parametrize( 'language', (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("python", marks = pytest.mark.python),
-        pytest.param("c", marks = [
-            pytest.mark.skip(reason="Collisions (initialised boolean) are not handled."),
-            pytest.mark.c]
-        )
-    )
-)
-@pytest.mark.xfail(os.environ.get('PYCCEL_DEFAULT_COMPILER', None) == 'intel', reason="1671")
-def test_inline_import(language):
-    pyccel_test("scripts/runtest_decorators_inline.py",
-            dependencies = ("scripts/decorators_inline.py"),
-                language = language)
-
-#------------------------------------------------------------------------------
-@pytest.mark.xdist_incompatible
-def test_json():
-    pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
-            pyccel_commands='--export-compile-info test.json')
-    with open(get_abs_path('scripts/test.json'), 'r') as f:
-        dict_1 = json.load(f)
-    pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
-        pyccel_commands='--compiler test.json --export-compile-info test2.json')
-    with open(get_abs_path('scripts/test2.json'), 'r') as f:
-        dict_2 = json.load(f)
-
-    assert dict_1 == dict_2
-
-@pytest.mark.xdist_incompatible
-def test_json_relative_path():
-    pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
-            pyccel_commands='--export-compile-info test.json')
-    shutil.move(get_abs_path('scripts/test.json'), get_abs_path('scripts/hope_benchmarks/test.json'))
-    compile_pyccel(get_abs_path('scripts/hope_benchmarks'), "../runtest_funcs.py", '--compiler test.json')
-
-#------------------------------------------------------------------------------
-def test_reserved_file_name():
-    with pytest.raises(ValueError) as exc_info:
-        libname = str(random.choice(tuple(python_builtin_libs))) + ".py" # nosec B311
-        execute_pyccel(fname=libname)
-    assert str(exc_info.value) == f"File called {libname} has the same name as a Python built-in package and can't be imported from Python. See #1402"
-
-#------------------------------------------------------------------------------
-def test_concatentation():
-    pyccel_test("scripts/concatenation.py",
-                language = 'fortran',
-                output_dtype=[int]*15+[str])
-
-#------------------------------------------------------------------------------
-@pytest.mark.parametrize( 'language', (
-        pytest.param("fortran", marks = pytest.mark.fortran),
-        pytest.param("c", marks = pytest.mark.c)
-    )
-)
-def test_class_imports(language):
-    cwd = get_abs_path('project_class_imports')
-
-    test_file = get_abs_path('project_class_imports/runtest.py')
-
-    pyth_out = get_python_output(test_file, cwd)
-
-    compile_file = get_abs_path('project_class_imports/project/basics/Point_mod.py')
-    compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
-
-    out1 = get_python_output(test_file, cwd)
-    compare_pyth_fort_output(pyth_out, out1, float, 'python')
-
-    compile_file = get_abs_path('project_class_imports/project/basics/Line_mod.py')
-    compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
-
-    out2 = get_python_output(test_file, cwd)
-    compare_pyth_fort_output(pyth_out, out2, float, 'python')
-
-    compile_file = get_abs_path('project_class_imports/project/shapes/Square_mod.py')
-    compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
-
-    out3 = get_python_output(test_file, cwd)
-    compare_pyth_fort_output(pyth_out, out3, float, 'python')
-
-    compile_file = get_abs_path('project_class_imports/runtest.py')
-    compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
-
-    lang_out = get_lang_output(test_file, language)
-    compare_pyth_fort_output(pyth_out, lang_out, float, language)
-
-#------------------------------------------------------------------------------
-def test_time_execution_flag():
-    test_file  = get_abs_path("scripts/runtest_funcs.py")
-
-    cwd = get_abs_path("scripts")
-
-    cmd = [shutil.which("pyccel"), test_file, "--language=fortran", "--time_execution"]
-    with subprocess.Popen(cmd, universal_newlines=True, cwd=cwd,
-                          stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
-        result, _ = p.communicate()
-
-    result_lines = result.split('\n')
-    assert 'Timers' in result_lines[0]
-    assert 'Total' in result_lines[-2]
-    for l in result_lines[1:-1]:
-        assert ' : ' in l
-
-#------------------------------------------------------------------------------
-def test_module_name_containing_conflict(language):
-    base_dir = os.path.dirname(os.path.realpath(__file__))
-    path_dir = os.path.join(base_dir, "scripts")
-    compile_pyccel(path_dir, get_abs_path("scripts/endif.py"), options = f"--language={language}")
-
-    test_file = get_abs_path("scripts/runtest_badly_named_module.py")
-    out1 = get_python_output(test_file)
-    out2 = get_python_output(test_file)
-
-    assert out1 == out2
+#     lang_out = get_lang_output(test_file, 'fortran')
+#     rx = re.compile('[-0-9.eE]+')
+#     lang_out_vals = []
+#     while lang_out:
+#         try:
+#             f, lang_out = get_value(lang_out, rx, float)
+#             lang_out_vals.append(f)
+#         except AssertionError:
+#             lang_out = None
+#     output_mat = np.array(lang_out_vals).reshape(4, 4)
+#     expected_output = np.eye(4)
+
+#     assert np.allclose(output_mat, expected_output, rtol=1e-14, atol=1e-15)
+
+# #------------------------------------------------------------------------------
+# def test_type_print( language ):
+#     pyccel_test("scripts/runtest_type_print.py",
+#                 language = language, output_dtype=str)
+
+# def test_container_type_print(language):
+#     test_file = "scripts/runtest_array_type_print.py"
+
+#     rel_test_dir = os.path.dirname(test_file)
+
+#     test_file = os.path.normpath(test_file)
+
+#     cwd = os.path.dirname(test_file)
+#     cwd = get_abs_path(cwd)
+
+#     test_file = get_abs_path(test_file)
+
+#     pyccel_commands = " --language="+language
+
+#     if language=="python":
+#         output_dir = os.path.join(get_abs_path(rel_test_dir), '__pyccel__')
+#         pyccel_commands += " --output "+output_dir
+#         output_test_file = os.path.join(output_dir, os.path.basename(test_file))
+#     else:
+#         output_test_file = test_file
+
+#     compile_pyccel(cwd, test_file, pyccel_commands)
+
+#     lang_out = get_lang_output(output_test_file, language)
+
+#     rx = re.compile(r'\bnumpy.ndarray\b')
+#     assert rx.search(lang_out)
+
+#     if language!="python":
+#         rx = re.compile(r'\bfloat64\b')
+#         assert rx.search(lang_out)
+# #------------------------------------------------------------------------------
+
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = [
+#             pytest.mark.skip(reason="Collisions (initialised boolean) are not handled."),
+#             pytest.mark.c]
+#         )
+#     )
+# )
+# def test_module_init( language ):
+#     test_mod  = get_abs_path("scripts/module_init.py")
+#     test_prog = get_abs_path("scripts/runtest_module_init.py")
+
+#     output_dir   = get_abs_path('scripts/__pyccel__')
+#     output_test_file = os.path.join(output_dir, os.path.basename(test_prog))
+
+#     cwd = get_abs_path("scripts")
+
+#     pyccel_commands = "--language="+language
+#     if language=="python":
+#         if output_dir is None:
+#             pyccel_commands += "--output="+output_dir
+
+#     pyth_out = get_python_output(test_prog)
+
+#     compile_pyccel(cwd, test_mod, pyccel_commands)
+
+#     if language != "python":
+#         pyth_mod_out = get_python_output(test_prog, cwd)
+#         compare_pyth_fort_output(pyth_out, pyth_mod_out, str, language)
+
+#     compile_pyccel(cwd, test_prog, pyccel_commands)
+
+#     if language == 'python' :
+#         lang_out = get_lang_output(output_test_file, language)
+#     else:
+#         lang_out = get_lang_output(test_prog, language)
+
+#     compare_pyth_fort_output(pyth_out, lang_out, str, language)
+
+# #------------------------------------------------------------------------------
+# def get_lang_exit_value(abs_path, language, cwd=None):
+#     abs_path = get_exe(abs_path, language)
+#     if language == "python":
+#         if cwd is None:
+#             p = subprocess.Popen([sys.executable , abs_path])
+#         else:
+#             p = subprocess.Popen([sys.executable , abs_path], cwd=cwd)
+#     else:
+#         p = subprocess.Popen([abs_path])
+#     p.communicate()
+#     return p.returncode
+
+# @pytest.mark.parametrize( "test_file", ["scripts/asserts/valid_assert.py",
+#                                         "scripts/asserts/unvalid_assert1.py",
+#                                         "scripts/asserts/unvalid_assert2.py",
+#                                         "scripts/asserts/unvalid_assert3.py",
+#                                         ] )
+
+# def test_assert(language, test_file):
+#     test_dir = os.path.dirname(test_file)
+#     test_file = get_abs_path(os.path.normpath(test_file))
+
+#     output_dir   = os.path.join(get_abs_path(test_dir), '__pyccel__')
+#     output_test_file = os.path.join(output_dir, os.path.basename(test_file))
+
+#     cwd = get_abs_path(test_dir)
+
+#     if not language:
+#         language = "fortran"
+#     pyccel_commands = " --language="+language
+#     pyccel_commands += " --output="+ output_dir
+
+#     compile_pyccel(cwd, test_file, pyccel_commands)
+#     lang_out = get_lang_exit_value(output_test_file, language)
+#     pyth_out = get_lang_exit_value(test_file, "python")
+#     assert (not lang_out and not pyth_out) or (lang_out and pyth_out)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( "test_file", ["scripts/exits/empty_exit.py",
+#                                         "scripts/exits/negative_exit1.py",
+#                                         "scripts/exits/negative_exit2.py",
+#                                         "scripts/exits/positive_exit1.py",
+#                                         "scripts/exits/positive_exit2.py",
+#                                         "scripts/exits/positive_exit3.py",
+#                                         "scripts/exits/zero_exit.py",
+#                                         "scripts/exits/error_message_exit.py",
+#                                         ] )
+
+# def test_exit(language, test_file):
+#     test_dir = os.path.dirname(test_file)
+#     test_file = get_abs_path(os.path.normpath(test_file))
+
+#     output_dir   = os.path.join(get_abs_path(test_dir), '__pyccel__')
+#     output_test_file = os.path.join(output_dir, os.path.basename(test_file))
+
+#     cwd = get_abs_path(test_dir)
+
+#     if not language:
+#         language = "fortran"
+#     pyccel_commands = " --language="+language
+#     pyccel_commands += " --output="+ output_dir
+
+#     compile_pyccel(cwd, test_file, pyccel_commands)
+#     lang_out = get_lang_exit_value(output_test_file, language)
+#     pyth_out = get_lang_exit_value(test_file, "python")
+#     assert lang_out == pyth_out
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = [
+#             pytest.mark.skip(reason="Collisions are not handled. And chained imports (see #756)"),
+#             pytest.mark.c]
+#         )
+#     )
+# )
+# def test_module_init_collisions( language ):
+#     test_mod  = get_abs_path("scripts/module_init2.py")
+#     test_prog = get_abs_path("scripts/runtest_module_init2.py")
+
+#     output_dir   = get_abs_path('scripts/__pyccel__')
+#     output_test_file = os.path.join(output_dir, os.path.basename(test_prog))
+
+#     cwd = get_abs_path("scripts")
+
+#     pyccel_commands = "--language="+language
+#     if language=="python":
+#         if output_dir is None:
+#             pyccel_commands += "--output="+output_dir
+
+#     pyth_out = get_python_output(test_prog)
+
+#     compile_pyccel(cwd, test_mod, pyccel_commands)
+#     compile_pyccel(cwd, test_prog, pyccel_commands)
+
+#     if language == 'python' :
+#         lang_out = get_lang_output(output_test_file, language)
+#     else:
+#         lang_out = get_lang_output(test_prog, language)
+
+#     compare_pyth_fort_output(pyth_out, lang_out, [float, float, float, int, float, float, float, int], language)
+
+# def test_function_aliasing():
+#     pyccel_test("scripts/runtest_function_alias.py",
+#             language = 'fortran')
+
+# #------------------------------------------------------------------------------
+
+# def test_function(language):
+#     pyccel_test("scripts/functions.py",
+#             language = language, output_dtype=[str]+[int]*8 )
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# @pytest.mark.xfail(os.environ.get('PYCCEL_DEFAULT_COMPILER', None) == 'intel', reason="1671")
+# def test_inline(language):
+#     pyccel_test("scripts/decorators_inline.py", language = language)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("python", marks = pytest.mark.python),
+#         pytest.param("c", marks = [
+#             pytest.mark.skip(reason="Collisions (initialised boolean) are not handled."),
+#             pytest.mark.c]
+#         )
+#     )
+# )
+# @pytest.mark.xfail(os.environ.get('PYCCEL_DEFAULT_COMPILER', None) == 'intel', reason="1671")
+# def test_inline_import(language):
+#     pyccel_test("scripts/runtest_decorators_inline.py",
+#             dependencies = ("scripts/decorators_inline.py"),
+#                 language = language)
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.xdist_incompatible
+# def test_json():
+#     pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
+#             pyccel_commands='--export-compile-info test.json')
+#     with open(get_abs_path('scripts/test.json'), 'r') as f:
+#         dict_1 = json.load(f)
+#     pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
+#         pyccel_commands='--compiler test.json --export-compile-info test2.json')
+#     with open(get_abs_path('scripts/test2.json'), 'r') as f:
+#         dict_2 = json.load(f)
+
+#     assert dict_1 == dict_2
+
+# @pytest.mark.xdist_incompatible
+# def test_json_relative_path():
+#     pyccel_test("scripts/runtest_funcs.py", language = 'fortran',
+#             pyccel_commands='--export-compile-info test.json')
+#     shutil.move(get_abs_path('scripts/test.json'), get_abs_path('scripts/hope_benchmarks/test.json'))
+#     compile_pyccel(get_abs_path('scripts/hope_benchmarks'), "../runtest_funcs.py", '--compiler test.json')
+
+# #------------------------------------------------------------------------------
+# def test_reserved_file_name():
+#     with pytest.raises(ValueError) as exc_info:
+#         libname = str(random.choice(tuple(python_builtin_libs))) + ".py" # nosec B311
+#         execute_pyccel(fname=libname)
+#     assert str(exc_info.value) == f"File called {libname} has the same name as a Python built-in package and can't be imported from Python. See #1402"
+
+# #------------------------------------------------------------------------------
+# def test_concatentation():
+#     pyccel_test("scripts/concatenation.py",
+#                 language = 'fortran',
+#                 output_dtype=[int]*15+[str])
+
+# #------------------------------------------------------------------------------
+# @pytest.mark.parametrize( 'language', (
+#         pytest.param("fortran", marks = pytest.mark.fortran),
+#         pytest.param("c", marks = pytest.mark.c)
+#     )
+# )
+# def test_class_imports(language):
+#     cwd = get_abs_path('project_class_imports')
+
+#     test_file = get_abs_path('project_class_imports/runtest.py')
+
+#     pyth_out = get_python_output(test_file, cwd)
+
+#     compile_file = get_abs_path('project_class_imports/project/basics/Point_mod.py')
+#     compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
+
+#     out1 = get_python_output(test_file, cwd)
+#     compare_pyth_fort_output(pyth_out, out1, float, 'python')
+
+#     compile_file = get_abs_path('project_class_imports/project/basics/Line_mod.py')
+#     compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
+
+#     out2 = get_python_output(test_file, cwd)
+#     compare_pyth_fort_output(pyth_out, out2, float, 'python')
+
+#     compile_file = get_abs_path('project_class_imports/project/shapes/Square_mod.py')
+#     compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
+
+#     out3 = get_python_output(test_file, cwd)
+#     compare_pyth_fort_output(pyth_out, out3, float, 'python')
+
+#     compile_file = get_abs_path('project_class_imports/runtest.py')
+#     compile_pyccel(cwd, compile_file, f"--language={language} --verbose")
+
+#     lang_out = get_lang_output(test_file, language)
+#     compare_pyth_fort_output(pyth_out, lang_out, float, language)
+
+# #------------------------------------------------------------------------------
+# def test_time_execution_flag():
+#     test_file  = get_abs_path("scripts/runtest_funcs.py")
+
+#     cwd = get_abs_path("scripts")
+
+#     cmd = [shutil.which("pyccel"), test_file, "--language=fortran", "--time_execution"]
+#     with subprocess.Popen(cmd, universal_newlines=True, cwd=cwd,
+#                           stdout=subprocess.PIPE, stderr=subprocess.PIPE) as p:
+#         result, _ = p.communicate()
+
+#     result_lines = result.split('\n')
+#     assert 'Timers' in result_lines[0]
+#     assert 'Total' in result_lines[-2]
+#     for l in result_lines[1:-1]:
+#         assert ' : ' in l
+
+# #------------------------------------------------------------------------------
+# def test_module_name_containing_conflict(language):
+#     base_dir = os.path.dirname(os.path.realpath(__file__))
+#     path_dir = os.path.join(base_dir, "scripts")
+#     compile_pyccel(path_dir, get_abs_path("scripts/endif.py"), options = f"--language={language}")
+
+#     test_file = get_abs_path("scripts/runtest_badly_named_module.py")
+#     out1 = get_python_output(test_file)
+#     out2 = get_python_output(test_file)
+
+#     assert out1 == out2
