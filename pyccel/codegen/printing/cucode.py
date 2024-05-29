@@ -190,6 +190,7 @@ class CudaCodePrinter(CCodePrinter):
                     }}\n'
         return '\n'.join((f"#ifndef {name.upper()}_H",
                           f"#define {name.upper()}_H",
+                          imports,
                           global_variables,
                           function_declaration,
                           "#endif // {name.upper()}_H\n"))
