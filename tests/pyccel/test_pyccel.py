@@ -341,15 +341,12 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
 
     if (cwd is None):
         cwd = os.path.dirname(test_file)
-    print('cwd = ', cwd)
     cwd = get_abs_path(cwd)
-    print('cwd = ', cwd)
 
     test_file = get_abs_path(test_file)
-    print('test_file = ', test_file)
 
     pyth_out = get_python_output(test_file, cwd)
-    print(pyth_out)
+
     if language:
         pyccel_commands += " --language="+language
     else:
@@ -372,16 +369,12 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
                 pyc_command = pyccel_commands
 
             if not compile_with_pyccel:
-                print('Compiling 1 {}'.format(dependencies[i]))
-                print(pyc_command)
                 compile_pyccel (cwd, dependencies[i], pyc_command+" -t")
                 if language == 'fortran':
                     compile_fortran(cwd, dependencies[i], [], is_mod = True)
                 elif language == 'c':
                     compile_c(cwd, dependencies[i], [], is_mod = True)
             else:
-                print('Compiling 2 {}'.format(dependencies[i]))
-                print(pyc_command)
                 compile_pyccel(cwd, dependencies[i], pyc_command)
 
     if output_dir:
