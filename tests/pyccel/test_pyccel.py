@@ -341,6 +341,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
 
     if (cwd is None):
         cwd = os.path.dirname(test_file)
+
     cwd = get_abs_path(cwd)
 
     test_file = get_abs_path(test_file)
@@ -397,9 +398,9 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         lang_out = get_lang_output(output_test_file, language)
         compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
 
-# ==============================================================================
+#==============================================================================
 # UNIT TESTS
-# ==============================================================================
+#==============================================================================
 def test_relative_imports_in_project(language):
 
     base_dir = os.path.dirname(os.path.realpath(__file__))
