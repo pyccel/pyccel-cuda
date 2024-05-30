@@ -138,8 +138,6 @@ class CudaCodePrinter(CCodePrinter):
 
     def _print_KernelCall(self, expr):
         func = expr.funcdef
-        if func.is_inline:
-            return self._handle_inline_func_call(expr)
         args = []
         for a, f in zip(expr.args, func.arguments):
             arg_val = a.value or Nil()

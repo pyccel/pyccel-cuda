@@ -3,10 +3,14 @@ from pyccel.decorators import kernel
 from pyccel import cuda
 
 @kernel
-def say_hello():
-    print("Hello")
+def say_hello(its_morning : bool):
+    if(its_morning):
+        print("Hello and Good morning")
+    else:
+        print("Hello and Good afternoon")
 
 def f():
-    say_hello[1,1]()
+    its_morning = True
+    say_hello[1,1](its_morning)
     cuda.synchronize()
 
