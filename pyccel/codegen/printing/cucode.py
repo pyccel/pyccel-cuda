@@ -131,29 +131,14 @@ class CudaCodePrinter(CCodePrinter):
         cuda_decorater = ""
         if('kernel' in expr.decorators):
             cuda_decorater = "__global__"
-        if isinstance(expr, FunctionAddress):
-            return f'{static}{ret_type} (*{name})({arg_code})'
-        else:
-            return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
+        return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
 
     def _print_KernelCall(self, expr):
         func = expr.funcdef
         args = []
         for a, f in zip(expr.args, func.arguments):
             arg_val = a.value or Nil()
-            f = f.var
-            if self.is_c_pointer(f):
-                if isinstance(arg_val, Variable):
-                    args.append(ObjectAddress(arg_val))
-                elif not self.is_c_pointer(arg_val):
-                    tmp_var = self.scope.get_temporary_variable(f.dtype)
-                    assign = Assign(tmp_var, arg_val)
-                    self._additional_code += self._print(assign)
-                    args.append(ObjectAddress(tmp_var))
-                else:
-                    args.append(arg_val)
-            else :
-                args.append(arg_val)
+            args.append(arg_val)
 
         args += self._temporary_args
         self._temporary_args = []
