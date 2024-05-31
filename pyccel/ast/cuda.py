@@ -35,9 +35,6 @@ class KernelCall(FunctionCall):
     tpblock : NativeInteger
         The number of threads per block.
 
-    launch_config : tuple
-        Launch configuration of kernel call.
-
     current_function : FunctionDef, default: None
         The function where the call takes place.
     """
