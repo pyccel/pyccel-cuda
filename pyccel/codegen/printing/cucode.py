@@ -12,18 +12,12 @@ from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
 
 from pyccel.ast.core        import Import, Module
 from pyccel.ast.core      import FunctionAddress
-from pyccel.ast.core      import Assign
 
 from pyccel.ast.datatypes import VoidType, PythonNativeInt
 
-
 from pyccel.errors.errors   import Errors
 
-from pyccel.ast.variable import Variable
-
 from pyccel.ast.literals  import Nil
-
-from pyccel.ast.c_concepts import ObjectAddress
 
 errors = Errors()
 
@@ -136,7 +130,7 @@ class CudaCodePrinter(CCodePrinter):
     def _print_KernelCall(self, expr):
         func = expr.funcdef
         args = []
-        for a, f in zip(expr.args, func.arguments):
+        for a in expr.args:
             arg_val = a.value or Nil()
             args.append(arg_val)
 
