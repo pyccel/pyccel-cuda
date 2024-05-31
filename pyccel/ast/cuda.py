@@ -41,12 +41,11 @@ class KernelCall(FunctionCall):
     current_function : FunctionDef, default: None
         The function where the call takes place.
     """
-    __slots__ = ('_numBlocks','_tpblock','_func', '_args', '_launch_config')
-    _attribute_nodes = (*FunctionCall._attribute_nodes, '_numBlocks', '_tpblock', '_launch_config')
-    def __init__(self, func, args, numBlocks, tpblock, launch_config,current_function=None):
+    __slots__ = ('_numBlocks','_tpblock','_func', '_args')
+    _attribute_nodes = (*FunctionCall._attribute_nodes, '_numBlocks', '_tpblock')
+    def __init__(self, func, args, numBlocks, tpblock,current_function=None):
         self._numBlocks = numBlocks
         self._tpblock = tpblock
-        self._launch_config = launch_config
         super().__init__(func, args, current_function)
 
     @property
@@ -67,11 +66,3 @@ class KernelCall(FunctionCall):
         """
         return self._tpblock
 
-    @property
-    def launch_config(self):
-        """
-        Launch configuration of kernel call.
-
-        Launch configuration of kernel call.
-        """
-        return self._launch_config

@@ -1202,7 +1202,7 @@ class SemanticParser(BasicParser):
                 errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
                     symbol = expr,
                     severity='fatal')
-        new_expr = KernelCall(func, args, expr.launch_config[0], expr.launch_config[1],())
+        new_expr = KernelCall(func, args, expr.launch_config[0], expr.launch_config[1])
         return new_expr
 
     def _sort_function_call_args(self, func_args, args):
