@@ -10,7 +10,7 @@ Provides CUDA functionality for code generation.
 """
 from .internals      import PyccelFunction
 
-from .datatypes import (VoidType)
+from .datatypes      import VoidType
 from .core           import Module, PyccelFunctionDef
 
 __all__ = (

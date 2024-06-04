@@ -136,7 +136,7 @@ from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_TH
         UNUSED_DECORATORS, UNSUPPORTED_POINTER_RETURN_VALUE, PYCCEL_RESTRICTION_OPTIONAL_NONE,
         PYCCEL_RESTRICTION_PRIMITIVE_IMMUTABLE, PYCCEL_RESTRICTION_IS_ISNOT,
         FOUND_DUPLICATED_IMPORT, UNDEFINED_WITH_ACCESS, MACRO_MISSING_HEADER_OR_FUNC, PYCCEL_RESTRICTION_INHOMOG_SET,
-        MISSING_KERNEL_CONFIGURATION,INVALID_KERNEL_LAUNCH_CONFIG_HEIGHT,
+        MISSING_KERNEL_CONFIGURATION,INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
         INVALID_KERNEL_LAUNCH_CONFIG_LOW, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
 
 from pyccel.parser.base      import BasicParser
@@ -1167,7 +1167,7 @@ class SemanticParser(BasicParser):
                     symbol=expr,
                     severity='fatal')
         if(len(expr.launch_config) > 2):
-            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_HEIGHT,
+            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
                     symbol=expr,
                     severity='fatal')
         if(len(func.results)):
@@ -1180,10 +1180,9 @@ class SemanticParser(BasicParser):
                 severity='fatal')
         if not isinstance(expr.launch_config[0], (LiteralInteger, PythonTuple)):
             if isinstance(expr.launch_config[0], PyccelSymbol):
-                numBlocks = self.get_variable(expr.launch_config[0])
+                num_blocks = self.get_variable(expr.launch_config[0])
 
-                if not isinstance(numBlocks.dtype, PythonNativeInt):
-                    print(isinstance(numBlocks.dtype, PythonNativeInt))
+                if not isinstance(num_blocks.dtype, PythonNativeInt):
                     errors.report(INVALID_KERNEL_CALL_BP_GRID,
                     symbol = expr,
                     severity='fatal')
@@ -1191,10 +1190,10 @@ class SemanticParser(BasicParser):
                 errors.report(INVALID_KERNEL_CALL_BP_GRID,
                     symbol = expr,
                     severity='fatal')
-        if not isinstance(expr.launch_config[1], (LiteralInteger, PythonTuple)):
+        if not isinstance(expr.launch_config[1], (LiteralInteger)):
             if isinstance(expr.launch_config[1], PyccelSymbol):
-                tpblock = self.get_variable(expr.launch_config[1])
-                if not isinstance(tpblock.dtype, PythonNativeInt):
+                tp_block = self.get_variable(expr.launch_config[1])
+                if not isinstance(tp_block.dtype, PythonNativeInt):
                     errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
                     symbol = expr,
                     severity='fatal')

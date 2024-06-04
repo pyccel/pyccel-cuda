@@ -29,37 +29,37 @@ class KernelCall(FunctionCall):
     args : tuple
         The arguments being passed to the function.
 
-    numBlocks : NativeInteger
+    num_blocks : NativeInteger
         The number of blocks.
 
-    tpblock : NativeInteger
+    tp_block : NativeInteger
         The number of threads per block.
 
     current_function : FunctionDef, default: None
         The function where the call takes place.
     """
-    __slots__ = ('_numBlocks','_tpblock','_func', '_args')
-    _attribute_nodes = (*FunctionCall._attribute_nodes, '_numBlocks', '_tpblock')
-    def __init__(self, func, args, numBlocks, tpblock,current_function=None):
-        self._numBlocks = numBlocks
-        self._tpblock = tpblock
+    __slots__ = ('_num_blocks','_tp_block','_func', '_args')
+    _attribute_nodes = (*FunctionCall._attribute_nodes, '_num_blocks', '_tp_block')
+    def __init__(self, func, args, num_blocks, tp_block,current_function=None):
+        self._num_blocks = num_blocks
+        self._tp_block = tp_block
         super().__init__(func, args, current_function)
 
     @property
-    def numBlocks(self):
+    def num_blocks(self):
         """
         The number of blocks in the kernel being called.
-    
+
         The number of blocks in the kernel being called.
         """
-        return self._numBlocks
+        return self._num_blocks
 
     @property
-    def tpblock(self):
+    def tp_block(self):
         """
         The number of threads per block.
 
-        Launch configuration of kernel call.
+        The number of threads per block.
         """
-        return self._tpblock
+        return self._tp_block
 

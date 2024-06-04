@@ -97,7 +97,7 @@ class CudaCodePrinter(CCodePrinter):
         elif n_results > 1:
             ret_type = self.find_in_dtype_registry(PythonNativeInt())
             arg_vars.extend(result_vars)
-            self._additional_args.append(result_vars) # Ensure correct result for is_c_pointer
+            self._additional_args.append(result_vars)
         else:
             ret_type = self.find_in_dtype_registry(VoidType())
 
@@ -137,7 +137,7 @@ class CudaCodePrinter(CCodePrinter):
         args += self._temporary_args
         self._temporary_args = []
         args = ', '.join([f'{self._print(a)}' for a in args])
-        return f"{func.name}<<<{expr.numBlocks}, {expr.tpblock}>>>({args});\n"
+        return f"{func.name}<<<{expr.num_blocks}, {expr.tp_block}>>>({args});\n"
 
     def _print_CudaSynchronize(self, expr):
         return 'cudaDeviceSynchronize();\n'

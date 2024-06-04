@@ -6,7 +6,7 @@ from pyccel.decorators import kernel
 from pyccel.errors.errors import Errors, PyccelSemanticError
 from pyccel.errors.messages import (INVALID_KERNEL_CALL_TP_BLOCK,
                                     INVALID_KERNEL_CALL_BP_GRID,
-                                    INVALID_KERNEL_LAUNCH_CONFIG_HEIGHT,
+                                    INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
                                     INVALID_KERNEL_LAUNCH_CONFIG_LOW)
 
 
@@ -58,8 +58,8 @@ def test_invalid_thread_per_block():
 
 
 @pytest.mark.cuda
-def test_invalid_launch_config_height():
-    def invalid_launch_config_height():
+def test_invalid_launch_config_high():
+    def invalid_launch_config_high():
         @kernel
         def kernel_call():
             pass
@@ -72,14 +72,14 @@ def test_invalid_launch_config_height():
     errors = Errors()
 
     with pytest.raises(PyccelSemanticError):
-        epyccel(invalid_launch_config_height, language="cuda")
+        epyccel(invalid_launch_config_high, language="cuda")
 
     assert errors.has_errors()
     assert errors.num_messages() == 1
 
     error_info = [*errors.error_info_map.values()][0][0]
     assert error_info.symbol.funcdef == 'kernel_call'
-    assert INVALID_KERNEL_LAUNCH_CONFIG_HEIGHT == error_info.message
+    assert INVALID_KERNEL_LAUNCH_CONFIG_HIGH == error_info.message
 
 
 @pytest.mark.cuda
@@ -106,7 +106,7 @@ def test_invalid_launch_config_low():
 
 
 @pytest.mark.cuda
-def test_invalid_arguments_for_cuda_language():
+def test_invalid_arguments_for_kernel_call():
     def invalid_arguments():
         @kernel
         def kernel_call(arg : int):
@@ -130,7 +130,7 @@ def test_invalid_arguments_for_cuda_language():
 
 
 @pytest.mark.cuda
-def test_invalid_arguments_for_cuda_language2():
+def test_invalid_arguments_for_kernel_call_2():
     def invalid_arguments_():
         @kernel
         def kernel_call():
