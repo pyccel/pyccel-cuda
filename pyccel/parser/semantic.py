@@ -1145,8 +1145,8 @@ class SemanticParser(BasicParser):
 
         Parameters
         ----------
-        expr : PyccelAstNode
-               The expression where this call is found (used for error output).\
+        expr : IndexedFunctionCall
+               Node has all the information about the function call
 
         func : FunctionDef instance, Interface instance or PyccelInternalFunction type
                The function being called.
@@ -1159,8 +1159,8 @@ class SemanticParser(BasicParser):
 
         Returns
         -------
-        FunctionCall/PyccelInternalFunction
-            The semantic representation of the call.
+        Pyccel.ast.cuda.KernelCall
+            The semantic representation of the kernel call.
         """
         if(len(expr.launch_config) < 2):
             errors.report(INVALID_KERNEL_LAUNCH_CONFIG_LOW,
