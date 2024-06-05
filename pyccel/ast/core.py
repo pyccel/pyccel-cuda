@@ -2086,8 +2086,6 @@ class IndexedFunctionCall(FunctionCall):
     """
     __slots__ = ('_launch_config',)
     def __init__(self, func, args, launch_config):
-        self._arguments = tuple(args)
-        self._func_name = func
         self._launch_config = launch_config
         super().__init__(func, args, None)
 

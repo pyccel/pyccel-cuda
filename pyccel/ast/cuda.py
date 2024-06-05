@@ -29,11 +29,11 @@ class KernelCall(FunctionCall):
     args : tuple
         The arguments being passed to the function.
 
-    num_blocks : NativeInteger
-        The number of blocks.
+    num_blocks : TypedAstNode
+        The number of blocks. These objects must have a class type of `NativeInteger`.
 
-    tp_block : NativeInteger
-        The number of threads per block.
+    tp_block : TypedAstNode
+        The number of threads per block. These objects must have a class type of `NativeInteger`.
 
     current_function : FunctionDef, default: None
         The function where the call takes place.
