@@ -137,11 +137,12 @@ class CudaCodePrinter(CCodePrinter):
 
         args += self._temporary_args
         self._temporary_args = []
-        args = ', '.join([f'{self._print(a)}' for a in args])
+        args = ', '.join(self._print(a) for a in args)
         return f"{func.name}<<<{expr.num_blocks}, {expr.tp_block}>>>({args});\n"
 
     def _print_CudaSynchronize(self, expr):
         return 'cudaDeviceSynchronize();\n'
+
     def _print_ModuleHeader(self, expr):
         self.set_scope(expr.module.scope)
         self._in_header = True
