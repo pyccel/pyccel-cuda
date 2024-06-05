@@ -26,10 +26,7 @@ class CudaSynchronize(PyccelFunction):
     __slots__ = ()
     _attribute_nodes = ()
     _shape     = None
-    _rank      = 0
     _class_type = VoidType()
-    _precision = None
-    _order     = None
     def __init__(self):
         super().__init__()
 
