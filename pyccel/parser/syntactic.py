@@ -1106,9 +1106,9 @@ class SyntaxParser(BasicParser):
             func = DottedName(*func.name[:-1], func_attr)
         elif isinstance(func,IndexedElement):
             func = IndexedFunctionCall(func.base, args, func.indices)
-            # func = KernelCall(func.base, args, 1, 1, func.indices)
         else:
-            raise NotImplementedError(f'Unknown function type {str(type(func))}')
+            raise NotImplementedError(f' Unknown function type {type(func)}')
+
         return func
 
     def _visit_keyword(self, stmt):

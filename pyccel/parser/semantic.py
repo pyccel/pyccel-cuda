@@ -2878,7 +2878,7 @@ class SemanticParser(BasicParser):
         name     = self.scope.get_expected_name(name)
 
         args = self._handle_function_args(expr.args, **settings)
-        if('kernel' in func.decorators):
+        if 'kernel' in func.decorators :
             return self._handle_kernel(expr, func, args, **settings)
         else:
             return errors.report("Unknown function type",
