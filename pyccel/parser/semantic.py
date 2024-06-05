@@ -1136,6 +1136,7 @@ class SemanticParser(BasicParser):
                             func, func.is_elemental)
 
             return new_expr
+
     def _handle_kernel(self, expr, func, args, **settings):
         """
         Create the node representing the kernel function call.
@@ -1148,14 +1149,11 @@ class SemanticParser(BasicParser):
         expr : IndexedFunctionCall
                Node has all the information about the function call
 
-        func : FunctionDef instance, Interface instance or PyccelInternalFunction type
+        func : FunctionDef |Interface | PyccelInternalFunction type
                The function being called.
 
         args : tuple
                The arguments passed to the function.
-
-        **settings : dict
-            The settings passed to _visit functions.
 
         Returns
         -------
