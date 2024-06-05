@@ -2872,14 +2872,14 @@ class SemanticParser(BasicParser):
                 expr = Lambda(tuple(expr.variables), expr_new)
         return expr
 
-    def _visit_IndexedFunctionCall(self, expr, **settings):
+    def _visit_IndexedFunctionCall(self, expr):
         name     = expr.funcdef
         func     = self.scope.find(name, 'functions')
         name     = self.scope.get_expected_name(name)
 
-        args = self._handle_function_args(expr.args, **settings)
+        args = self._handle_function_args(expr.args)
         if 'kernel' in func.decorators :
-            return self._handle_kernel(expr, func, args, **settings)
+            return self._handle_kernel(expr, func, args)
         else:
             return errors.report("Unknown function type",
                 symbol=expr, severity='fatal')
