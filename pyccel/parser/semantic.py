@@ -1160,11 +1160,11 @@ class SemanticParser(BasicParser):
         Pyccel.ast.cuda.KernelCall
             The semantic representation of the kernel call.
         """
-        if(len(expr.launch_config) < 2):
+        if(len(expr.indexes) < 2):
             errors.report(INVALID_KERNEL_LAUNCH_CONFIG_LOW,
                     symbol=expr,
                     severity='fatal')
-        if(len(expr.launch_config) > 2):
+        if(len(expr.indexes) > 2):
             errors.report(INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
                     symbol=expr,
                     severity='fatal')
@@ -1176,9 +1176,9 @@ class SemanticParser(BasicParser):
             errors.report(f"{len(args)} argument types given, but function takes {len(func.arguments)} arguments",
                 symbol=expr,
                 severity='fatal')
-        if not isinstance(expr.launch_config[0], (LiteralInteger, PythonTuple)):
-            if isinstance(expr.launch_config[0], PyccelSymbol):
-                num_blocks = self.get_variable(expr.launch_config[0])
+        if not isinstance(expr.indexes[0], (LiteralInteger, PythonTuple)):
+            if isinstance(expr.indexes[0], PyccelSymbol):
+                num_blocks = self.get_variable(expr.indexes[0])
 
                 if not isinstance(num_blocks.dtype, PythonNativeInt):
                     errors.report(INVALID_KERNEL_CALL_BP_GRID,
@@ -1188,9 +1188,9 @@ class SemanticParser(BasicParser):
                 errors.report(INVALID_KERNEL_CALL_BP_GRID,
                     symbol = expr,
                     severity='fatal')
-        if not isinstance(expr.launch_config[1], (LiteralInteger)):
-            if isinstance(expr.launch_config[1], PyccelSymbol):
-                tp_block = self.get_variable(expr.launch_config[1])
+        if not isinstance(expr.indexes[1], (LiteralInteger)):
+            if isinstance(expr.indexes[1], PyccelSymbol):
+                tp_block = self.get_variable(expr.indexes[1])
                 if not isinstance(tp_block.dtype, PythonNativeInt):
                     errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
                     symbol = expr,
@@ -1199,7 +1199,7 @@ class SemanticParser(BasicParser):
                 errors.report(INVALID_KERNEL_CALL_TP_BLOCK,
                     symbol = expr,
                     severity='fatal')
-        new_expr = KernelCall(func, args, expr.launch_config[0], expr.launch_config[1])
+        new_expr = KernelCall(func, args, expr.indexes[0], expr.indexes[1])
         return new_expr
 
     def _sort_function_call_args(self, func_args, args):

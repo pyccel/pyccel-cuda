@@ -2069,7 +2069,7 @@ class FunctionCall(TypedAstNode):
 class IndexedFunctionCall(FunctionCall):
     """
     Represents an indexed function call in the code.
-    
+
     class represents indexed function calls, encapsulating all
     relevant information for such calls within the codebase.
 
@@ -2081,22 +2081,22 @@ class IndexedFunctionCall(FunctionCall):
     args : tuple
         The arguments passed to the function.
 
-    launch_config : tuple
-        Launch configuration of kernel call.
+    indexes : tuple
+        indexes of kernel call.
     """
-    __slots__ = ('_launch_config',)
-    def __init__(self, func, args, launch_config):
-        self._launch_config = launch_config
+    __slots__ = ('_indexes',)
+    def __init__(self, func, args, indexes):
+        self._indexes = indexes
         super().__init__(func, args, None)
 
     @property
-    def launch_config(self):
+    def indexes(self):
         """
-        Launch configuration of kernel call.
-        
-        Launch configuration of kernel call.
+        indexes of function call.
+
+        represents the indexes of the function call
         """
-        return self._launch_config
+        return self._indexes
 
 class ConstructorCall(FunctionCall):
 
