@@ -1176,7 +1176,7 @@ class SemanticParser(BasicParser):
             errors.report(f"{len(args)} argument types given, but function takes {len(func.arguments)} arguments",
                 symbol=expr,
                 severity='fatal')
-        if not isinstance(expr.indexes[0], (LiteralInteger, PythonTuple)):
+        if not isinstance(expr.indexes[0], (LiteralInteger)):
             if isinstance(expr.indexes[0], PyccelSymbol):
                 num_blocks = self.get_variable(expr.indexes[0])
 
