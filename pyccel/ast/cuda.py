@@ -40,6 +40,7 @@ class KernelCall(FunctionCall):
     """
     __slots__ = ('_num_blocks','_tp_block','_func', '_args')
     _attribute_nodes = (*FunctionCall._attribute_nodes, '_num_blocks', '_tp_block')
+
     def __init__(self, func, args, num_blocks, tp_block, current_function = None):
         self._num_blocks = num_blocks
         self._tp_block = tp_block
