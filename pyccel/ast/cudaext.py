@@ -12,6 +12,7 @@ from .internals      import PyccelFunction
 
 from .datatypes      import VoidType
 from .core           import Module, PyccelFunctionDef
+from .numpytypes     import NumpyInt32Type
 
 __all__ = (
     'CudaSynchronize',
@@ -20,8 +21,8 @@ __all__ = (
 class CudaSynchronize(PyccelFunction):
     """
     Represents a call to  Cuda.deviceSynchronize for code generation.
-    
-    This class serves as a representation of a synchronization call to the CUDA.   
+
+    This class serves as a representation of a synchronization call to the CUDA.
     """
     __slots__ = ()
     _attribute_nodes = ()
@@ -30,8 +31,57 @@ class CudaSynchronize(PyccelFunction):
     def __init__(self):
         super().__init__()
 
+class CudaDimFunction(PyccelFunction):
+    """
+    Represents a call to a CUDA dimension-related function for code generation.
+
+    This class serves as a representation of a CUDA dimension-related function call.
+    """
+    __slots__ = ('_dim',)
+    _attribute_nodes = ('_dim',)
+    _shape = None
+    _class_type = NumpyInt32Type()
+
+    def __init__(self, dim=0):
+        self._dim = dim
+        super().__init__()
+
+    @property
+    def dim(self):
+        return self._dim
+
+class threadIdx(CudaDimFunction):
+    """
+    Represents a call to Cuda.threadIdx for code generation.
+
+    This class serves as a representation of a thread call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
+
+class blockIdx(CudaDimFunction):
+    """
+    Represents a call to Cuda.blockIdx for code generation.
+
+    This class serves as a representation of a block call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
+
+class blockDim(CudaDimFunction):
+    """
+    Represents a call to Cuda.blockDim for code generation.
+
+    This class serves as a representation of a block dimension call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
+
 cuda_funcs = {
     'synchronize'       : PyccelFunctionDef('synchronize' , CudaSynchronize),
+    'threadIdx'         : PyccelFunctionDef('threadIdx'   , threadIdx),
+    'blockIdx'          : PyccelFunctionDef('blockIdx'    , blockIdx),
+    'blockDim'          : PyccelFunctionDef('blockDim'    , blockDim)
 }
 
 cuda_mod = Module('cuda',
