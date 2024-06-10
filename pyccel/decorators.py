@@ -135,7 +135,7 @@ class kernel:
 
         Parameters
         ----------
-        *args : tuple
+        *args : Any
             The arguments passed to the kernel function.
 
         Returns

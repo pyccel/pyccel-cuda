@@ -26,8 +26,8 @@ class KernelCall(FunctionCall):
     func : FunctionDef
         The definition of the function being called.
 
-    args : tuple
-        The arguments being passed to the function.
+    args : List
+        list of LiteralInteger passed to the function
 
     num_blocks : TypedAstNode
         The number of blocks. These objects must have a class type of `NativeInteger`.
