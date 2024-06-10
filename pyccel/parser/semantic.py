@@ -1160,7 +1160,6 @@ class SemanticParser(BasicParser):
         Pyccel.ast.cuda.KernelCall
             The semantic representation of the kernel call.
         """
-        
         if(len(expr.indexes) < 2):
             errors.report(INVALID_KERNEL_LAUNCH_CONFIG_LOW,
                     symbol=expr,
@@ -2879,10 +2878,7 @@ class SemanticParser(BasicParser):
         name     = self.scope.get_expected_name(name)
 
         args = self._handle_function_args(expr.args)
-        print(func)
         func = self._annotate_the_called_function_def(func)
-        print(func)
-
         if 'kernel' in func.decorators :
             return self._handle_kernel(expr, func, args)
         else:
