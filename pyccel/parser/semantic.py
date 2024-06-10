@@ -1152,8 +1152,8 @@ class SemanticParser(BasicParser):
         func : FunctionDef |Interface | PyccelInternalFunction type
                The function being called.
 
-        args : tuple
-               The arguments passed to the function.
+        args : List
+               list of LiteralInteger passed to the function
 
         Returns
         -------
