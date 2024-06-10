@@ -10,3 +10,4 @@ def synchronize():
     Synchronize CUDA device execution.
     Synchronize CUDA device execution.
     """
+
