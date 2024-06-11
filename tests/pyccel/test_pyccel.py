@@ -734,7 +734,6 @@ def test_elemental(language):
 def test_hello_kernel(gpu_available):
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
-            dependencies = ("scripts/kernel/func.py") ,
             language="cuda", output_dtype=types , execute_code=gpu_available)
 
 #------------------------------------------------------------------------------

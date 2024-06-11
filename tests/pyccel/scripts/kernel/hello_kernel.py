@@ -14,5 +14,6 @@ def f():
     say_hello[1,1](its_morning)
     cuda.synchronize()
 
-f()
+if __name__ == '__main__':
+    f()
 
