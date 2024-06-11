@@ -30,10 +30,10 @@ class KernelCall(FunctionCall):
         list of LiteralInteger passed to the function
 
     num_blocks : TypedAstNode
-        The number of blocks. These objects must have a class type of `NativeInteger`.
+        The number of blocks. These objects must have a primitive type of `PrimitiveIntegerType`.
 
     tp_block : TypedAstNode
-        The number of threads per block. These objects must have a class type of `NativeInteger`.
+        The number of threads per block. These objects must have a primitive type of `PrimitiveIntegerType`.
 
     current_function : FunctionDef, default: None
         The function where the call takes place.
