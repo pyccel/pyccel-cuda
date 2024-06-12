@@ -12,9 +12,6 @@ enabling the direct translation of high-level Pyccel expressions into CUDA code.
 from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
 
 from pyccel.ast.core        import Import, Module
-from pyccel.ast.core      import FunctionAddress
-
-from pyccel.ast.datatypes import VoidType, PythonNativeInt
 
 from pyccel.errors.errors   import Errors
 
