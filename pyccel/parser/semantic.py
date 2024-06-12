@@ -136,8 +136,8 @@ from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_TH
         UNUSED_DECORATORS, UNSUPPORTED_POINTER_RETURN_VALUE, PYCCEL_RESTRICTION_OPTIONAL_NONE,
         PYCCEL_RESTRICTION_PRIMITIVE_IMMUTABLE, PYCCEL_RESTRICTION_IS_ISNOT,
         FOUND_DUPLICATED_IMPORT, UNDEFINED_WITH_ACCESS, MACRO_MISSING_HEADER_OR_FUNC, PYCCEL_RESTRICTION_INHOMOG_SET,
-        MISSING_KERNEL_CONFIGURATION,INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
-        INVALID_KERNEL_LAUNCH_CONFIG_LOW, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
+        MISSING_KERNEL_CONFIGURATION,
+        INVALID_KERNEL_LAUNCH_CONFIG, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
 
 from pyccel.parser.base      import BasicParser
 from pyccel.parser.syntactic import SyntaxParser
@@ -1158,20 +1158,16 @@ class SemanticParser(BasicParser):
         func : FunctionDef |Interface | PyccelInternalFunction type
                The function being called.
 
-        args : List
-               list of LiteralInteger passed to the function
+        args : List[LiteralInteger]
+               List of LiteralInteger passed to the function
 
         Returns
         -------
         Pyccel.ast.cuda.KernelCall
             The semantic representation of the kernel call.
         """
-        if(len(expr.indexes) < 2):
-            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_LOW,
-                    symbol=expr,
-                    severity='fatal')
-        if(len(expr.indexes) > 2):
-            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
+        if(len(expr.indexes) != 2):
+            errors.report(INVALID_KERNEL_LAUNCH_CONFIG,
                     symbol=expr,
                     severity='fatal')
         if(len(func.results)):
