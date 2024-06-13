@@ -2082,7 +2082,7 @@ class IndexedFunctionCall(FunctionCall):
         The arguments passed to the function.
 
     indexes : tuple
-        indexes of kernel call.
+        Indexes of kernel call.
     """
     __slots__ = ('_indexes',)
     def __init__(self, func, args, indexes):

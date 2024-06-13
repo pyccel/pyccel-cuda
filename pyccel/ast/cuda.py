@@ -27,7 +27,7 @@ class KernelCall(FunctionCall):
         The definition of the function being called.
 
     args : List[LiteralInteger]
-        List of LiteralInteger passed to the function
+        List of LiteralInteger passed to the function.
 
     num_blocks : TypedAstNode
         The number of blocks. These objects must have a primitive type of `PrimitiveIntegerType`.

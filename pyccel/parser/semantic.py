@@ -1153,13 +1153,13 @@ class SemanticParser(BasicParser):
         Parameters
         ----------
         expr : IndexedFunctionCall
-               Node has all the information about the function call
+               Node has all the information about the function call.
 
         func : FunctionDef |Interface | PyccelInternalFunction type
                The function being called.
 
         args : List[LiteralInteger]
-               List of LiteralInteger passed to the function
+               List of LiteralInteger passed to the function.
 
         Returns
         -------
