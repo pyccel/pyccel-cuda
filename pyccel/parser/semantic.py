@@ -2875,10 +2875,7 @@ class SemanticParser(BasicParser):
 
     def _visit_IndexedFunctionCall(self, expr):
         name     = expr.funcdef
-        try:
-            name = self.scope.get_expected_name(name)
-        except RuntimeError:
-            pass
+        name = self.scope.get_expected_name(name)
 
         func     = self.scope.find(name, 'functions')
         args = self._handle_function_args(expr.args)
