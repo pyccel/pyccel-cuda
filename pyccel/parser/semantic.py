@@ -1159,7 +1159,7 @@ class SemanticParser(BasicParser):
                The function being called.
 
         args : Any
-               The arguments being passed to the function
+               The arguments being passed to the function.
 
         Returns
         -------

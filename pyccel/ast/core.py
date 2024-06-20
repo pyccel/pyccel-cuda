@@ -2092,9 +2092,9 @@ class IndexedFunctionCall(FunctionCall):
     @property
     def indexes(self):
         """
-        indexes of function call.
+        Indexes of function call.
 
-        represents the indexes of the function call
+        Represents the indexes of the function call
         """
         return self._indexes
 
