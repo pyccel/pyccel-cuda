@@ -285,11 +285,16 @@ def test_sign_array_1d_complex(language):
     f_complex64_epyc = epyccel(f_complex64, language = language)
     f_complex128_epyc = epyccel(f_complex128, language = language)
 
+    print(mod)
+
     arr64 = np.array([0.+0j, 0.j, 1.+2.j, -1.+2.j, 1.-2.j, -1.-2.j, 2.j, -2.j], dtype=np.complex64)
     arr128 = np.array([0.+0j, 0.j, 1.+2.j, -1.+2.j, 1.-2.j, -1.-2.j, 2.j, -2.j], dtype=np.complex128)
 
     x_complex64, y_complex64 = f_complex64(arr64), f_complex64_epyc(arr64)
     x_complex128, y_complex128 = f_complex128(arr128), f_complex128_epyc(arr128)
+
+    print(x_complex64)
+    print(np.sign(arr64))
 
     assert np.array_equal(x_complex64, y_complex64) and x_complex64.dtype == y_complex64.dtype
     assert np.array_equal(x_complex128, y_complex128) and x_complex128.dtype == y_complex128.dtype
