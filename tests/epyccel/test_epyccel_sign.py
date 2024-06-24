@@ -2,7 +2,6 @@
 
 import numpy as np
 import modules.numpy_sign as mod
-import pytest
 
 from pyccel import epyccel
 
