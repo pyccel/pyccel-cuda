@@ -145,7 +145,7 @@ def test_sign_float64(language):
     assert x1_pos == x2_pos and x1_pos.dtype == x2_pos.dtype
     assert x1_neg == x2_neg and x1_neg.dtype == x2_neg.dtype
 
-pytest.mark.xfail(reason="...")
+@pytest.mark.xfail(reason="...")
 def test_sign_literal_complex(language):
     f_pos      = mod.literal_complex_pos
     f_neg      = mod.literal_complex_neg
