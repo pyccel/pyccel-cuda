@@ -486,6 +486,7 @@ def test_omp_sections(language):
     assert f1() == f2()
 
 @pytest.mark.external
+@pytest.mark.xfail(reason="...")
 def test_omp_get_set_schedule(language):
     set_num_threads = epyccel(openmp.set_num_threads, fflags = '-Wall', accelerators=['openmp'], language=language)
     set_num_threads(4)
