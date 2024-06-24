@@ -296,7 +296,7 @@ def test_sign_array_1d_complex(language):
     assert np.array_equal(x_complex128, y_complex128) and x_complex128.dtype == y_complex128.dtype
 
 def test_sign_array_2d_complex(language):
-    f_complex64 = mod.array_2d_complex
+    f_complex64 = mod.array_2d_complex64
     f_complex128 = mod.array_2d_complex128
     f_complex64_epyc = epyccel(f_complex64, language = language)
     f_complex128_epyc = epyccel(f_complex128, language = language)
