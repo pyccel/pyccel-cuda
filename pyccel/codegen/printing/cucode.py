@@ -9,7 +9,7 @@ This module is designed to interface Pyccel's Abstract Syntax Tree (AST) with CU
 enabling the direct translation of high-level Pyccel expressions into CUDA code.
 """
 
-from pyccel.codegen.printing.ccode  import CCodePrinter, c_library_headers
+from pyccel.codegen.printing.ccode  import CCodePrinter
 
 from pyccel.ast.core                import Import, Module
 from pyccel.ast.literals            import Nil

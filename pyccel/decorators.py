@@ -124,6 +124,7 @@ def kernel(f):
         The function to which the decorator is applied.
     """
     class KernelAccessor:
+        """Class for accessing the kernel function."""
         def __init__(self, f):
             self._f = f
         def __getitem__(self, args):
