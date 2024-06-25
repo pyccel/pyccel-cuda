@@ -25,8 +25,8 @@ class KernelCall(FunctionCall):
     func : FunctionDef
         The definition of the function being called.
 
-    args : List[LiteralInteger]
-        List of LiteralInteger passed to the function.
+    args : tuple
+        The arguments passed to the function.
 
     num_blocks : TypedAstNode
         The number of blocks. These objects must have a primitive type of `PrimitiveIntegerType`.
@@ -37,7 +37,7 @@ class KernelCall(FunctionCall):
     current_function : FunctionDef, default: None
         The function where the call takes place.
     """
-    __slots__ = ('_num_blocks','_tp_block','_func', '_args')
+    __slots__ = ('_num_blocks','_tp_block')
     _attribute_nodes = (*FunctionCall._attribute_nodes, '_num_blocks', '_tp_block')
 
     def __init__(self, func, args, num_blocks, tp_block, current_function = None):
