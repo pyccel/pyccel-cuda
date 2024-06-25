@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------------------#
 # This file is part of Pyccel which is released under MIT License. See the LICENSE file or #
@@ -17,9 +16,9 @@ __all__ = (
 class KernelCall(FunctionCall):
     """
     Represents a kernel function call in the code.
-    
-     The class serves as a representation of a kernel
-     function call within the codebase.
+
+    The class serves as a representation of a kernel
+    function call within the codebase.
 
     Parameters
     ----------

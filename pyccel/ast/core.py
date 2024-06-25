@@ -2070,8 +2070,8 @@ class IndexedFunctionCall(FunctionCall):
     """
     Represents an indexed function call in the code.
 
-    class represents indexed function calls, encapsulating all
-    relevant information for such calls within the codebase.
+    Class representing indexed function calls, encapsulating all
+    relevant information for such calls within the code base.
 
     Parameters
     ----------
@@ -4502,3 +4502,4 @@ class Decorator(PyccelAstNode):
         return self._name
 
 #==============================================================================
+
