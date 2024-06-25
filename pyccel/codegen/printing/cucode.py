@@ -86,16 +86,13 @@ class CudaCodePrinter(CCodePrinter):
         str
             Signature of the function.
         """
-        cuda_decorater = '__global__' if('kernel' in expr.decorators) else ''
+        cuda_decorater = '__global__' if 'kernel' in expr.decorators else ''
         c_function_signature = super().function_signature(expr, print_arg_names)
         return f'{cuda_decorater} {c_function_signature}'
 
     def _print_KernelCall(self, expr):
         func = expr.funcdef
-        args = []
-        for a in expr.args:
-            arg_val = a.value or Nil()
-            args.append(arg_val)
+        args = [a.value or Nil() for a in expr.args]
 
         args = ', '.join(self._print(a) for a in args)
         return f"{func.name}<<<{expr.num_blocks}, {expr.tp_block}>>>({args});\n"

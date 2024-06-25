@@ -1155,7 +1155,7 @@ class SemanticParser(BasicParser):
         expr : IndexedFunctionCall
                Node has all the information about the function call.
 
-        func : FunctionDef |Interface | PyccelInternalFunction type
+        func : FunctionDef | Interface | PyccelInternalFunction type
                The function being called.
 
         args : tuple
