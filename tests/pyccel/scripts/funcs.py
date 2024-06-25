@@ -11,3 +11,4 @@ def sum_to_n(n : 'int'):
     for i in range(1,n+1):
         result = add2(result,i)
     return result
+

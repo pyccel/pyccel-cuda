@@ -1166,11 +1166,11 @@ class SemanticParser(BasicParser):
         Pyccel.ast.cuda.KernelCall
             The semantic representation of the kernel call.
         """
-        if(len(expr.indexes) != 2):
+        if len(expr.indexes) != 2:
             errors.report(INVALID_KERNEL_LAUNCH_CONFIG,
                     symbol=expr,
                     severity='fatal')
-        if(len(func.results)):
+        if len(func.results):
             errors.report(f"cuda kernel function '{func.name}' returned a value in violation of the laid-down specification",
                          symbol=expr,
                          severity='fatal')
