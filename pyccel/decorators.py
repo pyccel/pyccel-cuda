@@ -111,36 +111,23 @@ def allow_negative_index(f,*args):
         return f
     return identity
 
-class kernel:
+def kernel(f):
     """
     Decorator for marking a Python function as a kernel.
-
     This class serves as a decorator to mark a Python function
     as a kernel function, typically used for GPU computations.
-    
+    This allows the function to be indexed with the number of blocks and threads.
+
     Parameters
     ----------
     f : function
         The function to which the decorator is applied.
     """
-    def __init__(self, f):
-        self._f = f
+    class KernelAccessor:
+         def __init__(self, f):
+             self._f = f
+         def __getitem__(self, args):
+             num_blocks, tp_block = args
+             return self._f
 
-    def __getitem__(self, *args):
-        """
-        Get item method for the kernel class.
-
-        This method allows the kernel function to be invoked with
-        arguments using square bracket notation.
-
-        Parameters
-        ----------
-        *args : Any
-            The arguments passed to the kernel function.
-
-        Returns
-        -------
-        Function
-            The original function stored internally.
-        """
-        return self._f
+    return KernelAccessor(f)
