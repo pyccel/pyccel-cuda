@@ -114,6 +114,7 @@ def allow_negative_index(f,*args):
 def kernel(f):
     """
     Decorator for marking a Python function as a kernel.
+
     This class serves as a decorator to mark a Python function
     as a kernel function, typically used for GPU computations.
     This allows the function to be indexed with the number of blocks and threads.
