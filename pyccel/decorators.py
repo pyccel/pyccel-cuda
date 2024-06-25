@@ -126,10 +126,12 @@ def kernel(f):
     Returns
     -------
     KernelAccessor
-        A class representing the kernel function
+        A class representing the kernel function.
     """
     class KernelAccessor:
         """
+        Class representing the kernel function.
+
         Class representing the kernel function.
         """
         def __init__(self, f):
