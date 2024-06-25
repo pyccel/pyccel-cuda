@@ -5,6 +5,6 @@
 """
     This module is for exposing the CudaSubmodule functions.
 """
-from .CudaSyncPrimitives    import synchronize
+from .cuda_sync_primitives    import synchronize
 
 __all__ = ['synchronize']
