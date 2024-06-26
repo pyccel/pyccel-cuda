@@ -5,6 +5,8 @@
 """
 This submodule contains CUDA methods for Pyccel.
 """
+
+
 def synchronize():
     """
     Synchronize CUDA device execution.
