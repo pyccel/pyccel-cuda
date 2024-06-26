@@ -66,7 +66,6 @@ __all__ = (
     'FuncAddressDeclare',
     'FunctionAddress',
     'FunctionCall',
-    'IndexedFunctionCall',
     'FunctionCallArgument',
     'FunctionDef',
     'FunctionDefArgument',
@@ -74,6 +73,7 @@ __all__ = (
     'If',
     'IfSection',
     'Import',
+    'IndexedFunctionCall',
     'InProgram',
     'InlineFunctionDef',
     'Interface',
@@ -2078,16 +2078,19 @@ class IndexedFunctionCall(FunctionCall):
     func : FunctionDef
         The function being called.
 
-    args : tuple
+    args : list of FunctionCallArgument
         The arguments passed to the function.
 
-    indexes : tuple
-        Indexes of kernel call.
+    indexes : list of TypedAstNode
+        The indexes of the function call
+
+    current_function : FunctionDef, optional
+        The function where the call takes place.
     """
     __slots__ = ('_indexes',)
-    def __init__(self, func, args, indexes):
+    def __init__(self, func, args, indexes, current_function = None):
         self._indexes = indexes
-        super().__init__(func, args, None)
+        super().__init__(func, args, current_function)
 
     @property
     def indexes(self):

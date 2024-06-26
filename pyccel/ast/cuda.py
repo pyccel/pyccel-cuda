@@ -25,7 +25,7 @@ class KernelCall(FunctionCall):
     func : FunctionDef
         The definition of the function being called.
 
-    args : tuple
+    args : list of FunctionCallArgument
         The arguments passed to the function.
 
     num_blocks : TypedAstNode
@@ -34,7 +34,7 @@ class KernelCall(FunctionCall):
     tp_block : TypedAstNode
         The number of threads per block. These objects must have a primitive type of `PrimitiveIntegerType`.
 
-    current_function : FunctionDef, default: None
+    current_function : FunctionDef, optional
         The function where the call takes place.
     """
     __slots__ = ('_num_blocks','_tp_block')
