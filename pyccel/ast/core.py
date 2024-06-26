@@ -2082,7 +2082,7 @@ class IndexedFunctionCall(FunctionCall):
         The arguments passed to the function.
 
     indexes : list of TypedAstNode
-        The indexes of the function call
+        The indexes of the function call.
 
     current_function : FunctionDef, optional
         The function where the call takes place.
