@@ -737,6 +737,12 @@ def test_hello_kernel(gpu_available):
             language="cuda", output_dtype=types , execute_code=gpu_available)
 
 #------------------------------------------------------------------------------
+@pytest.mark.cuda
+def test_kernel_collision(gpu_available):
+    pyccel_test("scripts/kernel/kernel_name_collision.py",
+            language="cuda", execute_code=gpu_available)
+
+#------------------------------------------------------------------------------
 def test_print_strings(language):
     types = str
     pyccel_test("scripts/print_strings.py", language=language, output_dtype=types)
