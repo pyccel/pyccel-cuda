@@ -16,15 +16,6 @@ class LanguageNameClashChecker(metaclass = Singleton):
     A super class which provides functionalities to check or propose variable names and
     verify that they do not cause name clashes. Name clashes may be due to
     a variety of reasons which vary from language to language.
-
-    Parameters
-    ----------
-    name : str
-        The name of the class.
-    bases : tuple[class,...]
-        A tuple of the superclasses of the class.
-    dct : dict
-        A dictionary of the class attributes.
     """
     keywords = None
 
