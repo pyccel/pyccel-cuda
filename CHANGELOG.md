@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 
 -   #32 : Add support for `nvcc` Compiler and `cuda` language as a possible option.
 -   #48 : Fix incorrect handling of imports in `cuda`.
--   #59 : Updated cuda clash checker.
+-   #59 : Updated `cuda` clash checker.
 
 ## \[UNRELEASED\]
 
