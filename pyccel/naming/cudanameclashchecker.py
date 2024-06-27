@@ -17,7 +17,9 @@ class CudaNameClashChecker(LanguageNameClashChecker):
     new variables, or due to the use of reserved keywords.
     """
 
-    def __init__(self) -> None:
+    def __init__(self): #pylint: disable=useless-parent-delegation 
+    # This __init__ function is required so the ArgumentSingleton can 
+    # always detect a signature
         super().__init__()
 
     # Keywords as mentioned on https://en.cppreference.com/w/c/keyword
