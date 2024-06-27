@@ -2078,16 +2078,17 @@ class IndexedFunctionCall(FunctionCall):
     func : FunctionDef
         The function being called.
 
-    args : list of FunctionCallArgument
+    args : iterable of FunctionCallArgument
         The arguments passed to the function.
 
-    indexes : list of TypedAstNode
+    indexes : iterable of TypedAstNode
         The indexes of the function call.
 
     current_function : FunctionDef, optional
         The function where the call takes place.
     """
     __slots__ = ('_indexes',)
+    _attribute_nodes = FunctionCall._attribute_nodes + ('_indexes',)
     def __init__(self, func, args, indexes, current_function = None):
         self._indexes = indexes
         super().__init__(func, args, current_function)

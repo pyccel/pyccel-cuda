@@ -25,7 +25,7 @@ class KernelCall(FunctionCall):
     func : FunctionDef
         The definition of the function being called.
 
-    args : list of FunctionCallArgument
+    args : iterable of FunctionCallArgument
         The arguments passed to the function.
 
     num_blocks : TypedAstNode
