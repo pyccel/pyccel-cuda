@@ -66,7 +66,6 @@ __all__ = (
     'FuncAddressDeclare',
     'FunctionAddress',
     'FunctionCall',
-    'IndexedFunctionCall',
     'FunctionCallArgument',
     'FunctionDef',
     'FunctionDefArgument',
@@ -74,6 +73,7 @@ __all__ = (
     'If',
     'IfSection',
     'Import',
+    'IndexedFunctionCall',
     'InProgram',
     'InlineFunctionDef',
     'Interface',
@@ -2070,31 +2070,34 @@ class IndexedFunctionCall(FunctionCall):
     """
     Represents an indexed function call in the code.
 
-    class represents indexed function calls, encapsulating all
-    relevant information for such calls within the codebase.
+    Class representing indexed function calls, encapsulating all
+    relevant information for such calls within the code base.
 
     Parameters
     ----------
     func : FunctionDef
         The function being called.
 
-    args : tuple
+    args : list of FunctionCallArgument
         The arguments passed to the function.
 
-    indexes : tuple
-        indexes of kernel call.
+    indexes : list of TypedAstNode
+        The indexes of the function call.
+
+    current_function : FunctionDef, optional
+        The function where the call takes place.
     """
     __slots__ = ('_indexes',)
-    def __init__(self, func, args, indexes):
+    def __init__(self, func, args, indexes, current_function = None):
         self._indexes = indexes
-        super().__init__(func, args, None)
+        super().__init__(func, args, current_function)
 
     @property
     def indexes(self):
         """
-        indexes of function call.
+        Indexes of function call.
 
-        represents the indexes of the function call
+        Represents the indexes of the function call
         """
         return self._indexes
 
@@ -4502,3 +4505,4 @@ class Decorator(PyccelAstNode):
         return self._name
 
 #==============================================================================
+

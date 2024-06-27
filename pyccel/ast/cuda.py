@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------------------#
 # This file is part of Pyccel which is released under MIT License. See the LICENSE file or #
@@ -17,28 +16,28 @@ __all__ = (
 class KernelCall(FunctionCall):
     """
     Represents a kernel function call in the code.
-    
-     The class serves as a representation of a kernel
-     function call within the codebase.
+
+    The class serves as a representation of a kernel
+    function call within the codebase.
 
     Parameters
     ----------
     func : FunctionDef
         The definition of the function being called.
 
-    args : tuple
-        The arguments being passed to the function.
+    args : list of FunctionCallArgument
+        The arguments passed to the function.
 
     num_blocks : TypedAstNode
-        The number of blocks. These objects must have a class type of `NativeInteger`.
+        The number of blocks. These objects must have a primitive type of `PrimitiveIntegerType`.
 
     tp_block : TypedAstNode
-        The number of threads per block. These objects must have a class type of `NativeInteger`.
+        The number of threads per block. These objects must have a primitive type of `PrimitiveIntegerType`.
 
-    current_function : FunctionDef, default: None
+    current_function : FunctionDef, optional
         The function where the call takes place.
     """
-    __slots__ = ('_num_blocks','_tp_block','_func', '_args')
+    __slots__ = ('_num_blocks','_tp_block')
     _attribute_nodes = (*FunctionCall._attribute_nodes, '_num_blocks', '_tp_block')
 
     def __init__(self, func, args, num_blocks, tp_block, current_function = None):

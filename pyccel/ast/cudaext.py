@@ -20,9 +20,9 @@ __all__ = (
 
 class CudaSynchronize(PyccelFunction):
     """
-    Represents a call to  Cuda.deviceSynchronize for code generation.
+    Represents a call to Cuda.synchronize for code generation.
 
-    This class serves as a representation of a synchronization call to the CUDA.
+    This class serves as a representation of the Cuda.synchronize method.
     """
     __slots__ = ()
     _attribute_nodes = ()

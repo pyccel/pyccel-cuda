@@ -136,8 +136,8 @@ from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, UNDERSCORE_NOT_A_TH
         UNUSED_DECORATORS, UNSUPPORTED_POINTER_RETURN_VALUE, PYCCEL_RESTRICTION_OPTIONAL_NONE,
         PYCCEL_RESTRICTION_PRIMITIVE_IMMUTABLE, PYCCEL_RESTRICTION_IS_ISNOT,
         FOUND_DUPLICATED_IMPORT, UNDEFINED_WITH_ACCESS, MACRO_MISSING_HEADER_OR_FUNC, PYCCEL_RESTRICTION_INHOMOG_SET,
-        MISSING_KERNEL_CONFIGURATION,INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
-        INVALID_KERNEL_LAUNCH_CONFIG_LOW, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
+        MISSING_KERNEL_CONFIGURATION,
+        INVALID_KERNEL_LAUNCH_CONFIG, INVALID_KERNEL_CALL_BP_GRID, INVALID_KERNEL_CALL_TP_BLOCK)
 
 from pyccel.parser.base      import BasicParser
 from pyccel.parser.syntactic import SyntaxParser
@@ -1153,28 +1153,24 @@ class SemanticParser(BasicParser):
         Parameters
         ----------
         expr : IndexedFunctionCall
-               Node has all the information about the function call
+               Node has all the information about the function call.
 
-        func : FunctionDef |Interface | PyccelInternalFunction type
+        func : FunctionDef | Interface | PyccelInternalFunction type
                The function being called.
 
         args : tuple
-               The arguments passed to the function.
+               The arguments being passed to the function.
 
         Returns
         -------
         Pyccel.ast.cuda.KernelCall
             The semantic representation of the kernel call.
         """
-        if(len(expr.indexes) < 2):
-            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_LOW,
+        if len(expr.indexes) != 2:
+            errors.report(INVALID_KERNEL_LAUNCH_CONFIG,
                     symbol=expr,
                     severity='fatal')
-        if(len(expr.indexes) > 2):
-            errors.report(INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
-                    symbol=expr,
-                    severity='fatal')
-        if(len(func.results)):
+        if len(func.results):
             errors.report(f"cuda kernel function '{func.name}' returned a value in violation of the laid-down specification",
                          symbol=expr,
                          severity='fatal')
@@ -2886,16 +2882,21 @@ class SemanticParser(BasicParser):
 
     def _visit_IndexedFunctionCall(self, expr):
         name     = expr.funcdef
+        name = self.scope.get_expected_name(name)
         func     = self.scope.find(name, 'functions')
-        name     = self.scope.get_expected_name(name)
-
         args = self._handle_function_args(expr.args)
+
+        if func is None:
+            return errors.report(UNDEFINED_FUNCTION, symbol=expr.funcdef,
+                    bounding_box=(self.current_ast_node.lineno, self.current_ast_node.col_offset),
+                    severity='fatal')
+
+        func = self._annotate_the_called_function_def(func)
         if 'kernel' in func.decorators :
             return self._handle_kernel(expr, func, args)
         else:
             return errors.report("Unknown function type",
                 symbol=expr, severity='fatal')
-
     def _visit_FunctionCall(self, expr):
         name     = expr.funcdef
         try:

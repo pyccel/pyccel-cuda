@@ -9,16 +9,13 @@ This module is designed to interface Pyccel's Abstract Syntax Tree (AST) with CU
 enabling the direct translation of high-level Pyccel expressions into CUDA code.
 """
 
-from pyccel.codegen.printing.ccode import CCodePrinter, c_library_headers
+from pyccel.codegen.printing.ccode  import CCodePrinter
 
-from pyccel.ast.core        import Import, Module
-from pyccel.ast.core      import FunctionAddress
+from pyccel.ast.core                import Import, Module
+from pyccel.ast.literals            import Nil
 
-from pyccel.ast.datatypes import VoidType, PythonNativeInt
+from pyccel.errors.errors           import Errors
 
-from pyccel.errors.errors   import Errors
-
-from pyccel.ast.literals  import Nil
 
 errors = Errors()
 
@@ -89,54 +86,14 @@ class CudaCodePrinter(CCodePrinter):
         str
             Signature of the function.
         """
-        arg_vars = [a.var for a in expr.arguments]
-        result_vars = [r.var for r in expr.results if not r.is_argument]
-        n_results = len(result_vars)
-
-        if n_results == 1:
-            ret_type = self.get_declare_type(result_vars[0])
-        elif n_results > 1:
-            ret_type = self.find_in_dtype_registry(PythonNativeInt())
-            arg_vars.extend(result_vars)
-            self._additional_args.append(result_vars)
-        else:
-            ret_type = self.find_in_dtype_registry(VoidType())
-
-        name = expr.name
-        if not arg_vars:
-            arg_code = 'void'
-        else:
-            def get_arg_declaration(var):
-                """ Get the code which declares the argument variable.
-                """
-                code = "const " * var.is_const
-                code += self.get_declare_type(var)
-                if print_arg_names:
-                    code += ' ' + var.name
-                return code
-
-            arg_code_list = [self.function_signature(var, False) if isinstance(var, FunctionAddress)
-                                else get_arg_declaration(var) for var in arg_vars]
-            arg_code = ', '.join(arg_code_list)
-
-        if self._additional_args :
-            self._additional_args.pop()
-
-        static = 'static ' if expr.is_static else ''
-        cuda_decorater = ""
-        if('kernel' in expr.decorators):
-            cuda_decorater = "__global__"
-        return f'{static} {cuda_decorater} {ret_type} {name}({arg_code})'
+        cuda_decorater = '__global__' if 'kernel' in expr.decorators else ''
+        c_function_signature = super().function_signature(expr, print_arg_names)
+        return f'{cuda_decorater} {c_function_signature}'
 
     def _print_KernelCall(self, expr):
         func = expr.funcdef
-        args = []
-        for a in expr.args:
-            arg_val = a.value or Nil()
-            args.append(arg_val)
+        args = [a.value or Nil() for a in expr.args]
 
-        args += self._temporary_args
-        self._temporary_args = []
         args = ', '.join(self._print(a) for a in args)
         return f"{func.name}<<<{expr.num_blocks}, {expr.tp_block}>>>({args});\n"
 

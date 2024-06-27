@@ -3,11 +3,14 @@
 # go to https://github.com/pyccel/pyccel/blob/master/LICENSE for full license details.     #
 #------------------------------------------------------------------------------------------#
 """
-This module contains CUDA methods for Pyccel.
+This submodule contains CUDA methods for Pyccel.
 """
+
+
 def synchronize():
     """
     Synchronize CUDA device execution.
 
     Synchronize CUDA device execution.
     """
+

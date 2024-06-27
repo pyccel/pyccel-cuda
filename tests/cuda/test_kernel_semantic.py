@@ -6,8 +6,7 @@ from pyccel.decorators import kernel
 from pyccel.errors.errors import Errors, PyccelSemanticError
 from pyccel.errors.messages import (INVALID_KERNEL_CALL_TP_BLOCK,
                                     INVALID_KERNEL_CALL_BP_GRID,
-                                    INVALID_KERNEL_LAUNCH_CONFIG_HIGH,
-                                    INVALID_KERNEL_LAUNCH_CONFIG_LOW)
+                                    INVALID_KERNEL_LAUNCH_CONFIG)
 
 
 @pytest.mark.cuda
@@ -79,7 +78,7 @@ def test_invalid_launch_config_high():
 
     error_info = [*errors.error_info_map.values()][0][0]
     assert error_info.symbol.funcdef == 'kernel_call'
-    assert INVALID_KERNEL_LAUNCH_CONFIG_HIGH == error_info.message
+    assert INVALID_KERNEL_LAUNCH_CONFIG == error_info.message
 
 
 @pytest.mark.cuda
@@ -102,7 +101,7 @@ def test_invalid_launch_config_low():
 
     error_info = [*errors.error_info_map.values()][0][0]
     assert error_info.symbol.funcdef == 'kernel_call'
-    assert INVALID_KERNEL_LAUNCH_CONFIG_LOW == error_info.message
+    assert INVALID_KERNEL_LAUNCH_CONFIG == error_info.message
 
 
 @pytest.mark.cuda

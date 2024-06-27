@@ -294,7 +294,7 @@ def compare_pyth_fort_output( p_output, f_output, dtype=float, language=None):
 #------------------------------------------------------------------------------
 def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
         cwd = None, pyccel_commands = "", output_dtype = float,
-        language = None, output_dir = None, gpu_available = False):
+        language = None, output_dir = None, execute_code = True):
     """
     Run pyccel and compare the output to ensure that the results
     are equivalent
@@ -394,7 +394,7 @@ def pyccel_test(test_file, dependencies = None, compile_with_pyccel = True,
             compile_fortran(cwd, output_test_file, dependencies)
         elif language == 'c':
             compile_c(cwd, output_test_file, dependencies)
-    if  gpu_available:
+    if  execute_code:
         lang_out = get_lang_output(output_test_file, language)
         compare_pyth_fort_output(pyth_out, lang_out, output_dtype, language)
 
@@ -734,8 +734,13 @@ def test_elemental(language):
 def test_hello_kernel(gpu_available):
     types = str
     pyccel_test("scripts/kernel/hello_kernel.py",
-            dependencies = ("scripts/kernel/func.py") ,
-            language="cuda", output_dtype=types , gpu_available=gpu_available)
+            language="cuda", output_dtype=types , execute_code=gpu_available)
+
+#------------------------------------------------------------------------------
+@pytest.mark.cuda
+def test_kernel_collision(gpu_available):
+    pyccel_test("scripts/kernel/kernel_name_collision.py",
+            language="cuda", execute_code=gpu_available)
 
 #------------------------------------------------------------------------------
 def test_print_strings(language):
