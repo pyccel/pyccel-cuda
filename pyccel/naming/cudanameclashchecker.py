@@ -15,6 +15,10 @@ class CudaNameClashChecker(LanguageNameClashChecker):
     A class which provides functionalities to check or propose variable names and
     verify that they do not cause name clashes. Name clashes may be due to
     new variables, or due to the use of reserved keywords.
+
+    parameters
+    ----------
+        None
     """
     # Keywords as mentioned on https://en.cppreference.com/w/c/keyword
     keywords = set(['isign', 'fsign', 'csign', 'auto', 'break', 'case', 'char', 'const',
