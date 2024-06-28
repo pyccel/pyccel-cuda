@@ -147,6 +147,8 @@ def device(f):
     """
     This decorator is used to mark a Python function as a GPU device function.
 
+    This decorator is used to mark a Python function as a GPU device function.
+
     Parameters
     ----------
     f : Function
@@ -156,6 +158,5 @@ def device(f):
     -------
     f
         The function marked as a device.
-
     """
     return f
