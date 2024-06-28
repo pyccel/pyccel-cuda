@@ -145,7 +145,7 @@ def kernel(f):
 
 def device(f):
     """
-    This decorator is used to mark a Python function as a GPU device function.
+    Decorator for marking a function as a GPU device function.
 
     This decorator is used to mark a Python function as a GPU device function.
 
