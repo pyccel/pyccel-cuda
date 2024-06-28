@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 -   #48 : Fix incorrect handling of imports in `cuda`.
 -   #42 : Add support for custom kernel in`cuda`.
 -   #42 : Add Cuda module to Pyccel. Add support for `cuda.synchronize` function.
+-   #62 : Fix Invalid Suffix on Literal with PRId64/PRId16/PRId8 in C++11
+
 
 ## \[UNRELEASED\]
 
