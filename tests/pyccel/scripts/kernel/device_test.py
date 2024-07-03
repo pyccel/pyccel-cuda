@@ -1,5 +1,5 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
-from pyccel.decorators import device , kernel
+from pyccel.decorators import device, kernel
 from pyccel import cuda
 
 @device
