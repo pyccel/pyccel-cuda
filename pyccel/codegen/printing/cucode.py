@@ -205,4 +205,20 @@ class CudaCodePrinter(CCodePrinter):
                 return " \n"
 
         return super()._print_Assign(expr)
+    def _get_cuda_dim(self, dim, prefix):
+        if dim == 0:
+            return f'{prefix}.x'
+        elif dim == 1:
+            return f'{prefix}.y'
+        elif dim == 2:
+            return f'{prefix}.z'
+
+    def _print_threadIdx(self, expr):
+        return self._get_cuda_dim(expr.dim, 'threadIdx')
+
+    def _print_blockIdx(self, expr):
+        return self._get_cuda_dim(expr.dim, 'blockIdx')
+
+    def _print_blockDim(self, expr):
+        return self._get_cuda_dim(expr.dim, 'blockDim')
 

@@ -63,3 +63,27 @@ for i in range(10):
 if __name__ == '__main__':
     print(a)
 ```
+
+### cuda+device_empty
+
+The cuda+device_empty function allocates an empty array on the device.
+
+```python
+from pyccel import cuda
+from pyccel.decorators import kernel
+
+@kernel
+def kernel_call(a : 'int[:]', size : 'int'):
+    i =  cuda.threadIdx(0) + cuda.blockIdx(0) * cuda.blockDim(0)
+    if(i < size):
+        a[i] = 1
+
+def f():
+    x = cuda.device_empty(10)
+    kernel_call[1,10](x, 10)
+
+if __name__ == "__main__":
+    f()
+
+```
+

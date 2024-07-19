@@ -15,6 +15,7 @@ from .datatypes      import VoidType
 from .core           import Module, PyccelFunctionDef
 from .numpyext       import process_dtype, process_shape
 from .cudatypes      import CudaArrayType
+from .numpytypes     import NumpyInt32Type
 
 
 
@@ -141,6 +142,81 @@ class CudaHostEmpty(CudaFull):
         The value with which the array will be filled on initialisation.
         """
         return None
+class CudaDeviceEmpty(CudaFull):
+    """
+    Represents a call to  Cuda.host_empty for code generation.
+
+    A class representing a call to the Cuda `host_empty` function.
+
+    Parameters
+    ----------
+    shape : tuple of int , int
+        The shape of the new array.
+
+    dtype : PythonType, LiteralString, str
+        The actual dtype passed to the NumPy function.
+
+    order : str , LiteralString
+        The order passed to the function defoulting to 'C'.
+    """
+    __slots__ = ()
+    name = 'empty'
+    def __init__(self, shape, dtype='float', order='C'):
+        memory_location = 'device'
+        super().__init__(shape, Nil(), dtype, order , memory_location)
+    @property
+    def fill_value(self):
+        """
+        The value with which the array will be filled on initialisation.
+
+        The value with which the array will be filled on initialisation.
+        """
+        return None
+class CudaDimFunction(PyccelFunction):
+    """
+    Represents a call to a CUDA dimension-related function for code generation.
+
+    This class serves as a representation of a CUDA dimension-related function call.
+    """
+    __slots__ = ('_dim',)
+    _attribute_nodes = ('_dim',)
+    _shape = None
+    _class_type = NumpyInt32Type()
+
+    def __init__(self, dim=0):
+        self._dim = dim
+        super().__init__()
+
+    @property
+    def dim(self):
+        return self._dim
+
+class threadIdx(CudaDimFunction):
+    """
+    Represents a call to Cuda.threadIdx for code generation.
+
+    This class serves as a representation of a thread call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
+
+class blockIdx(CudaDimFunction):
+    """
+    Represents a call to Cuda.blockIdx for code generation.
+
+    This class serves as a representation of a block call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
+
+class blockDim(CudaDimFunction):
+    """
+    Represents a call to Cuda.blockDim for code generation.
+
+    This class serves as a representation of a block dimension call to the CUDA.
+    """
+    def __init__(self, dim=0):
+        super().__init__(dim)
 
 class CudaSynchronize(PyccelFunction):
     """
@@ -158,7 +234,11 @@ class CudaSynchronize(PyccelFunction):
 cuda_funcs = {
     'synchronize'       : PyccelFunctionDef('synchronize' , CudaSynchronize),
     'full'              : PyccelFunctionDef('full' , CudaFull),
-    'host_empty'             : PyccelFunctionDef('host_empty' , CudaHostEmpty),
+    'host_empty'        : PyccelFunctionDef('host_empty' , CudaHostEmpty),
+    'device_empty'      : PyccelFunctionDef('device_empty' , CudaDeviceEmpty),
+    'threadIdx'         : PyccelFunctionDef('threadIdx'   , threadIdx),
+    'blockIdx'          : PyccelFunctionDef('blockIdx'    , blockIdx),
+    'blockDim'          : PyccelFunctionDef('blockDim'    , blockDim)
 }
 
 cuda_mod = Module('cuda',
