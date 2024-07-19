@@ -44,11 +44,4 @@ def device_empty(shape):
     import numpy as np
     a = np.empty(shape)
     return a
-def threadIdx(dim):
-    return 1
-def blockIdx(dim):
-    return 0
-def blockDim(dim):
-    return 0
-
 

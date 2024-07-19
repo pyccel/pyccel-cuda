@@ -144,9 +144,9 @@ class CudaHostEmpty(CudaFull):
         return None
 class CudaDeviceEmpty(CudaFull):
     """
-    Represents a call to  Cuda.host_empty for code generation.
+    Represents a call to  Cuda.device_empty for code generation.
 
-    A class representing a call to the Cuda `host_empty` function.
+    A class representing a call to the Cuda `device_empty` function.
 
     Parameters
     ----------

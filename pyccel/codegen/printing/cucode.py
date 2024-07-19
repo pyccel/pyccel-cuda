@@ -205,6 +205,7 @@ class CudaCodePrinter(CCodePrinter):
                 return " \n"
 
         return super()._print_Assign(expr)
+
     def _get_cuda_dim(self, dim, prefix):
         if dim == 0:
             return f'{prefix}.x'
