@@ -175,6 +175,16 @@ def kernel(f):
         def __getitem__(self, args):
             num_blocks, num_threads = args
             def internal_loop(*args, **kwargs):
+                """
+                The internal loop for kernel execution.
+
+                Parameters
+                ----------
+                *args : tuple
+                    Positional arguments for the kernel function.
+                **kwargs : dict
+                    Keyword arguments for the kernel function.
+                """
                 for b in range(num_blocks):
                     for t in range(num_threads):
                         self._f.__globals__['cu'] = CudaThreadIndexing(b, t)
