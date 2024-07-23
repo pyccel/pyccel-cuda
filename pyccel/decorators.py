@@ -178,12 +178,7 @@ def kernel(f):
                 """
                 The internal loop for kernel execution.
 
-                Parameters
-                ----------
-                *args : tuple
-                    Positional arguments for the kernel function.
-                **kwargs : dict
-                    Keyword arguments for the kernel function.
+                The internal loop for kernel execution.
                 """
                 for b in range(num_blocks):
                     for t in range(num_threads):
