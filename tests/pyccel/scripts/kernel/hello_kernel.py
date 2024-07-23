@@ -11,7 +11,7 @@ def say_hello(its_morning : bool):
 
 def f():
     its_morning = True
-    say_hello[1,1](its_morning)
+    say_hello[5,5](its_morning)
     cuda.synchronize()
 
 if __name__ == '__main__':
