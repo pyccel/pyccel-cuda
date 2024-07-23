@@ -141,12 +141,27 @@ def kernel(f):
             self._thread_idx = thread_idx
 
         def threadIdx(self, dim):
+            """
+            Get the thread index.
+
+            Get the thread index.
+            """
             return self._thread_idx
 
         def blockIdx(self, dim):
+            """
+            Get the block index.
+
+            Get the block index.
+            """
             return self._block_idx
 
         def blockDim(self, dim):
+            """
+            Get the block dimension.
+
+            Get the block dimension.
+            """
             return 0
 
     class KernelAccessor:
@@ -162,7 +177,6 @@ def kernel(f):
             def internal_loop(*args, **kwargs):
                 for b in range(num_blocks):
                     for t in range(num_threads):
-                        global cu
                         self._f.__globals__['cu'] = CudaThreadIndexing(b, t)
                         self._f(*args, **kwargs)
 
