@@ -6,7 +6,7 @@
 This submodule contains cuda_arrays methods for Pyccel.
 """
 
-def host_empty(shape):
+def host_empty(shape, dtype = 'float', order = 'C'):
     """
     Create an empty array on the host.
 
@@ -23,7 +23,7 @@ def host_empty(shape):
         The empty array on the host.
     """
     import numpy as np
-    a = np.empty(shape)
+    a = np.empty(shape, dtype = dtype, order = order)
     return a
 
 

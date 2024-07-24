@@ -1,19 +1,19 @@
 #include "cuda_ndarrays.h"
 
-void    device_memory(void** devPtr, size_t size)
+void    allocateMemoryOnDevice(void** devPtr, size_t size)
 {
     cudaMalloc(devPtr, size);
 }
 
-void    host_memory(void** devPtr, size_t size)
+void    allocateMemoryOnHost(void** devPtr, size_t size)
 {
-    cudaMallocHost(devPtr, size);
+    *devPtr = malloc(size);
 }
 t_ndarray   cuda_array_create(int32_t nd, int64_t *shape, enum e_types type, bool is_view ,
 enum e_memory_locations location)
 {
     t_ndarray  arr;
-    void (*fun_ptr_arr[])(void**, size_t) = {host_memory, device_memory};
+    void (*fun_ptr_arr[])(void**, size_t) = {allocateMemoryOnHost, allocateMemoryOnDevice};
 
     arr.nd = nd;
     arr.type = type;
@@ -66,10 +66,12 @@ int32_t cuda_free_host(t_ndarray  arr)
 {
     if (arr.shape == NULL)
         return (0);
-    cudaFreeHost(arr.raw_data);
+    free(arr.raw_data);
     arr.raw_data = NULL;
     cudaFree(arr.shape);
     arr.shape = NULL;
+    cudaFree(arr.strides);
+    arr.strides = NULL;
     return (1);
 }
 
@@ -82,5 +84,7 @@ int32_t cuda_free(t_ndarray  arr)
     arr.raw_data = NULL;
     cudaFree(arr.shape);
     arr.shape = NULL;
+    cudaFree(arr.strides);
+    arr.strides = NULL;
     return (0);
 }

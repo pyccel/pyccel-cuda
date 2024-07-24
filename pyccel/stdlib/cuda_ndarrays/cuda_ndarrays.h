@@ -8,8 +8,8 @@
 
 enum e_memory_locations
 {
-        allocateMemoryOnHost,
-        allocateMemoryOnDevice
+        HostMemory,
+        DeviceMemory
 };
 
 

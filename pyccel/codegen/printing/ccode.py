@@ -62,6 +62,7 @@ from pyccel.ast.c_concepts import ObjectAddress, CMacro, CStringExpression, Poin
 from pyccel.codegen.printing.codeprinter import CodePrinter
 
 
+
 from pyccel.errors.errors   import Errors
 from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, INCOMPATIBLE_TYPEVAR_TO_FUNC,
                                     PYCCEL_RESTRICTION_IS_ISNOT, UNSUPPORTED_ARRAY_RANK)
@@ -230,8 +231,7 @@ c_library_headers = (
 import_dict = {'omp_lib' : 'omp' }
 
 c_imports = {n : Import(n, Module(n, (), ())) for n in
-                ['cuda_ndarrays',
-                 'stdlib',
+                ['stdlib',
                  'math',
                  'string',
                  'ndarrays',
@@ -243,6 +243,7 @@ c_imports = {n : Import(n, Module(n, (), ())) for n in
                  'stdbool',
                  'assert',
                  'numpy_c']}
+
 
 import_header_guard_prefix = {'Set_extensions' : '_TOOLS_SET'}
 
@@ -1319,6 +1320,7 @@ class CCodePrinter(CodePrinter):
         >>> self.get_declare_type(v)
         't_ndarray*'
         """
+        from pyccel.codegen.printing.cucode import cu_imports
         class_type = expr.class_type
         rank  = expr.rank
 
@@ -1333,7 +1335,7 @@ class CCodePrinter(CodePrinter):
                 dtype = 't_ndarray'
             elif isinstance(expr.class_type, CudaArrayType):
                 self.add_import(c_imports['ndarrays'])
-                self.add_import(c_imports['cuda_ndarrays'])
+                self.add_import(cu_imports['cuda_ndarrays'])
                 dtype = 't_ndarray'
             else:
                 errors.report(PYCCEL_RESTRICTION_TODO+' (rank>0)', symbol=expr, severity='fatal')

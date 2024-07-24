@@ -61,7 +61,7 @@ class CudaFull(CudaNewarray):
     Represents a call to `cuda.full` for code generation.
 
     Represents a call to the Cuda function `full` which creates an array
-    of a specified size and shape filled with a specified value.
+    filled with a specified value.
 
     Parameters
     ----------
@@ -109,14 +109,17 @@ class CudaHostEmpty(CudaFull):
 
     Parameters
     ----------
-    shape : tuple of int , int
-        The shape of the new array.
+    shape : TypedAstNode
+        Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+        For a 1D array this is either a `LiteralInteger` or an expression.
+        For a cuda ND array this is a `TypedAstNode` with the class type HomogeneousTupleType.
 
-    dtype : PythonType, LiteralString, str
-        The actual dtype passed to the NumPy function.
+    dtype : PythonType, PyccelFunctionDef, LiteralString, str, optional
+        Datatype for the constructed array.
 
-    order : str , LiteralString
-        The order passed to the function defoulting to 'C'.
+    order : {'C', 'F'}, optional
+        Whether to store multidimensional data in C- or Fortran-contiguous
+        (row- or column-wise) order in memory.
     """
     __slots__ = ()
     name = 'empty'

@@ -17,12 +17,15 @@ from pyccel.ast.literals            import Nil
 from pyccel.errors.errors           import Errors
 from pyccel.ast.cudatypes           import CudaArrayType
 from pyccel.ast.cudaext             import CudaFull
-from pyccel.codegen.printing.ccode  import c_imports
 
 
 errors = Errors()
 
 __all__ = ["CudaCodePrinter"]
+
+cu_imports = {n : Import(n, Module(n, (), ())) for n in
+                ['cuda_ndarrays',]
+                }
 
 class CudaCodePrinter(CCodePrinter):
     """
@@ -148,10 +151,10 @@ class CudaCodePrinter(CCodePrinter):
         is_view = 'false' if variable.on_heap else 'true'
         memory_location = variable.class_type.memory_location
         if memory_location in ('device', 'host'):
-            memory_location = 'allocateMemoryOn' + str(memory_location).capitalize()
+            memory_location = str(memory_location).capitalize() + 'Memory'
         else:
             memory_location = 'managedMemory'
-        self.add_import(c_imports['cuda_ndarrays'])
+        self.add_import(cu_imports['cuda_ndarrays'])
         alloc_code = f"{self._print(expr.variable)} = cuda_array_create({variable.rank},  shape_Assign_{expr.variable.name}, {dtype}, {is_view},{memory_location});\n"
         return f'{shape_Assign} {alloc_code}'
 
