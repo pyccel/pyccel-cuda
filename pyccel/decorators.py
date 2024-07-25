@@ -182,7 +182,7 @@ def kernel(f):
                 """
                 for b in range(num_blocks):
                     for t in range(num_threads):
-                        self._f.__globals__['cu'] = CudaThreadIndexing(b, t)
+                        self._f.__globals__['cuda'] = CudaThreadIndexing(b, t)
                         self._f(*args, **kwargs)
 
             return internal_loop
