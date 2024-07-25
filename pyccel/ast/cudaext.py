@@ -174,7 +174,7 @@ class CudaDimFunction(PyccelFunction):
         Returns the dimension Of The Grid.
 
         Returns the dimension Of The Grid.
-    
+
         Returns
         -------
         int
