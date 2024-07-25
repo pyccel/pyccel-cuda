@@ -150,10 +150,12 @@ def kernel(f):
                 for b in range(num_blocks):
                     for t in range(num_threads):
                         cu = CudaThreadIndexing(b, t)
-                        self._f.__globals__['cuda'].threadIdx = cu.threadIdx
-                        self._f.__globals__['cuda'].blockIdx = cu.blockIdx
-                        self._f.__globals__['cuda'].blockDim = num_threads
-                        self._f(*args, **kwargs)
+                        if 'cuda' in self._f.__globals__:
+                            self._f.__globals__['cuda'].threadIdx = cu.threadIdx
+                            self._f.__globals__['cuda'].blockIdx = cu.blockIdx
+                            self._f.__globals__['cuda'].blockDim = num_threads
+                        else:
+                            self._f.__globals__['cuda'] = cu
             return internal_loop
 
     return KernelAccessor(f)
