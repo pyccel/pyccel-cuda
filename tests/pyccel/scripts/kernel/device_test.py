@@ -1,6 +1,5 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 from pyccel.decorators import device, kernel
-from pyccel import cuda
 
 @device
 def device_call():
@@ -12,6 +11,7 @@ def kernel_call():
 
 def f():
     kernel_call[1,1]()
+    from pyccel import cuda
     cuda.synchronize()
 
 if __name__ == '__main__':
