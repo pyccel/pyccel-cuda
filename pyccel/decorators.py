@@ -130,6 +130,40 @@ def kernel(f):
     KernelAccessor
         A class representing the kernel function.
     """
+    class CudaThreadIndexing:
+        """
+        Class representing the CUDA thread indexing.
+
+        Class representing the CUDA thread indexing.
+        """
+        def __init__(self, block_idx, thread_idx):
+            self._block_idx = block_idx
+            self._thread_idx = thread_idx
+
+        def threadIdx(self, dim):
+            """
+            Get the thread index.
+
+            Get the thread index.
+            """
+            return self._thread_idx
+
+        def blockIdx(self, dim):
+            """
+            Get the block index.
+
+            Get the block index.
+            """
+            return self._block_idx
+
+        def blockDim(self, dim):
+            """
+            Get the block dimension.
+
+            Get the block dimension.
+            """
+            return 0
+
     class KernelAccessor:
         """
         Class representing the kernel function.
@@ -139,7 +173,19 @@ def kernel(f):
         def __init__(self, f):
             self._f = f
         def __getitem__(self, args):
-            return self._f
+            num_blocks, num_threads = args
+            def internal_loop(*args, **kwargs):
+                """
+                The internal loop for kernel execution.
+
+                The internal loop for kernel execution.
+                """
+                for b in range(num_blocks):
+                    for t in range(num_threads):
+                        self._f.__globals__['cu'] = CudaThreadIndexing(b, t)
+                        self._f(*args, **kwargs)
+
+            return internal_loop
 
     return KernelAccessor(f)
 
