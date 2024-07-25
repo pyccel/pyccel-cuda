@@ -178,11 +178,29 @@ class CudaCodePrinter(CCodePrinter):
         return super()._print_Assign(expr)
 
     def _get_cuda_dim(self, dim, prefix):
+        """
+        Get the CUDA representation of the CUDA dimension call.
+
+        Get the CUDA representation of the CUDA dimension call.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension of the CUDA call (0, 1, or 2).
+
+        prefix : str
+            The prefix of the CUDA call (e.g., 'block', 'thread').
+
+        Returns
+        -------
+        str
+            The CUDA representation of the CUDA dimension call.
+        """
         if dim == 0:
             return f'{prefix}.x'
         elif dim == 1:
             return f'{prefix}.y'
-        elif dim == 2:
+        else:
             return f'{prefix}.z'
 
     def _print_threadIdx(self, expr):

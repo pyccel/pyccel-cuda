@@ -153,7 +153,7 @@ class CudaDeviceEmpty(CudaFull):
         The value with which the array will be filled on initialisation.
         """
         return None
-    
+
 class CudaDimFunction(PyccelFunction):
     """
     Represents a call to a CUDA dimension-related function for code generation.
@@ -170,6 +170,16 @@ class CudaDimFunction(PyccelFunction):
 
     @property
     def dim(self):
+        """
+        Returns the dimension Of The Grid.
+
+        Returns the dimension Of The Grid.
+    
+        Returns
+        -------
+        int
+            The dimension of the grid.
+        """
         return self._dim
 
 class threadIdx(CudaDimFunction):
