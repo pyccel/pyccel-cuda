@@ -50,16 +50,6 @@ class CudaNewarray(PyccelFunction):
     __slots__ = ('_class_type', '_init_dtype', '_memory_location')
     name = 'newarray'
 
-    @property
-    def init_dtype(self):
-        """
-        The dtype provided to the function when it was initialised in Python.
-
-        The dtype provided to the function when it was initialised in Python.
-        If no dtype was provided then this should equal `None`.
-        """
-        return self._init_dtype
-
     def __init__(self, *args ,class_type, init_dtype, memory_location):
         self._class_type = class_type
         self._init_dtype = init_dtype
@@ -72,7 +62,7 @@ class CudaFull(CudaNewarray):
     Represents a call to `cuda.full` for code generation.
 
     Represents a call to the Cuda function `full` which creates an array
-    of a specified size and shape filled with a specified value.
+    filled with a specified value.
 
     Parameters
     ----------
@@ -120,42 +110,34 @@ class CudaHostEmpty(CudaFull):
 
     Parameters
     ----------
-    shape : tuple of int , int
-        The shape of the new array.
+    shape : TypedAstNode
+        Shape of the new array, e.g., ``(2, 3)`` or ``2``.
+        For a 1D array this is either a `LiteralInteger` or an expression.
+        For a cuda ND array this is a `TypedAstNode` with the class type HomogeneousTupleType.
 
-    dtype : PythonType, LiteralString, str
-        The actual dtype passed to the NumPy function.
+    dtype : PythonType, PyccelFunctionDef, LiteralString, str, optional
+        Datatype for the constructed array.
 
-    order : str , LiteralString
-        The order passed to the function defoulting to 'C'.
+    order : {'C', 'F'}, optional
+        Whether to store multidimensional data in C- or Fortran-contiguous
+        (row- or column-wise) order in memory.
     """
     __slots__ = ()
     name = 'empty'
     def __init__(self, shape, dtype='float', order='C'):
         memory_location = 'host'
         super().__init__(shape, Nil(), dtype, order , memory_location)
-    @property
-    def fill_value(self):
-        """
-        The value with which the array will be filled on initialisation.
 
-        The value with which the array will be filled on initialisation.
-        """
-        return None
 class CudaDeviceEmpty(CudaFull):
     """
     Represents a call to  Cuda.device_empty for code generation.
-
     A class representing a call to the Cuda `device_empty` function.
-
     Parameters
     ----------
     shape : tuple of int , int
         The shape of the new array.
-
     dtype : PythonType, LiteralString, str
         The actual dtype passed to the NumPy function.
-
     order : str , LiteralString
         The order passed to the function defoulting to 'C'.
     """
@@ -168,14 +150,13 @@ class CudaDeviceEmpty(CudaFull):
     def fill_value(self):
         """
         The value with which the array will be filled on initialisation.
-
         The value with which the array will be filled on initialisation.
         """
         return None
+    
 class CudaDimFunction(PyccelFunction):
     """
     Represents a call to a CUDA dimension-related function for code generation.
-
     This class serves as a representation of a CUDA dimension-related function call.
     """
     __slots__ = ('_dim',)
@@ -194,7 +175,6 @@ class CudaDimFunction(PyccelFunction):
 class threadIdx(CudaDimFunction):
     """
     Represents a call to Cuda.threadIdx for code generation.
-
     This class serves as a representation of a thread call to the CUDA.
     """
     def __init__(self, dim=0):
@@ -203,7 +183,6 @@ class threadIdx(CudaDimFunction):
 class blockIdx(CudaDimFunction):
     """
     Represents a call to Cuda.blockIdx for code generation.
-
     This class serves as a representation of a block call to the CUDA.
     """
     def __init__(self, dim=0):
@@ -212,11 +191,11 @@ class blockIdx(CudaDimFunction):
 class blockDim(CudaDimFunction):
     """
     Represents a call to Cuda.blockDim for code generation.
-
     This class serves as a representation of a block dimension call to the CUDA.
     """
     def __init__(self, dim=0):
         super().__init__(dim)
+
 
 class CudaSynchronize(PyccelFunction):
     """

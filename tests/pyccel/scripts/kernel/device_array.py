@@ -3,7 +3,7 @@ from pyccel.decorators import kernel
 
 @kernel
 def kernel_call(a : 'int[:]', size : 'int'):
-    i =  cuda.threadIdx(0) + cuda.blockIdx(0) * cuda.blockDim(0)
+    i =  cuda.threadIdx(0) + cu.blockIdx(0) * cu.blockDim(0)
     if(i < size):
         a[i] = 1
         print(a[i])

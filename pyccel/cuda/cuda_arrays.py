@@ -6,7 +6,7 @@
 This submodule contains cuda_arrays methods for Pyccel.
 """
 
-def host_empty(shape):
+def host_empty(shape, dtype = 'float', order = 'C'):
     """
     Create an empty array on the host.
 
@@ -17,13 +17,19 @@ def host_empty(shape):
     shape : tuple of int or int
         The shape of the array.
 
+    dtype : str, optional
+        The data type of the array. The default is 'float'.
+
+    order : str, optional
+        The order of the array. The default is 'C'.
+
     Returns
     -------
     array
         The empty array on the host.
     """
     import numpy as np
-    a = np.empty(shape)
+    a = np.empty(shape, dtype = dtype, order = order)
     return a
 def device_empty(shape):
     """

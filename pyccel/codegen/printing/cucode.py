@@ -16,18 +16,15 @@ from pyccel.ast.literals            import Nil
 
 from pyccel.errors.errors           import Errors
 from pyccel.ast.cudatypes           import CudaArrayType
-from pyccel.ast.datatypes           import HomogeneousContainerType
-from pyccel.ast.numpytypes          import numpy_precision_map
 from pyccel.ast.cudaext             import CudaFull
 
 errors = Errors()
 
 __all__ = ["CudaCodePrinter"]
 
-c_imports = {n : Import(n, Module(n, (), ())) for n in
-                ['cuda_ndarrays',
-                 'ndarrays',
-                 ]}
+cu_imports = {n : Import(n, Module(n, (), ())) for n in
+                ['cuda_ndarrays',]
+                }
 
 class CudaCodePrinter(CCodePrinter):
     """
@@ -146,19 +143,18 @@ class CudaCodePrinter(CCodePrinter):
         shape = ", ".join(self._print(i) for i in expr.shape)
         if isinstance(variable.class_type, CudaArrayType):
             dtype = self.find_in_ndarray_type_registry(variable.dtype)
-        elif isinstance(variable.class_type, HomogeneousContainerType):
-            dtype = self.find_in_ndarray_type_registry(numpy_precision_map[(variable.dtype.primitive_type, variable.dtype.precision)])
         else:
             raise NotImplementedError(f"Don't know how to index {variable.class_type} type")
-        shape_Assign = "int64_t shape_Assign [] = {" + shape + "};\n"
+        shape_Assign = f"int64_t shape_Assign_{expr.variable.name} [] = {{{shape}}};\n"
+
         is_view = 'false' if variable.on_heap else 'true'
         memory_location = variable.class_type.memory_location
         if memory_location in ('device', 'host'):
-            memory_location = 'allocateMemoryOn' + str(memory_location).capitalize()
+            memory_location = str(memory_location).capitalize() + 'Memory'
         else:
             memory_location = 'managedMemory'
-        self.add_import(c_imports['cuda_ndarrays'])
-        alloc_code = f"{self._print(expr.variable)} = cuda_array_create({variable.rank},  shape_Assign, {dtype}, {is_view},{memory_location});\n"
+        self.add_import(cu_imports['cuda_ndarrays'])
+        alloc_code = f"{self._print(expr.variable)} = cuda_array_create({variable.rank},  shape_Assign_{expr.variable.name}, {dtype}, {is_view},{memory_location});\n"
         return f'{shape_Assign} {alloc_code}'
 
     def _print_Deallocate(self, expr):
@@ -171,31 +167,6 @@ class CudaCodePrinter(CCodePrinter):
             return f"cuda_free_host({var_code});\n"
         else:
             return f"cuda_free({var_code});\n"
-    def get_declare_type(self, expr):
-        """
-        Get the string which describes the type in a declaration.
-
-        This function returns the code which describes the type
-        of the `expr` object such that the declaration can be written as:
-        `f"{self.get_declare_type(expr)} {expr.name}"`
-
-        Parameters
-        ----------
-        expr : Variable
-            The variable whose type should be described.
-
-        Returns
-        -------
-        str
-            The code describing the type.
-        """
-        class_type = expr.class_type
-        rank  = expr.rank
-        if not isinstance(class_type, CudaArrayType ) or rank <= 0:
-            return super().get_declare_type(expr)
-        self.add_import(c_imports['ndarrays'])
-        dtype = 't_ndarray '
-        return dtype
 
     def _print_Assign(self, expr):
         rhs = expr.rhs

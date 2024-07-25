@@ -746,7 +746,7 @@ def test_kernel_collision(gpu_available):
 @pytest.mark.cuda
 def test_host_array(gpu_available):
     types = float
-    pyccel_test("scripts/kernel/host_array.py",
+    pyccel_test("scripts/kernel/host_array.py", pyccel_commands = '--verbose',
             language="cuda", output_dtype=types, execute_code=gpu_available)
 
 #------------------------------------------------------------------------------
@@ -754,6 +754,18 @@ def test_host_array(gpu_available):
 def test_device_array(gpu_available):
     types = float
     pyccel_test("scripts/kernel/device_array.py",
+                language="cuda", output_dtype=types, execute_code=gpu_available)
+
+#------------------------------------------------------------------------------
+def test_cuda_host_array_addition(gpu_available):
+    types = float
+    pyccel_test("scripts/kernel/cuda_host_array_addition.py",
+            language="cuda", output_dtype=types, execute_code=gpu_available)
+#------------------------------------------------------------------------------
+@pytest.mark.cuda
+def test_cuda_host_2d_array_addition(gpu_available):
+    types = float
+    pyccel_test("scripts/kernel/cuda_host_2d_array_addition.py",
             language="cuda", output_dtype=types, execute_code=gpu_available)
 
 #------------------------------------------------------------------------------
