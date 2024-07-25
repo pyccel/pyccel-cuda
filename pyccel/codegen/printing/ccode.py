@@ -45,6 +45,7 @@ from pyccel.ast.numpyext import NumpyReal, NumpyImag, NumpyFloat, NumpySize
 from pyccel.ast.numpytypes import NumpyInt8Type, NumpyInt16Type, NumpyInt32Type, NumpyInt64Type
 from pyccel.ast.numpytypes import NumpyFloat32Type, NumpyFloat64Type, NumpyComplex64Type, NumpyComplex128Type
 from pyccel.ast.numpytypes import NumpyNDArrayType, numpy_precision_map
+from pyccel.ast.cudatypes  import CudaArrayType
 
 from pyccel.ast.type_annotations import VariableTypeAnnotation
 
@@ -59,6 +60,8 @@ from pyccel.ast.variable import InhomogeneousTupleVariable
 from pyccel.ast.c_concepts import ObjectAddress, CMacro, CStringExpression, PointerCast, CNativeInt
 
 from pyccel.codegen.printing.codeprinter import CodePrinter
+
+
 
 from pyccel.errors.errors   import Errors
 from pyccel.errors.messages import (PYCCEL_RESTRICTION_TODO, INCOMPATIBLE_TYPEVAR_TO_FUNC,
@@ -240,6 +243,7 @@ c_imports = {n : Import(n, Module(n, (), ())) for n in
                  'stdbool',
                  'assert',
                  'numpy_c']}
+
 
 import_header_guard_prefix = {'Set_extensions' : '_TOOLS_SET'}
 
@@ -1316,6 +1320,7 @@ class CCodePrinter(CodePrinter):
         >>> self.get_declare_type(v)
         't_ndarray*'
         """
+        from pyccel.codegen.printing.cucode import cu_imports
         class_type = expr.class_type
         rank  = expr.rank
 
@@ -1327,6 +1332,10 @@ class CCodePrinter(CodePrinter):
                 if expr.rank > 15:
                     errors.report(UNSUPPORTED_ARRAY_RANK, symbol=expr, severity='fatal')
                 self.add_import(c_imports['ndarrays'])
+                dtype = 't_ndarray'
+            elif isinstance(expr.class_type, CudaArrayType):
+                self.add_import(c_imports['ndarrays'])
+                self.add_import(cu_imports['cuda_ndarrays'])
                 dtype = 't_ndarray'
             else:
                 errors.report(PYCCEL_RESTRICTION_TODO+' (rank>0)', symbol=expr, severity='fatal')
@@ -1453,6 +1462,7 @@ class CCodePrinter(CodePrinter):
         inds = list(expr.indices)
         base_shape = base.shape
         allow_negative_indexes = expr.allows_negative_indexes
+
         if isinstance(base.class_type, NumpyNDArrayType):
             #set dtype to the C struct types
             dtype = self.find_in_ndarray_type_registry(expr.dtype)

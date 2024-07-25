@@ -15,11 +15,16 @@ from pyccel.ast.core                import Import, Module
 from pyccel.ast.literals            import Nil
 
 from pyccel.errors.errors           import Errors
-
+from pyccel.ast.cudatypes           import CudaArrayType
+from pyccel.ast.cudaext             import CudaFull
 
 errors = Errors()
 
 __all__ = ["CudaCodePrinter"]
+
+cu_imports = {n : Import(n, Module(n, (), ())) for n in
+                ['cuda_ndarrays',]
+                }
 
 class CudaCodePrinter(CCodePrinter):
     """
@@ -131,4 +136,79 @@ class CudaCodePrinter(CCodePrinter):
                           global_variables,
                           function_declaration,
                           "#endif // {name.upper()}_H\n"))
+    def _print_Allocate(self, expr):
+        variable = expr.variable
+        if not isinstance(variable.class_type, CudaArrayType):
+            return super()._print_Allocate(expr)
+        shape = ", ".join(self._print(i) for i in expr.shape)
+        if isinstance(variable.class_type, CudaArrayType):
+            dtype = self.find_in_ndarray_type_registry(variable.dtype)
+        else:
+            raise NotImplementedError(f"Don't know how to index {variable.class_type} type")
+        shape_Assign = f"int64_t shape_Assign_{expr.variable.name} [] = {{{shape}}};\n"
+
+        is_view = 'false' if variable.on_heap else 'true'
+        memory_location = variable.class_type.memory_location
+        if memory_location in ('device', 'host'):
+            memory_location = str(memory_location).capitalize() + 'Memory'
+        else:
+            memory_location = 'managedMemory'
+        self.add_import(cu_imports['cuda_ndarrays'])
+        alloc_code = f"{self._print(expr.variable)} = cuda_array_create({variable.rank},  shape_Assign_{expr.variable.name}, {dtype}, {is_view},{memory_location});\n"
+        return f'{shape_Assign} {alloc_code}'
+
+    def _print_Deallocate(self, expr):
+        var_code = self._print(expr.variable)
+
+        if not isinstance(expr.variable.class_type, CudaArrayType):
+            return super()._print_Deallocate(expr)
+
+        if expr.variable.class_type.memory_location == 'host':
+            return f"cuda_free_host({var_code});\n"
+        else:
+            return f"cuda_free({var_code});\n"
+
+    def _print_Assign(self, expr):
+        rhs = expr.rhs
+        if isinstance(rhs.class_type, CudaArrayType):
+            if(isinstance(rhs, (CudaFull))):
+            # TODO add support for CudaFull
+                return " \n"
+
+        return super()._print_Assign(expr)
+
+    def _get_cuda_dim(self, dim, prefix):
+        """
+        Get the CUDA representation of the CUDA dimension call.
+
+        Get the CUDA representation of the CUDA dimension call.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension of the CUDA call (0, 1, or 2).
+
+        prefix : str
+            The prefix of the CUDA call (e.g., 'block', 'thread').
+
+        Returns
+        -------
+        str
+            The CUDA representation of the CUDA dimension call.
+        """
+        if dim == 0:
+            return f'{prefix}.x'
+        elif dim == 1:
+            return f'{prefix}.y'
+        else:
+            return f'{prefix}.z'
+
+    def _print_threadIdx(self, expr):
+        return self._get_cuda_dim(expr.dim, 'threadIdx')
+
+    def _print_blockIdx(self, expr):
+        return self._get_cuda_dim(expr.dim, 'blockIdx')
+
+    def _print_blockDim(self, expr):
+        return self._get_cuda_dim(expr.dim, 'blockDim')
 

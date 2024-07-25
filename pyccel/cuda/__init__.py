@@ -6,5 +6,7 @@
     This module is for exposing the CudaSubmodule functions.
 """
 from .cuda_sync_primitives    import synchronize
+from .cuda_arrays             import host_empty
+from .cuda_arrays             import device_empty
 
-__all__ = ['synchronize']
+__all__ = ['synchronize', 'host_empty', 'device_empty']

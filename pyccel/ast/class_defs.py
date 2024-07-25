@@ -21,9 +21,13 @@ from .numpyext   import (NumpyShape, NumpySum, NumpyAmin, NumpyAmax,
                          NumpyImag, NumpyReal, NumpyTranspose,
                          NumpyConjugate, NumpySize, NumpyResultType, NumpyArray)
 from .numpytypes import NumpyNumericType, NumpyNDArrayType
+from .cudatypes  import CudaArrayType
 
 __all__ = (
     'BooleanClass',
+    'CudaArrayClass',
+    'IntegerClass',
+    'FloatClass',
     'ComplexClass',
     'DictClass',
     'FloatClass',
@@ -36,6 +40,7 @@ __all__ = (
     'get_cls_base',
     'literal_classes',
 )
+#=======================================================================================
 
 #=======================================================================================
 
@@ -180,7 +185,9 @@ TupleClass = ClassDef('tuple',
             #index
             #count
             ])
-
+CudaArrayClass = ClassDef('cuda.array',
+        methods=[]
+        )
 #=======================================================================================
 
 NumpyArrayClass = ClassDef('numpy.ndarray',
@@ -255,8 +262,11 @@ def get_cls_base(class_type):
         return None
     elif class_type in literal_classes:
         return literal_classes[class_type]
+    elif isinstance(class_type, CudaArrayType):
+        return CudaArrayClass
     elif isinstance(class_type, (NumpyNumericType, NumpyNDArrayType)):
         return NumpyArrayClass
+    # elif isinstance(class_type, StackArrayType):
     elif isinstance(class_type, TupleType):
         return TupleClass
     elif isinstance(class_type, HomogeneousListType):
