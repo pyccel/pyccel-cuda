@@ -77,3 +77,4 @@ class CudaThreadIndexing:
             The size of the block in the specified dimension.
         """
         return 0
+
