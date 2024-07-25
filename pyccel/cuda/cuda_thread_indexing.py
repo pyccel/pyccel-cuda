@@ -3,13 +3,86 @@
 # go to https://github.com/pyccel/pyccel/blob/master/LICENSE for full license details.     #
 #------------------------------------------------------------------------------------------#
 """
-This submodule contains cuda_thread_indexing methods for Pyccel.
+This module contains all the CUDA thread indexing methods
 """
-def threadIdx(dim):
-    return 1
-def blockIdx(dim):
-    return 0
-def blockDim(dim):
-    return 0
+class CudaThreadIndexing:
+    """
+    Class representing the CUDA thread indexing.
 
+    Class representing the CUDA thread indexing.
+
+    Parameters
+    ----------
+    block_idx : int
+        The index of the block in the x-dimension.
+
+    thread_idx : int
+        The index of the thread in the x-dimension.
+    """
+    def __init__(self, block_idx, thread_idx):
+        self._block_idx = block_idx
+        self._thread_idx = thread_idx
+
+    def threadIdx(self, dim):
+        """
+        Get the thread index.
+
+        Get the thread index.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension of the indexing. It can be:
+            - 0 for the x-dimension
+            - 1 for the y-dimension
+            - 2 for the z-dimension
+
+        Returns
+        -------
+        int
+            The index of the thread in the specified dimension of its block.
+        """
+        return self._thread_idx
+
+    def blockIdx(self, dim):
+        """
+        Get the block index.
+
+        Get the block index.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension of the indexing. It can be:
+            - 0 for the x-dimension
+            - 1 for the y-dimension
+            - 2 for the z-dimension
+
+        Returns
+        -------
+        int
+            The index of the block in the specified dimension.
+        """
+        return self._block_idx
+
+    def blockDim(self, dim):
+        """
+        Get the block dimension.
+
+        Get the block dimension.
+
+        Parameters
+        ----------
+        dim : int
+            The dimension of the indexing. It can be:
+            - 0 for the x-dimension
+            - 1 for the y-dimension
+            - 2 for the z-dimension
+
+        Returns
+        -------
+        int
+            The size of the block in the specified dimension.
+        """
+        return 0
 
