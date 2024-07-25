@@ -22,7 +22,7 @@ class CudaThreadIndexing:
         Get the thread index.
 
         Parameters
-        -----------
+        ----------
         dim : int
             The dimension of the indexing. It can be:
             - 0 for the x-dimension
@@ -30,7 +30,7 @@ class CudaThreadIndexing:
             - 2 for the z-dimension
 
         Returns
-        -----------------
+        -------
         int
             The index of the thread in the specified dimension of its block.
         """
