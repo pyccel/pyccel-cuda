@@ -17,6 +17,12 @@ def host_empty(shape, dtype = 'float', order = 'C'):
     shape : tuple of int or int
         The shape of the array.
 
+    dtype : str, optional
+        The data type of the array. The default is 'float'.
+
+    order : str, optional
+        The order of the array. The default is 'C'.
+
     Returns
     -------
     array
