@@ -14,9 +14,9 @@ class CudaThreadIndexing:
     Parameters
     ----------
     block_idx : int
-        The index of the block in the x-dimension
+        The index of the block in the x-dimension.
     thread_idx : int
-        The index of the thread in the x-dimension
+        The index of the thread in the x-dimension.
     """
     def __init__(self, block_idx, thread_idx):
         self._block_idx = block_idx
