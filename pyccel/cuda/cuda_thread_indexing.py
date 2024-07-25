@@ -15,6 +15,7 @@ class CudaThreadIndexing:
     ----------
     block_idx : int
         The index of the block in the x-dimension.
+
     thread_idx : int
         The index of the thread in the x-dimension.
     """
