@@ -153,9 +153,10 @@ def kernel(f):
                         if 'cuda' in self._f.__globals__:
                             self._f.__globals__['cuda'].threadIdx = cu.threadIdx
                             self._f.__globals__['cuda'].blockIdx = cu.blockIdx
-                            self._f.__globals__['cuda'].blockDim = num_threads
+                            self._f.__globals__['cuda'].blockDim = cu.blockDim
                         else:
                             self._f.__globals__['cuda'] = cu
+                        self._f(*args, **kwargs)
             return internal_loop
 
     return KernelAccessor(f)
