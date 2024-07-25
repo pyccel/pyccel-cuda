@@ -51,7 +51,7 @@ class CudaThreadIndexing:
         Get the block index.
 
         Parameters
-        -----------
+        ----------
         dim : int
             The dimension of the indexing. It can be:
             - 0 for the x-dimension
@@ -59,7 +59,7 @@ class CudaThreadIndexing:
             - 2 for the z-dimension
 
         Returns
-        -----------------
+        -------
         int
             The index of the block in the specified dimension.
         """
@@ -72,7 +72,7 @@ class CudaThreadIndexing:
         Get the block dimension.
 
         Parameters
-        -----------
+        ----------
         dim : int
             The dimension of the indexing. It can be:
             - 0 for the x-dimension
@@ -80,7 +80,7 @@ class CudaThreadIndexing:
             - 2 for the z-dimension
 
         Returns
-        -----------------
+        -------
         int
             The size of the block in the specified dimension.
         """
