@@ -11,7 +11,6 @@ All notable changes to this project will be documented in this file.
 -   #42 : Add support for custom kernel in`cuda`.
 -   #42 : Add Cuda module to Pyccel. Add support for `cuda.synchronize` function.
 -   #41 : Add support for custom device in`cuda`.
--   #69 : Improve kernel decorator.
 
 ## \[UNRELEASED\]
 
