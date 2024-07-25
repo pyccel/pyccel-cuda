@@ -12,7 +12,6 @@ def kernel_call():
 
 def f():
     kernel_call[1,1]()
-    from pyccel import cuda
     cuda.synchronize()
 
 if __name__ == '__main__':
