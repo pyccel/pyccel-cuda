@@ -37,6 +37,9 @@ All notable changes to this project will be documented in this file.
 -   #1895 : Add Python support for dict initialisation with `{}`.
 -   #1895 : Add Python support for dict initialisation with `dict()`.
 -   #1886 : Add Python support for dict method `pop()`.
+-   #1944 : Add the appropriate C language equivalent for declaring a Python `dict` container using the STC library.
+-   #1936 : Add missing C output for inline decorator example in documentation
+-   #1937 : Optimise `pyccel.ast.basic.PyccelAstNode.substitute` method.
 -   \[INTERNALS\] Added `container_rank` property to `ast.datatypes.PyccelType` objects.
 -   \[DEVELOPER\] Added an improved traceback to the developer-mode errors for errors in function calls.
 
@@ -59,6 +62,7 @@ All notable changes to this project will be documented in this file.
 -   #1927 : Improve error Message for missing target language compiler in Pyccel
 -   #1933 : Improve code printing speed.
 -   #1930 : Preserve ordering of import targets.
+-   #1951 : Fix return type for class whose argument cannot be wrapped.
 
 ### Changed
 
@@ -101,7 +105,7 @@ All notable changes to this project will be documented in this file.
 -   \[INTERNALS\] Remove unused/unnecessary functions in `pyccel.parser.utilities` : `read_file`, `header_statement`, `accelerator_statement`, `get_module_name`, `view_tree`.
 -   \[INTERNALS\] Remove unused functions `Errors.unset_target`, and `Errors.reset_target`.
 
-## \[1.12.0\] - 2024-05-08
+## \[1.12.0\] - 2024-05-13
 
 ### Added
 
