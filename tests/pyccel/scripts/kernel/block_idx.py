@@ -1,3 +1,4 @@
+# pylint: disable=missing-function-docstring, missing-module-docstring
 from pyccel.decorators import kernel
 from pyccel            import cuda
 
@@ -11,3 +12,4 @@ def f():
 
 if __name__ == '__main__':
     f()
+
