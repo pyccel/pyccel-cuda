@@ -1,6 +1,6 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
 from pyccel.decorators import kernel
-from pyccel import cuda
+from pyccel            import cuda
 
 @kernel
 def say_hello(its_morning : bool):

@@ -1,18 +1,15 @@
 # pylint: disable=missing-function-docstring, missing-module-docstring
-from pyccel.decorators import device, kernel
+from pyccel.decorators import kernel
 from pyccel            import cuda
 
-@device
-def device_call():
-    print("Hello from device")
-
 @kernel
-def kernel_call():
-    device_call()
+def print_block():
+    print(cuda.threadIdx(0)) # pylint: disable=no-member
 
 def f():
-    kernel_call[1,1]()
+    print_block[5,5]()
     cuda.synchronize()
 
 if __name__ == '__main__':
     f()
+

@@ -43,4 +43,22 @@ def my_kernel():
 my_kernel[1, 1]()
 
 ```
+## Cuda Device Methods
+The following methods are available for CUDA devices in Pyccel and can be called from either kernels or device functions. Currently, the only import syntax supported is:
+```python
+from pyccel import cuda
+```
+Using an alias for the import is not supported, so this is not allowed:
+
+```python
+from pyccel import cuda as py_cu
+```
+
+| Method | Description |
+|--------|-------------|
+
+
+
+
+
 
