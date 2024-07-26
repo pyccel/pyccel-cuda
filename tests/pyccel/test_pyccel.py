@@ -730,6 +730,8 @@ def test_elemental(language):
     pyccel_test("scripts/decorators_elemental.py", language = language)
 
 #------------------------------------------------------------------------------
+
+
 @pytest.mark.cuda
 def test_hello_kernel(gpu_available):
     types = str
@@ -743,7 +745,29 @@ def test_kernel_collision(gpu_available):
             language="cuda", execute_code=gpu_available)
 
 #------------------------------------------------------------------------------
+def test_block_idx():
+    test_file = get_abs_path("scripts/kernel/block_idx.py")
+    cwd = get_abs_path(os.path.dirname(test_file))
 
+    pyth_out = get_python_output(test_file, cwd)
+
+    python_block_idx = list(map(int, pyth_out.split()))
+
+    for i in range(5):
+        assert python_block_idx.count(i) == 5
+#------------------------------------------------------------------------------
+def test_thread_idx():
+    test_file = get_abs_path("scripts/kernel/thread_idx.py")
+    cwd = get_abs_path(os.path.dirname(test_file))
+
+    pyth_out = get_python_output(test_file, cwd)
+
+    python_idx = list(map(int, pyth_out.split()))
+
+    for i in range(5):
+        assert python_idx.count(i) == 5
+
+#------------------------------------------------------------------------------
 @pytest.mark.cuda
 def test_device_call(gpu_available):
     types = str
