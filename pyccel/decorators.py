@@ -6,6 +6,7 @@
 """
 This module contains all the provided decorator methods.
 """
+from pyccel.cuda.cuda_thread_indexing import CudaThreadIndexing
 import warnings
 
 __all__ = (
@@ -139,7 +140,24 @@ def kernel(f):
         def __init__(self, f):
             self._f = f
         def __getitem__(self, args):
-            return self._f
+            num_blocks, num_threads = args
+            def internal_loop(*args, **kwargs):
+                """
+                The internal loop for kernel execution.
+
+                The internal loop for kernel execution.
+                """
+                for b in range(num_blocks):
+                    for t in range(num_threads):
+                        cu = CudaThreadIndexing(b, t)
+                        if 'cuda' in self._f.__globals__:
+                            self._f.__globals__['cuda'].threadIdx = cu.threadIdx
+                            self._f.__globals__['cuda'].blockIdx = cu.blockIdx
+                            self._f.__globals__['cuda'].blockDim = cu.blockDim
+                        else:
+                            self._f.__globals__['cuda'] = cu
+                        self._f(*args, **kwargs)
+            return internal_loop
 
     return KernelAccessor(f)
 
