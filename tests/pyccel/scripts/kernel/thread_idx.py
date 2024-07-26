@@ -4,7 +4,7 @@ from pyccel            import cuda
 
 @kernel
 def print_block():
-    print(cuda.threadIdx(0))
+    print(cuda.threadIdx(0)) # pylint: disable=no-member
 
 def f():
     print_block[5,5]()
