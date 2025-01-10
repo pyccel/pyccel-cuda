@@ -24,5 +24,4 @@ runs:
         python3 -m venv .venv
         source .venv/bin/activate
         echo "$(pwd)/.venv/bin" >> $GITHUB_PATH
-        echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH >> $GITHUB_ENV
       shell: bash
