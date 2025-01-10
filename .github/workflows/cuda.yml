@@ -37,6 +37,7 @@ jobs:
         run: |
           echo $LD_LIBRARY_PATH
           which mpicc
+          ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/comm_libs/mpi/
           apt-get update && apt-get install -y sudo
           TZ=Europe/France
           ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
