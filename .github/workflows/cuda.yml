@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Prepare docker
         run: |
+          echo "OMPI_ALLOW_RUN_AS_ROOT=1" >> $GITHUB_ENV
+          echo "OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1" >> $GITHUB_ENV
           echo $LD_LIBRARY_PATH
           which mpicc
           mpicc -show
