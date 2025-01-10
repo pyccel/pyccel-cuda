@@ -62,10 +62,8 @@ jobs:
         uses: ./.github/actions/linux_install
       - name: Install Pyccel with tests
         run: |
-            PATH=${PATH}:$HOME/.local/bin
-            echo "PATH=${PATH}" >> $GITHUB_ENV
             python -m pip install --upgrade pip
-            python -m pip install --user .[test]
+            python -m pip install .[test]
         shell: bash
       - name: Coverage install
         uses: ./.github/actions/coverage_install
