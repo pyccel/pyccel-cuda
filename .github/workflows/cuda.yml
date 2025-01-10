@@ -39,11 +39,11 @@ jobs:
           ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/lib
           ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/
           ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/share
-          apt update && apt install -y sudo
+          apt-get update && apt-get install -y sudo
           TZ=Europe/France
           ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
-          sudo apt install -y git
+          sudo apt-get install -y git
           sudo chown -R $(whoami) /github/home
         shell: bash
       - uses: actions/checkout@v4
