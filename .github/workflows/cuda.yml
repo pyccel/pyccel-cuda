@@ -36,7 +36,7 @@ jobs:
       - name: Prepare docker
         run: |
           echo $LD_LIBRARY_PATH
-          ls /proj/nv/libraries/Linux_x86_64/24.9/hpcx-12/261727-rel-1/comm_libs/12.6/hpcx/hpcx-2.20/ompi/share/openmpi/
+          ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/lib
           apt update && apt install -y sudo
           TZ=Europe/France
           ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
