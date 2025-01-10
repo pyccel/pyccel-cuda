@@ -28,10 +28,10 @@ env:
 jobs:
   Cuda:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: Unit tests
 
-    container: nvidia/cuda:11.7.1-devel-ubuntu20.04
+    container: kitware/nvidia-nvhpc:24.9-devel-cuda_multi-ubuntu24.04
     steps:
       - name: Prepare docker
         run: |
