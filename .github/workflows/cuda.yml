@@ -40,6 +40,7 @@ jobs:
           ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
           DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends tzdata
           sudo apt install -y git
+          sudo chown -R $(whoami) /github/home
         shell: bash
       - uses: actions/checkout@v4
         with:
