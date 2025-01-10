@@ -37,6 +37,8 @@ jobs:
         run: |
           echo $LD_LIBRARY_PATH
           ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/lib
+          ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/
+          ls /opt/nvidia/hpc_sdk/Linux_x86_64/24.9/compilers/share
           apt update && apt install -y sudo
           TZ=Europe/France
           ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
